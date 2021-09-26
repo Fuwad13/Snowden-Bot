@@ -36,7 +36,7 @@ def get_prefix(bot, message):
 
 
 bot = commands.AutoShardedBot(
-    command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True)
+    command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True, slash_commands = True)
 
 # extensions
 INITIAL_EXTENSIONS = ['jishaku']
