@@ -1,7 +1,9 @@
-git+https://github.com/Rapptz/discord.py
+git+https://github.com/iDevision/enhanced-discord.py
+
 aiohttp
 asyncio
 jishaku
 python-dotenv
 bs4
 git+https://github.com/Rapptz/discord-ext-menus
+humanize
