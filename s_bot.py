@@ -70,7 +70,7 @@ async def activity_change_():
 # dev essential commands
 
 
-@bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=True, brief="Loads a cog")
+@bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=False, brief="Loads a cog")
 @commands.is_owner()
 async def _loadcog(ctx, cogname: str):
     try:
