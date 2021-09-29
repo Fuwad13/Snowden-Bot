@@ -69,6 +69,9 @@ async def on_ready():
     print(f'logged in as {bot.user}')
     bot.get_command("jishaku").hidden = True
 
+@bot.event
+async def on_command(ctx):
+    logger.warning(f"command invoked : {ctx.command} in {ctx.channel.id} by {ctx.author}")
 
 #tasks
 
