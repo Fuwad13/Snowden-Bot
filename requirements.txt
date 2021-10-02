@@ -7,3 +7,4 @@ python-dotenv
 bs4
 git+https://github.com/Rapptz/discord-ext-menus
 humanize
+psycopg2-binary
