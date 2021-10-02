@@ -10,6 +10,8 @@ from itertools import cycle
 from discord.ext.commands import BucketType
 from dotenv import load_dotenv
 
+
+
 import logging
 
 logger = logging.getLogger('discord')
@@ -22,7 +24,7 @@ logger.addHandler(handler)
 
 
 load_dotenv()  # take environment variables from .env.
-
+os.environ["JISHAKU_HIDE"] = "True"
 # --------tokens and keys-----------------
 
 TOKEN = os.getenv("TOKEN")
@@ -37,7 +39,7 @@ intents = discord.Intents(messages=True, guilds=True,
 
 def get_prefix(bot, message):
 
-    prefixes = ['sd', 'snow']
+    prefixes = ['sd', 'Sd', 'snow']
 
     if not message.guild:
 
@@ -79,7 +81,7 @@ async def on_command(ctx):
 @tasks.loop(seconds=60, count=2)
 async def activity_change_():
     print("1")
-    await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=f"your mom"))
+    await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=f"@Snowden"))
 
 # dev essential commands
 
@@ -173,3 +175,4 @@ async def reloaderror(ctx, error):
 
 
 bot.run(TOKEN)
+
