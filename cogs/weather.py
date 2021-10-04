@@ -2,7 +2,7 @@ import aiohttp
 import discord
 import aiohttp
 from discord.ext import commands
-import json
+
 
 api_key = "ea5785a913a3474bc8ed46f7d862327f"
 base_url = "http://api.openweathermap.org/data/2.5/weather?"
@@ -21,9 +21,9 @@ class Weather(commands.Cog):
         complete_url = base_url + "appid=" + api_key + "&q=" + city_name+"&units=metric"
         async with aiohttp.ClientSession() as session:
             async with session.get(complete_url) as res:
-                response = res
+                x = await res.json()
         #response = requests.get(complete_url)
-        x =await  response.json()
+        
         thermo = u"\U0001f321"
         hum = u"\U0001f4a6"
         des = u"\U0001f505"
