@@ -71,15 +71,15 @@ class Weather(commands.Cog):
         else:
             await channel.send("City not found.")
 
-    # @weather.error
-    # async def weather_error(self, ctx, error):
-    #     if isinstance(error, commands.CommandOnCooldown):
-    #         text = f"{ctx.author.mention} You're on cooldown!!\n"
-    #         r = "Please retry this command after `{:.2f} seconds`!".format(
-    #         	error.retry_after)
-    #         await ctx.channel.send(text+r)
-    #     else:
-    #       await ctx.send(error)
+    @weather.error
+    async def weather_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            text = f"{ctx.author.mention} You're on cooldown!!\n"
+            r = "Please retry this command after `{:.2f} seconds`!".format(
+            	error.retry_after)
+            await ctx.channel.send(text+r)
+        else:
+          await ctx.send(error)
 
     @commands.command(aliases=["locateweather", "locatew", "lw"])
     @commands.cooldown(1, 10, type=commands.BucketType.user)
