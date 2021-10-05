@@ -14,7 +14,7 @@ class Weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["w"], name = 'weather', brief = 'Get current weather information for a city or location')
+    @commands.command(aliases=["w"], name = 'weather', brief = 'Get current weather information for a city or location', help  = "Get current weather status of a city or location!")
     @commands.cooldown(1, 10, type=commands.BucketType.user)
     async def weather(self, ctx, *, city: str):
         city_name = city
