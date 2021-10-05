@@ -58,7 +58,8 @@ bot = commands.AutoShardedBot(
 
 
 # extensions
-INITIAL_EXTENSIONS = ['jishaku']
+INITIAL_EXTENSIONS = ['cogs.scores', 'cogs.games', 'cogs.weather',
+                      'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku']
 
 ALL_EXTENSIONS = ['cogs.scores', 'cogs.games', 'cogs.weather',
                   'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku']
