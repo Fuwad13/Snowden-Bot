@@ -33,7 +33,7 @@ class Weather(commands.Cog):
         sp = u"\U0001f300"
         
         if x["cod"] != "404":
-            async with channel.typing():
+            async with ctx.typing():
                 y = x["main"]
                 current_temperature_celcius = y["temp"]
 
