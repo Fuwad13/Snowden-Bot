@@ -9,11 +9,9 @@ from discord.ext import commands, tasks
 from itertools import cycle
 from discord.ext.commands import BucketType
 from dotenv import load_dotenv
-import psycopg2
+from utility import help_cmd 
 
-DATABASE_URL = os.environ['DATABASE_URL']
 
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 
 import logging
@@ -55,7 +53,7 @@ def get_prefix(bot, message):
 bot = commands.AutoShardedBot(
     command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True, slash_commands = True)
 
-bot.conn= conn
+
 
 
 
@@ -63,12 +61,14 @@ bot.conn= conn
 INITIAL_EXTENSIONS = ['jishaku']
 
 ALL_EXTENSIONS = ['cogs.scores', 'cogs.games', 'cogs.weather',
-                  'cogs.image','cogs.music' ,'cogs.web_search', 'cogs.info', "cogs.misc", 'jishaku']
+                  'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku']
 
 
 if __name__ == "__main__":
     for e in INITIAL_EXTENSIONS:
         bot.load_extension(e)
+
+bot.help_command = help_cmd.SnowdenHelp()
 
 #events =========
 @bot.event

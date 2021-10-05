@@ -1,3 +1,2 @@
-worker: python s_bot.py
+worker: python main.py
 
-web: bundle exec rails server -p https://snowden-bot.herokuapp.com/
