@@ -31,7 +31,7 @@ class Weather(commands.Cog):
         wea = u"\U0001f326"
         feel = u"\U0001f912"
         sp = u"\U0001f300"
-        channel = ctx.message.channel
+        
         if x["cod"] != "404":
             async with channel.typing():
                 y = x["main"]
@@ -67,9 +67,9 @@ class Weather(commands.Cog):
                                 value=f"**{current_pressure}hPa**", inline=True)
                 embed.set_thumbnail(url="https://i.ibb.co/CMrsxdX/weather.png")
                 embed.set_footer(text=f"Requested by {ctx.author.name}")
-                await ctx.message.reply(embed=embed, mention_author=False)
+                await ctx.send(embed=embed,ephemeral = True)
         else:
-            await channel.send("City not found.")
+            await ctx.send("City not found.", ephemeral = True)
 
     @weather.error
     async def weather_error(self, ctx, error):
