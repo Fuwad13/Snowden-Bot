@@ -51,7 +51,7 @@ def get_prefix(bot, message):
 
 
 bot = commands.AutoShardedBot(
-    command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True, slash_commands = True)
+    command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True, slash_commands=True, slash_command_guilds=[874735250842984458])
 
 
 
