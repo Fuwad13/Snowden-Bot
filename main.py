@@ -9,7 +9,8 @@ from discord.ext import commands, tasks
 from itertools import cycle
 from discord.ext.commands import BucketType
 from dotenv import load_dotenv
-from utility import help_cmd 
+from utils import help_cmd , buttons_and_selects
+
 
 
 
@@ -41,7 +42,7 @@ intents = discord.Intents(messages=True, guilds=True,
 
 def get_prefix(bot, message):
 
-    prefixes = ['sd', 'Sd', 'snow']
+    prefixes = ['sd', 'Sd', 'snow', 'SD', 'Snow']
 
     if not message.guild:
 
@@ -58,10 +59,10 @@ bot = commands.AutoShardedBot(
 
 
 # extensions
-INITIAL_EXTENSIONS = ['cogs.scores', 'cogs.games', 'cogs.weather',
+INITIAL_EXTENSIONS = ['cogs.games', 'cogs.weather',
                       'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku']
 
-ALL_EXTENSIONS = ['cogs.scores', 'cogs.games', 'cogs.weather',
+ALL_EXTENSIONS = ['cogs.games', 'cogs.weather',
                   'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku']
 
 
