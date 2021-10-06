@@ -4,10 +4,11 @@ from discord import ui
 class ConfirmOrCancel(ui.View):
 
 
-	def __init__(self,*,timeout = 60):
+	def __init__(self,ctx, *,timeout = 60):
 		super().__init__(timeout=timeout)
 		
 		self.value = None
+		self.ctx = ctx
 		
 
 	async def interaction_check(self, intr):
