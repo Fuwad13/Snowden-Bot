@@ -28,12 +28,14 @@ class Information(commands.Cog):
 		view = bs.ConfirmOrCancel(ctx,timeout=30)
 		await ctx.send(embed = em , view = view)
 		await view.wait()
-		if view.value:
+		if view.value == True:
 			await ctx.send("confirmed")
 
-		elif not view.value:
+		elif view.value == False:
 			await ctx.send('cancelled')
 
+		elif view.value == None:
+			await ctx.send('Timed out')
 		
 
 	

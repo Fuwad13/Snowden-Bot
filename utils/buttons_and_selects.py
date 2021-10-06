@@ -20,6 +20,7 @@ class ConfirmOrCancel(ui.View):
 		
 		await interaction.response.send_message("Confirming....", ephemeral = True)
 		self.value = True
+		self.clear_items()
 		self.stop()
 
 	@ui.button(label = 'Cancel', style = discord.ButtonStyle.red)
@@ -27,6 +28,7 @@ class ConfirmOrCancel(ui.View):
 		
 		await interaction.response.send_message("Cancelling....", ephemeral = True)
 		self.value = False
+		self.clear_items()
 		self.stop()
 
 
