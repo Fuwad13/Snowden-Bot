@@ -14,6 +14,9 @@ class ConfirmOrCancel(ui.View):
 		
 		self.value = None
 		self.ctx = ctx
+
+	async def on_timeout(self):
+
 		
 
 	async def interaction_check(self, intr):
@@ -104,23 +107,24 @@ class MyMenuPages(ui.View, menus.MenuPages):
 		if not intr.user.guild_permissions.manage_emojis:
 				await intr.response.send_message("Sorry, you don't have enough permissions to add emojis in this server.", ephemeral = True)
 		elif intr.user.guild_permissions.manage_emojis:
-				confirm_message = await intr.response.send_message("**The selected emoji will be added to your server! Are you sure to add this emoji?**`(you have 15 seconds to choose)`", view = confirm_view)
+				await intr.response.send_message("**The selected emoji will be added to your server! Are you sure to add this emoji?**`(you have 15 seconds to choose)`", view = confirm_view)
 				await confirm_view.wait()
 				if confirm_view.value == True:
 
 						await self.ctx.send("Adding the selected emoji!!")
 						confirm_view.clear_items()
-						await confirm_message.edit(view = confirm_view)
+						await intr.original_message.edit(view = confirm_view)
+						
+						
 
 				elif confirm_view.value == False:
 						await self.ctx.send("Cancelling.....", delete_after = 5)
-						confirm_view.clear_items()
-						await confirm_message.edit(view = confirm_view)
+						
+						
 
 				elif confirm_view.value == None:
 						await self.ctx.send("You took too long to response!! Cancelling...", delete_after = 5)
-						confirm_view.clear_items()
-						await confirm_message.edit(view = confirm_view)
+						
 
 
 			
