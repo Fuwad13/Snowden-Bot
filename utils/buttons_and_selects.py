@@ -23,7 +23,7 @@ class ConfirmOrCancel(ui.View):
 	@ui.button(label = 'Confirm', style = discord.ButtonStyle.green)
 	async def confirm_button(self, button, interaction):
 		
-		await interaction.response.send_message("Confirming....", ephemeral = True)
+		
 		self.value = True
 		
 		self.stop()
@@ -31,7 +31,7 @@ class ConfirmOrCancel(ui.View):
 	@ui.button(label = 'Cancel', style = discord.ButtonStyle.red)
 	async def cancel_button(self, button, interaction):
 		
-		await interaction.response.send_message("Cancelling....", ephemeral = True)
+		
 		self.value = False
 		
 		self.stop()
@@ -108,17 +108,17 @@ class MyMenuPages(ui.View, menus.MenuPages):
 
 						await intr.response.send_message("Adding the selected emoji!!")
 						confirm_view.clear_items()
-						await confirm_message.edit(view = confirm_view, delete_after = 5)
+						await confirm_message.edit(view = confirm_view)
 
 				elif confirm_view.value == False:
 						await intr.response.send_message("Cancelling.....", ephemeral = True)
 						confirm_view.clear_items()
-						await confirm_message.edit(view = confirm_view, delete_after = 5)
+						await confirm_message.edit(view = confirm_view)
 
 				elif confirm_view.value == None:
 						await intr.response.send_message("You took too long to response!! Cancelling...", ephemeral = True)
 						confirm_view.clear_items()
-						await confirm_message.edit(view = confirm_view, delete_after = 5)
+						await confirm_message.edit(view = confirm_view)
 
 
 			
