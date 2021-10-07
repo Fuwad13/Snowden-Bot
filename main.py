@@ -10,11 +10,7 @@ from itertools import cycle
 from discord.ext.commands import BucketType
 from dotenv import load_dotenv
 from utils import help_cmd , buttons_and_selects
-
-
-
-
-
+import asyncpg
 import logging
 
 logger = logging.getLogger('discord')
@@ -71,6 +67,13 @@ if __name__ == "__main__":
         bot.load_extension(e)
 
 bot.help_command = help_cmd.SnowdenHelp()
+
+
+# database
+
+async def create_db_pool():
+    credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
+    bot.db = await asyncpg.create_pool(dsn = f'{credential}')
 
 #events =========
 @bot.event
@@ -183,6 +186,6 @@ async def reloaderror(ctx, error):
 
 
 
-
+bot.loop.run_until_complete(create_db_pool())
 bot.run(TOKEN)
 
