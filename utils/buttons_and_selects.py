@@ -14,7 +14,7 @@ class ConfirmOrCancel(ui.View):
 		
 		self.value = None
 		self.ctx = ctx
-		self.interact = None
+		
 
 	async def interaction_check(self, intr):
 		if not self.ctx.author == intr.user:
@@ -26,7 +26,7 @@ class ConfirmOrCancel(ui.View):
 		
 		
 		self.value = True
-		self.interact = interaction
+		
 		
 		self.stop()
 
@@ -35,7 +35,7 @@ class ConfirmOrCancel(ui.View):
 		
 		
 		self.value = False
-		self.interact = interaction
+		
 		self.stop()
 
 
@@ -108,17 +108,17 @@ class MyMenuPages(ui.View, menus.MenuPages):
 				await confirm_view.wait()
 				if confirm_view.value == True:
 
-						await confirm_view.interact.response.send_message("Adding the selected emoji!!")
+						await self.ctx.send("Adding the selected emoji!!")
 						confirm_view.clear_items()
 						await confirm_message.edit(view = confirm_view)
 
 				elif confirm_view.value == False:
-						await confirm_view.interact.response.send_message("Cancelling.....", ephemeral = True)
+						await self.ctx.send("Cancelling.....", delete_after = 5)
 						confirm_view.clear_items()
 						await confirm_message.edit(view = confirm_view)
 
 				elif confirm_view.value == None:
-						await confirm_view.interact.response.send_message("You took too long to response!! Cancelling...", ephemeral = True)
+						await self.ctx.send("You took too long to response!! Cancelling...", delete_after = 5)
 						confirm_view.clear_items()
 						await confirm_message.edit(view = confirm_view)
 
