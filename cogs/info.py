@@ -26,9 +26,10 @@ class Information(commands.Cog):
 	async def test(self, ctx):
 		em = discord.Embed(title = 'Test')
 		view = bs.ConfirmOrCancel(ctx,timeout=30)
-		await ctx.send(embed = em , view = view)
+		view.msg = await ctx.send(embed = em , view = view)
 		await view.wait()
 		view.clear_items()
+		await view.msg.edit(view = view)
 		if view.value == True:
 			await ctx.send("confirmed")
 
