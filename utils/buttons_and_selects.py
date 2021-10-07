@@ -114,17 +114,21 @@ class MyMenuPages(ui.View, menus.MenuPages):
 
 						await self.ctx.send("Adding the selected emoji!!")
 						confirm_view.clear_items()
-						await intr.original_message.edit(view = confirm_view)
+						await intr.edit_original_message(view = confirm_view)
 						
 						
 
 				elif confirm_view.value == False:
 						await self.ctx.send("Cancelling.....", delete_after = 5)
+						confirm_view.clear_items()
+						await intr.edit_original_message(view = confirm_view)
 						
 						
 
 				elif confirm_view.value == None:
 						await self.ctx.send("You took too long to response!! Cancelling...", delete_after = 5)
+						confirm_view.clear_items()
+						await intr.edit_original_message(view = confirm_view)
 						
 
 
