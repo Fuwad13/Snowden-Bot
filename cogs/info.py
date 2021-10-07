@@ -28,6 +28,7 @@ class Information(commands.Cog):
 		view = bs.ConfirmOrCancel(ctx,timeout=30)
 		await ctx.send(embed = em , view = view)
 		await view.wait()
+		view.clear_items()
 		if view.value == True:
 			await ctx.send("confirmed")
 
