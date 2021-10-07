@@ -4,6 +4,7 @@ import discord.ui
 from discord import ui
 from discord.ext import menus
 from itertools import starmap, chain
+import aiohttp
 
 class ConfirmOrCancel(ui.View):
 
