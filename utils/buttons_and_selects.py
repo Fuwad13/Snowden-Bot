@@ -16,6 +16,7 @@ class ConfirmOrCancel(ui.View):
 		self.ctx = ctx
 
 	async def on_timeout(self):
+		pass
 
 		
 
