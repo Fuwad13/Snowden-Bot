@@ -96,7 +96,7 @@ class Games(commands.Cog):
 				await msg.edit(embed = embed , view = view)
 
 			elif won_or_lost == 0:
-				await self.update_balance(player_id = ctx.author.id, amount = amount,add = False)
+				bal = await self.update_balance(player_id = ctx.author.id, amount = amount,add = False)
 				
 				text = f"\U0001f626 **\U0001f626 Aw snap,** {ctx.author.name},\nThe coin landed on **Tails** You chose **Heads**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}** "
 				embed.description = text
