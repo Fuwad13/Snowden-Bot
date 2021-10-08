@@ -15,7 +15,7 @@ class Games(commands.Cog):
 			return await ctx.send("You already have an account! You can continue playing")
 		else:
 
-			await self.bot.db.execute(""" INSERT INTO user_accounts VALUES ($1, $2,$3, $4)  ;""", ctx.author.id, int(ctx.message.created_at.timestamp()), 0, "test_idklol")
+			await self.bot.db.execute(""" INSERT INTO user_accounts VALUES ($1, $2,$3, $4)  ;""", ctx.author.id, int(ctx.message.created_at.timestamp()), int(1000), "test_idklol")
 			await ctx.send("Created your account, you can play now")
 
 	@commands.command(name = 'inventory', aliases = ['inv'])
@@ -23,7 +23,7 @@ class Games(commands.Cog):
 		if not user:
 			user = ctx.author
 
-		data = await self.bot.db.fetchval(""" SELECT (id, created_at) FROM  user_accounts WHERE id = $1  ;""", ctx.author.id)
+		data = await self.bot.db.fetchval(""" SELECT * FROM  user_accounts WHERE id = $1  ;""", ctx.author.id)
 		await ctx.send(f"{data}")
 
 
