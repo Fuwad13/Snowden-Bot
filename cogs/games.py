@@ -69,14 +69,14 @@ class Games(commands.Cog):
 		if view.value == True:
 			won_or_lost = random.randint(0,1)
 			if won_or_lost == 1:
-				await self.update_balance(ctx.author.id, reward, True)
+				await self.update_balance(player_id = ctx.author.id,amount =  reward, add = True)
 				
 				text = f"**Congrats** {ctx.author.name},\nYou just won ${reward} doing coinflip gambling! "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 
 			elif won_or_lost == 0:
-				await self.update_balance(ctx.author.id, reward, False)
+				await self.update_balance(player_id = ctx.author.id, amount = reward,add = False)
 				
 				text = f"**Aw snap,** {ctx.author.name},\nYou just lost ${reward} doing coinflip gambling! "
 				embed.description = text
