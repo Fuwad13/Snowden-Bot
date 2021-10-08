@@ -62,6 +62,10 @@ class HeadsOrTails(ui.View):
 		self.value = False
 		self.stop()
 
+	async def on_timeout(self):
+		self.clear_items()
+		
+
 
 
 
