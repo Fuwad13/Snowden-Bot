@@ -38,5 +38,30 @@ class ConfirmOrCancel(ui.View):
 		self.stop()
 
 
+class HeadOrTail(ui.View):
+	def __init__(self, ctx):
+		self.ctx = ctx
+		self.value = None
+		super().__init__(timeout = 15)
+
+	async def interaction_check(self, intr):
+		if not intr.user == self.ctx.author:
+			await intr.response.send_message(f"Sorry, only **{self.ctx.author.name}** can choose from these buttons!", ephemeral = True)
+
+		return intr.user == self.ctx.author
+
+	@ui.button(label = 'Head', style = discord.ButtonStyle.gray)
+	async def head_button(self, button, intr):
+		self.clear_items()
+		self.value = True
+		self.stop()
+
+	@ui.button(label = 'Tail', style = discord.ButtonStyle.gray)
+	async def tail_buttton(self, button, intr):
+		self.clear_items()
+		self.value = False
+		self.stop()
+
+
 
 
