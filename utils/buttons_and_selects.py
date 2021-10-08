@@ -38,7 +38,7 @@ class ConfirmOrCancel(ui.View):
 		self.stop()
 
 
-class HeadOrTail(ui.View):
+class HeadsOrTails(ui.View):
 	def __init__(self, ctx):
 		self.ctx = ctx
 		self.value = None
@@ -50,14 +50,14 @@ class HeadOrTail(ui.View):
 
 		return intr.user == self.ctx.author
 
-	@ui.button(label = 'Head', style = discord.ButtonStyle.gray)
-	async def head_button(self, button, intr):
+	@ui.button(label = 'Heads', style = discord.ButtonStyle.gray)
+	async def heads_button(self, button, intr):
 		self.clear_items()
 		self.value = True
 		self.stop()
 
-	@ui.button(label = 'Tail', style = discord.ButtonStyle.gray)
-	async def tail_buttton(self, button, intr):
+	@ui.button(label = 'Tails', style = discord.ButtonStyle.gray)
+	async def tails_buttton(self, button, intr):
 		self.clear_items()
 		self.value = False
 		self.stop()

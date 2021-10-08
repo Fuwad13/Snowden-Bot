@@ -88,6 +88,8 @@ async def on_ready():
 async def on_command(ctx):
     logger.warning(f"command invoked : {ctx.command} in {ctx.channel.id} by {ctx.author}")
 
+    
+
 #tasks
 
 
