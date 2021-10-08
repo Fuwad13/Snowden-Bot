@@ -52,52 +52,52 @@ class Games(commands.Cog):
 		await ctx.send(embed = embed)
 
 	@commands.command(name = 'coinflip', aliases =[ 'cf', 'coinf'])
-	@commands.cooldown(1,15, commands.BucketType.user)
+	@commands.cooldown(2,10, commands.BucketType.user)
 	async def _cf(self, ctx, amount : int = 500):
 		flag = await self.check_if_exists(ctx.author.id)
 		if not flag:
 			return await ctx.send("You don't have any account yet, to create one , run the `start` command first!")
 		balance = await self.bot.db.fetchval(""" SELECT balance FROM snowden_bg where id = $1; """, ctx.author.id)
 		if balance < amount:
-			return await ctx.send("Looks like you don't have enough cash to gamble in coinflip!")
+			return await ctx.send("Looks like you don't have enough money to gamble in coinflip!")
 
 		view = bs.HeadOrTail(ctx)
 
 		embed = discord.Embed(title ='Coinflip', description = f"{ctx.author.name}, choose an option in next 15 seconds!", color = 0x2F3136)
 
 		msg = await ctx.send(embed = embed , view = view)
-		reward = random.randint(0,amount)
+		
 
 		await view.wait()
 		if view.value == True:
 			won_or_lost = random.randint(0,1)
 			if won_or_lost == 1:
-				await self.update_balance(player_id = ctx.author.id,amount =  reward, add = True)
+				await self.update_balance(player_id = ctx.author.id,amount =  amount, add = True)
 				
-				text = f"**Congrats** {ctx.author.name},\nYou just won ${reward} doing coinflip gambling! "
+				text = f"\U0001f38a **Congrats** {ctx.author.name},\nYou just won **${amount}** doing coinflip gambling! "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 
 			elif won_or_lost == 0:
-				await self.update_balance(player_id = ctx.author.id, amount = reward,add = False)
+				await self.update_balance(player_id = ctx.author.id, amount = amount,add = False)
 				
-				text = f"**Aw snap,** {ctx.author.name},\nYou just lost ${reward} doing coinflip gambling! "
+				text = f"**Aw snap,** {ctx.author.name},\nYou just lost **${amount}** doing coinflip gambling! "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 		
 		elif view.value == False:
 			won_or_lost = random.randint(0,1)
 			if won_or_lost == 1:
-				await self.update_balance(ctx.author.id, reward, True)
+				await self.update_balance(player_id = ctx.author.id,amount = amount, add = True)
 				
-				text = f"**Congrats** {ctx.author.name},\nYou just won ${reward} doing coinflip gambling! "
+				text = f"\U0001f38a **Congrats** {ctx.author.name},\nYou just won **${amount}** doing coinflip gambling! "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 
 			elif won_or_lost == 0:
-				await self.update_balance(ctx.author.id, reward, False)
+				await self.update_balance(player_id = ctx.author.id,amount = amount, add =False)
 				
-				text = f"**Aw snap,** {ctx.author.name},\nYou just lost ${reward} doing coinflip gambling! "
+				text = f"**Aw snap,** {ctx.author.name},\nYou just lost **${amount}** doing coinflip gambling! "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 		else:
