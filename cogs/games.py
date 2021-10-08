@@ -23,12 +23,12 @@ class Games(commands.Cog):
 	async def update_balance(self,*,player_id, amount, add : bool = True):
 		if add == True:
 			bal = await self.bot.db.fetchval(""" SELECT balance FROM snowden_bg WHERE id = $1 ;""", player_id)
-			bal = bal + float(round(amount, 2))
+			bal = bal + amount
 			await self.bot.db.execute(""" UPDATE snowden_bg SET balance = $1 WHERE id = $2; """, bal, player_id)
 
 		elif add == False:
 			bal = await self.bot.db.fetchval(""" SELECT balance FROM snowden_bg WHERE id = $1 ;""", player_id)
-			bal = bal - float(round(amount, 2))
+			bal = bal - amount
 			await self.bot.db.execute(""" UPDATE snowden_bg SET balance = $1 WHERE id = $2; """, bal, player_id)
 
 	async def get_user_inventory(self, player : typing.Union[discord.User, discord.Member]):
@@ -42,18 +42,21 @@ class Games(commands.Cog):
 	@commands.command(name = 'start')
 	async def _start(self, ctx):
 		user_id = ctx.author.id
-		await self.bot.db.execute(""" CREATE TABLE IF NOT EXISTS snowden_bg ( id bigint PRIMARY KEY, created_at bigint NOT NULL, balance numeric(12,2)); """)
+		await self.bot.db.execute(""" CREATE TABLE IF NOT EXISTS snowden_bg ( id bigint PRIMARY KEY, created_at bigint NOT NULL, balance bigint); """)
 
 		flag = await self.check_if_exists(user_id)
 		if flag:
-			return await ctx.send("**You already have an account, you can keep playing")
-		await self.bot.db.execute(""" INSERT INTO snowden_bg VALUES ($1, $2, $3); """, user_id, int(ctx.message.created_at.timestamp()), float(1000.00))
-		embed = discord.Embed(title = "Welcome to Snowden's BattleGround!!", description = "**Congrats!!**\nYou got **$1000.00** as a reward for creating an account!", color = 0x2F3136)
+			return await ctx.send("**You already have an account, you can keep playing**")
+		await self.bot.db.execute(""" INSERT INTO snowden_bg VALUES ($1, $2, $3); """, user_id, int(ctx.message.created_at.timestamp()), float(1000))
+		embed = discord.Embed(title = "Welcome to Snowden's BattleGround!!", description = "**Congrats!!**\nYou got **$1000** as a reward for creating an account!", color = 0x2F3136)
 		await ctx.send(embed = embed)
 
 	@commands.command(name = 'coinflip', aliases =[ 'cf', 'coinf'])
 	@commands.cooldown(1,15, commands.BucketType.user)
 	async def _cf(self, ctx, amount : int = 500):
+		flag = await self.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send("You don't have any account yet, to create one , run the `start` command first!")
 		balance = await self.bot.db.fetchval(""" SELECT balance FROM snowden_bg where id = $1; """, ctx.author.id)
 		if balance < amount:
 			return await ctx.send("Looks like you don't have enough cash to gamble in coinflip!")
