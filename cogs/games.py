@@ -23,7 +23,7 @@ class Games(commands.Cog):
 		if not user:
 			user = ctx.author
 
-		data = await self.bot.db.fetchval(""" SELECT * FROM  user_accounts WHERE id = $1  ;""", ctx.author.id)
+		data = await self.bot.db.fetchrow(""" SELECT * FROM  user_accounts WHERE id = $1  ;""", ctx.author.id)
 		await ctx.send(f"{data}")
 
 
