@@ -62,8 +62,8 @@ class Games(commands.Cog):
 		flag = await self.check_if_exists(user_id)
 		if flag:
 			return await ctx.send("**You already have an account, you can keep playing**")
-		await self.bot.db.execute(""" INSERT INTO snowden_bg VALUES ($1, $2, $3); """, user_id, int(ctx.message.created_at.timestamp()), float(1000))
-		embed = discord.Embed(title = "Welcome to Snowden's BattleGround!!", description = "**Congrats!!**\nYou got **$1000** as a reward for creating an account!", color = 0x2F3136)
+		await self.bot.db.execute(""" INSERT INTO snowden_bg VALUES ($1, $2, $3); """, user_id, int(ctx.message.created_at.timestamp()), int(5000))
+		embed = discord.Embed(title = "Welcome to Snowden's BattleGround!!", description = "**Congrats!! {ctx.author}**\nYou got **$5000** as a reward for creating an account!", color = 0x2F3136)
 		await ctx.send(embed = embed)
 
 	@commands.command(name = 'coinflip', aliases =[ 'cf', 'coinf'])
@@ -98,7 +98,7 @@ class Games(commands.Cog):
 			elif won_or_lost == 0:
 				bal = await self.update_balance(player_id = ctx.author.id, amount = amount,add = False)
 				
-				text = f"\U0001f626 **\U0001f626 Aw snap,** {ctx.author.name},\nThe coin landed on **Tails** You chose **Heads**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}** "
+				text = f"\U0001f626 **Aw snap,**{ctx.author.name},\nThe coin landed on **Tails** You chose **Heads**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}** "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 		
@@ -114,11 +114,12 @@ class Games(commands.Cog):
 			elif won_or_lost == 0:
 				bal = await self.update_balance(player_id = ctx.author.id,amount = amount, add =False)
 				
-				text = f"\U0001f626 **\U0001f626 Aw snap,** {ctx.author.name},\nThe coin landed on **Heads** You chose **Tails**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}** "
+				text = f"\U0001f626 **Aw snap,** {ctx.author.name},\nThe coin landed on **Heads** You chose **Tails**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}** "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 		else:
 			embed.description = "Timed out!"
+			view.clear_items()
 			await msg.edit(embed = embed, view = view)
 			
 	@_cf.error
