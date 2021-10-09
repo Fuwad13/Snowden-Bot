@@ -20,6 +20,23 @@ class Games(commands.Cog):
 			flag = False
 		return flag
 
+	async def update_column(self, *,player_id :int, c_name : str, value, add :bool = True ):
+		if c_name == 'balance' or c_name == 'exp':
+			if add == True:
+				val = await self.bot.db.fetchval(""" SELECT $1 FROM snowden_bg WHERE id = $2 ;""", c_name,player_id)
+				val = (float(val) if c_name ==  'balance' else int(val)) + value
+				await self.bot.db.execute(""" UPDATE snowden_bg SET $1 = $2 WHERE id = $3; """, c_name,val, player_id)
+
+			elif add == False:
+				val = await self.bot.db.fetchval(""" SELECT $1 FROM snowden_bg WHERE id = $2 ;""", c_name,player_id)
+				val = (float(val) if c_name ==  'balance' else int(val)) - value
+				await self.bot.db.execute(""" UPDATE snowden_bg SET $1 = $2 WHERE id = $3; """, c_name,val, player_id)
+			return val
+		val = await self.bot.db.fetchval("SELECT $1 FROM snowde_bg WHERE id = $2;", c_name, player_id)
+
+
+
+
 	async def update_balance(self,*,player_id, amount, add : bool = True):
 		if add == True:
 			bal = await self.bot.db.fetchval(""" SELECT balance FROM snowden_bg WHERE id = $1 ;""", player_id)
@@ -49,7 +66,7 @@ class Games(commands.Cog):
 		if not flag:
 			return await ctx.send(f"{player} don't have any account yet, to create one , run the `start` command first!")
 		data = await self.get_user_inventory(player_id)
-		embed = discord.Embed(title = f"{player}'s Profile:", description = f"Balance : **${float(data['balance'])}**\nAccount created: <t:{data['created_at']}:f> (<t:{data['created_at']}:R>)\n")
+		embed = discord.Embed(title = f"{player}'s Profile:", description = f"Balance : **${float(data['balance'])}**\nAccount created: <t:{data['created_at']}:f> (<t:{data['created_at']}:R>)\nExperience points : <:exp:896086434946097162> {data['exp']} exp")
 		await ctx.send(embed = embed)
 	
 
@@ -78,7 +95,7 @@ class Games(commands.Cog):
 		if flag:
 			return await ctx.send("**You already have an account, you can keep playing**")
 		await self.bot.db.execute(""" INSERT INTO snowden_bg (id, created_at) VALUES ($1, $2); """, user_id, int(ctx.message.created_at.timestamp()))
-		embed = discord.Embed(title = "Welcome to Snowden's BattleGround!!", description = f"**Congrats!! {ctx.author}**\nYou got **$2500.00** as a reward for creating an account!", color = 0x2F3136)
+		embed = discord.Embed(title = "Welcome to Snowden's BattleGround!!", description = f"**Congrats!! {ctx.author}**\nYou got **$2500.00** and <:exp:896086434946097162>**500 exp*** as a reward for creating an account!", color = 0x2F3136)
 		await ctx.send(embed = embed)
 
 	@commands.command(name = 'coinflip', aliases =[ 'cf', 'coinf'])
@@ -104,32 +121,42 @@ class Games(commands.Cog):
 		if view.value == True:
 			won_or_lost = random.randint(0,1)
 			if won_or_lost == 1:
+				g_exp = 50
+				exp = await self.update_column(player_id = ctx.author.id, c_name= 'exp',value= 50)
 				bal = await self.update_balance(player_id = ctx.author.id,amount =  amount, add = True)
 				
-				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Heads!** You chose **Heads**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal}** "
+				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Heads!** You chose **Heads**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp**  "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 
 			elif won_or_lost == 0:
+				g_exp = 25
+				exp = await self.update_column(player_id = ctx.author.id, c_name= 'exp',value= 25)
+
+
 				bal = await self.update_balance(player_id = ctx.author.id, amount = amount,add = False)
 				
-				text = f"\U0001f626 **Aw snap,**{ctx.author.name},\nThe coin landed on **Tails** You chose **Heads**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}** "
+				text = f"\U0001f626 **Aw snap,**{ctx.author.name},\nThe coin landed on **Tails** You chose **Heads**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp** "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 		
 		elif view.value == False:
 			won_or_lost = random.randint(0,1)
 			if won_or_lost == 1:
+				g_exp = 50
+				exp = await self.update_column(player_id = ctx.author.id, c_name= 'exp',value= 50)
 				bal = await self.update_balance(player_id = ctx.author.id,amount = amount, add = True)
 				
-				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Tails!** You chose **Tails**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal}** "
+				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Tails!** You chose **Tails**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp**  "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 
 			elif won_or_lost == 0:
+				g_exp = 25
+				exp = await self.update_column(player_id = ctx.author.id, c_name= 'exp',value= 25)
 				bal = await self.update_balance(player_id = ctx.author.id,amount = amount, add =False)
 				
-				text = f"\U0001f626 **Aw snap,** {ctx.author.name},\nThe coin landed on **Heads** You chose **Tails**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}** "
+				text = f"\U0001f626 **Aw snap,** {ctx.author.name},\nThe coin landed on **Heads** You chose **Tails**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp**  "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 		else:
