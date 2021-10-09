@@ -65,7 +65,7 @@ class Games(commands.Cog):
 		if not flag:
 			return await ctx.send(f"{player} don't have any account yet, to create one , run the `start` command first!")
 		data = await self.get_user_inventory(player_id)
-		embed = discord.Embed(title = f"{player}'s Profile:", description = f"Balance : **${float(data['balance'])}**\nAccount created: <t:{data['created_at']}:f> (<t:{data['created_at']}:R>)\nExperience points : <:exp:896086434946097162> {data['exp']} exp")
+		embed = discord.Embed(title = f"{player}'s Profile:", description = f"Balance : **${float(data['balance'])}**\nAccount created: <t:{data['created_at']}:f>\nExperience points : <:exp:896086434946097162> {data['exp']} exp")
 		await ctx.send(embed = embed)
 	
 
@@ -135,7 +135,7 @@ class Games(commands.Cog):
 
 				bal = await self.update_balance(player_id = ctx.author.id, amount = amount,add = False)
 				
-				text = f"\U0001f626 **Aw snap,**{ctx.author.name},\nThe coin landed on **Tails** You chose **Heads**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp** "
+				text = f"\U0001f626 **Aw snap,**{ctx.author.name},\nThe coin landed on **Tails** You chose **Heads**, meaning that you've just lost **${amount}**!\n\nYour new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp** "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 		
@@ -155,7 +155,7 @@ class Games(commands.Cog):
 				exp = await self.update_exp(player_id = ctx.author.id,amount= 25)
 				bal = await self.update_balance(player_id = ctx.author.id,amount = amount, add =False)
 				
-				text = f"\U0001f626 **Aw snap,** {ctx.author.name},\nThe coin landed on **Heads** You chose **Tails**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp**  "
+				text = f"\U0001f626 **Aw snap,** {ctx.author.name},\nThe coin landed on **Heads** You chose **Tails**, meaning that you've just lost **${amount}**!\n\nYour new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp**  "
 				embed.description = text
 				await msg.edit(embed = embed , view = view)
 		else:
