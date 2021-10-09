@@ -23,12 +23,12 @@ class Games(commands.Cog):
 	async def update_balance(self,*,player_id, amount, add : bool = True):
 		if add == True:
 			bal = await self.bot.db.fetchval(""" SELECT balance FROM snowden_bg WHERE id = $1 ;""", player_id)
-			bal = bal + amount
+			bal = float(bal) + amount
 			await self.bot.db.execute(""" UPDATE snowden_bg SET balance = $1 WHERE id = $2; """, bal, player_id)
 
 		elif add == False:
 			bal = await self.bot.db.fetchval(""" SELECT balance FROM snowden_bg WHERE id = $1 ;""", player_id)
-			bal = bal - amount
+			bal = float(bal) - amount
 			await self.bot.db.execute(""" UPDATE snowden_bg SET balance = $1 WHERE id = $2; """, bal, player_id)
 		return bal
 
@@ -36,6 +36,21 @@ class Games(commands.Cog):
 		data = await self.bot.db.fetchrow(""" SELECT * FROM snowden_bg where id = $1;  """, player_id)
 		return data
 
+	
+	@commands.command(name = 'profile')
+	async def _profile(self, ctx, player : typing.Union[discord.User, discord.Member] = None):
+		if not player:
+			player_id = ctx.author.id
+			player = ctx.author
+		else:
+			player_id = player.id
+
+		flag = await self.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{player} don't have any account yet, to create one , run the `start` command first!")
+		data = await self.get_user_inventory(player_id)
+		embed = discord.Embed(title = f"{player}'s Profile:", description = f"Balance : **${float(data['balance'])}**\nAccount created: <t:{data['created_at']}:f> (<t:{data['created_at']}:R>)\n")
+		await ctx.send(embed = embed)
 	
 
 	@commands.command(name = 'balance', aliases = ['bal', 'wallet'])
@@ -49,7 +64,7 @@ class Games(commands.Cog):
 
 		flag = await self.check_if_exists(player_id)
 		if not flag:
-			return await ctx.send("You don't have any account yet, to create one , run the `start` command first!")
+			return await ctx.send(f"{player} don't have any account yet, to create one , run the `start` command first!")
 		data = await self.get_user_inventory(player_id)
 		balance = data['balance']
 		await ctx.send(f"{player}'s balance : **${balance}**")
@@ -57,13 +72,13 @@ class Games(commands.Cog):
 	@commands.command(name = 'start')
 	async def _start(self, ctx):
 		user_id = ctx.author.id
-		await self.bot.db.execute(""" CREATE TABLE IF NOT EXISTS snowden_bg ( id bigint PRIMARY KEY, created_at bigint NOT NULL, balance bigint); """)
+		
 
 		flag = await self.check_if_exists(user_id)
 		if flag:
 			return await ctx.send("**You already have an account, you can keep playing**")
-		await self.bot.db.execute(""" INSERT INTO snowden_bg VALUES ($1, $2, $3); """, user_id, int(ctx.message.created_at.timestamp()), int(5000))
-		embed = discord.Embed(title = "Welcome to Snowden's BattleGround!!", description = "**Congrats!! {ctx.author}**\nYou got **$5000** as a reward for creating an account!", color = 0x2F3136)
+		await self.bot.db.execute(""" INSERT INTO snowden_bg (id, created_at) VALUES ($1, $2); """, user_id, int(ctx.message.created_at.timestamp()))
+		embed = discord.Embed(title = "Welcome to Snowden's BattleGround!!", description = f"**Congrats!! {ctx.author}**\nYou got **$2500.00** as a reward for creating an account!", color = 0x2F3136)
 		await ctx.send(embed = embed)
 
 	@commands.command(name = 'coinflip', aliases =[ 'cf', 'coinf'])
@@ -75,8 +90,8 @@ class Games(commands.Cog):
 		balance = await self.bot.db.fetchval(""" SELECT balance FROM snowden_bg where id = $1; """, ctx.author.id)
 		if balance < amount:
 			return await ctx.send("Looks like you don't have enough money to gamble in coinflip!")
-		if amount > 100000:
-			return await ctx.send("Maximum amount of gambling is **$100000**")
+		if amount > 100000 or amount < 500:
+			return await ctx.send("Minimum amount of gambling is **$500**\nMaximum amount of gambling is **$100000**")
 
 		view = bs.HeadsOrTails(ctx)
 

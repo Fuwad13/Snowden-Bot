@@ -75,6 +75,8 @@ async def create_db_pool():
     credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
     bot.db = await asyncpg.create_pool(dsn = f'{credential}')
 
+    await bot.db.execute(""" CREATE TABLE IF NOT EXISTS snowden_bg ( id bigint PRIMARY KEY, created_at bigint NOT NULL, balance numeric(14,2) default 2500.00, exp bigint default 500 ); """)
+
 #events =========
 @bot.event
 async def on_ready():
@@ -88,7 +90,7 @@ async def on_ready():
 async def on_command(ctx):
     logger.warning(f"command invoked : {ctx.command} in {ctx.channel.id} by {ctx.author}")
 
-    
+
 
 #tasks
 
