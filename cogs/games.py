@@ -20,19 +20,18 @@ class Games(commands.Cog):
 			flag = False
 		return flag
 
-	async def update_column(self, *,player_id :int, c_name : str, value, add :bool = True ):
-		if c_name == 'balance' or c_name == 'exp':
-			if add == True:
-				val = await self.bot.db.fetchval(""" SELECT $1 FROM snowden_bg WHERE id = $2 ;""", c_name,player_id)
-				val = (float(val) if c_name ==  'balance' else int(val)) + value
-				await self.bot.db.execute(""" UPDATE snowden_bg SET $1 = $2 WHERE id = $3; """, c_name,val, player_id)
+	async def update_exp(self, *,player_id :int, amount, add :bool = True ):
+		if add == True:
+			bal = await self.bot.db.fetchval(""" SELECT exp FROM snowden_bg WHERE id = $1 ;""", player_id)
+			bal = int(bal) + amount
+			await self.bot.db.execute(""" UPDATE snowden_bg SET exp = $1 WHERE id = $2; """, bal, player_id)
 
-			elif add == False:
-				val = await self.bot.db.fetchval(""" SELECT $1 FROM snowden_bg WHERE id = $2 ;""", c_name,player_id)
-				val = (float(val) if c_name ==  'balance' else int(val)) - value
-				await self.bot.db.execute(""" UPDATE snowden_bg SET $1 = $2 WHERE id = $3; """, c_name,val, player_id)
-			return val
-		val = await self.bot.db.fetchval("SELECT $1 FROM snowde_bg WHERE id = $2;", c_name, player_id)
+		elif add == False:
+			bal = await self.bot.db.fetchval(""" SELECT exp FROM snowden_bg WHERE id = $1 ;""", player_id)
+			bal = int(bal) - amount
+			await self.bot.db.execute(""" UPDATE snowden_bg SET exp = $1 WHERE id = $2; """, bal, player_id)
+		return bal
+		
 
 
 
@@ -122,7 +121,7 @@ class Games(commands.Cog):
 			won_or_lost = random.randint(0,1)
 			if won_or_lost == 1:
 				g_exp = 50
-				exp = await self.update_column(player_id = ctx.author.id, c_name= 'exp',value= 50)
+				exp = await self.update_exp(player_id = ctx.author.id,amount= 50)
 				bal = await self.update_balance(player_id = ctx.author.id,amount =  amount, add = True)
 				
 				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Heads!** You chose **Heads**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp**  "
@@ -131,7 +130,7 @@ class Games(commands.Cog):
 
 			elif won_or_lost == 0:
 				g_exp = 25
-				exp = await self.update_column(player_id = ctx.author.id, c_name= 'exp',value= 25)
+				exp = await self.update_exp(player_id = ctx.author.id,amount= 25)
 
 
 				bal = await self.update_balance(player_id = ctx.author.id, amount = amount,add = False)
@@ -144,7 +143,7 @@ class Games(commands.Cog):
 			won_or_lost = random.randint(0,1)
 			if won_or_lost == 1:
 				g_exp = 50
-				exp = await self.update_column(player_id = ctx.author.id, c_name= 'exp',value= 50)
+				exp = await self.update_exp(player_id = ctx.author.id,amount= 50)
 				bal = await self.update_balance(player_id = ctx.author.id,amount = amount, add = True)
 				
 				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Tails!** You chose **Tails**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp**  "
@@ -153,7 +152,7 @@ class Games(commands.Cog):
 
 			elif won_or_lost == 0:
 				g_exp = 25
-				exp = await self.update_column(player_id = ctx.author.id, c_name= 'exp',value= 25)
+				exp = await self.update_exp(player_id = ctx.author.id,amount= 25)
 				bal = await self.update_balance(player_id = ctx.author.id,amount = amount, add =False)
 				
 				text = f"\U0001f626 **Aw snap,** {ctx.author.name},\nThe coin landed on **Heads** You chose **Tails**, meaning that you've just lost **${amount}**!\n\n Your new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp**  "
