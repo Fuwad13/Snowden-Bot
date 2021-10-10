@@ -46,8 +46,28 @@ def get_prefix(bot, message):
 
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
+class SnowdenContext(commands.Context):
+    
+    async def send(self, content = None, **kwargs):
+        ch = random.choice(
+            [":star: I'm still under development", ":star: Have you tried the new commands?", ":star: Support me by voting! oh no you can't vote me"]
+        )
+        if random.randint(1,15) == 9:
+            content = f"{ch}\n\n{str(content) if content else ''}"
+            return await super().send(content, **kwargs)
 
-bot = commands.AutoShardedBot(
+        return await super().send(content, **kwargs)
+
+class SnowdenBot(commands.AutoShardedBot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    async def get_context(self, message, *, cls=SnowdenContext):
+        return await super().get_context(message, cls=cls)
+
+
+
+bot = SnowdenBot(
     command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True, slash_commands=False)
 
 
