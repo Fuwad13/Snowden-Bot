@@ -286,7 +286,7 @@ class Games(commands.Cog):
 			return await ctx.send(f"{ctx.author.mention} **You can get the weekly rewards again in** `{humanize.precisedelta(cd - current_time)}`")
 		reward = random.randint(5000, 10000)
 		n_bal = await self.update_balance(player_id = ctx.author.id, amount = reward, add = True)
-		await self.update_cooldowns(ctx.author.id, 'daily')
+		await self.update_cooldowns(ctx.author.id, 'weekly')
 		c_exp, n_exp = await self.update_exp(player_id = ctx.author.id,amount= random.randint(1000, 1500))
 		c_lvl = self.get_level(c_exp)
 		lvl_up = self.level_up_check(c_exp, n_exp)
