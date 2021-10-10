@@ -237,7 +237,7 @@ class Games(commands.Cog):
 			return await ctx.send(f"Hey {ctx.author}, you don't have an account yet. To create one, run the `start` command! Thanks ")
 		#check for cooldown
 		current_time = int(time.time())
-		cd = self.get_cooldown_data(ctx.author.id, 'daily')
+		cd = await self.get_cooldown_data(ctx.author.id, 'daily')
 		if current_time < cd:
 			return await ctx.send(f"{ctx.author.mention} **You can get the daily rewards again in** `{humanize.precisedelta(cd - current_time)}`")
 		reward = random.randint(2500, 5000)
