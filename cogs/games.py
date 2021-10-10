@@ -240,10 +240,61 @@ class Games(commands.Cog):
 		cd = await self.get_cooldown_data(ctx.author.id, 'daily')
 		if current_time < int(cd):
 			return await ctx.send(f"{ctx.author.mention} **You can get the daily rewards again in** `{humanize.precisedelta(cd - current_time)}`")
-		reward = random.randint(2500, 5000)
+		reward = random.randint(2000, 4000)
 		n_bal = await self.update_balance(player_id = ctx.author.id, amount = reward, add = True)
 		await self.update_cooldowns(ctx.author.id, 'daily')
-		await ctx.send(f"{ctx.author.mention} , You got **${reward}** as your daily check-in reward!\nYour new balace is **${n_bal}**")
+		c_exp, n_exp = await self.update_exp(player_id = ctx.author.id,amount= random.randint(250, 500))
+		c_lvl = self.get_level(c_exp)
+		lvl_up = self.level_up_check(c_exp, n_exp)
+		text = f"{ctx.author.mention} , You got **${reward}** as your daily check-in reward!\nYour new balace is **${n_bal}**"
+		if lvl_up:
+			text += f"\n\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
+			await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
+		await ctx.send(text)
+
+	@commands.command(name = 'hourly', aliases = ['h'])
+	async def _hourly(self, ctx):
+		flag = await self.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey {ctx.author}, you don't have an account yet. To create one, run the `start` command! Thanks ")
+		#check for cooldown
+		current_time = int(time.time())
+		cd = await self.get_cooldown_data(ctx.author.id, 'hourly')
+		if current_time < int(cd):
+			return await ctx.send(f"{ctx.author.mention} **You can get hourly rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+		reward = random.randint(500,1500)
+		n_bal = await self.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await self.update_cooldowns(ctx.author.id, 'hourly')
+		c_exp, n_exp = await self.update_exp(player_id = ctx.author.id,amount= random.randint(100, 200))
+		c_lvl = self.get_level(c_exp)
+		lvl_up = self.level_up_check(c_exp, n_exp)
+		text = f"{ctx.author.mention} , You got **${reward}** as your hourly rewards!\nYour new balace is **${n_bal}**"
+		if lvl_up:
+			text += f"\n\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
+			await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
+		await ctx.send(text)
+
+	@commands.command(name = 'weekly', aliases = ['w'])
+	async def _weekly(self, ctx):
+		flag = await self.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey {ctx.author}, you don't have an account yet. To create one, run the `start` command! Thanks ")
+		#check for cooldown
+		current_time = int(time.time())
+		cd = await self.get_cooldown_data(ctx.author.id, 'weekly')
+		if current_time < int(cd):
+			return await ctx.send(f"{ctx.author.mention} **You can get the weekly rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+		reward = random.randint(5000, 10000)
+		n_bal = await self.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await self.update_cooldowns(ctx.author.id, 'daily')
+		c_exp, n_exp = await self.update_exp(player_id = ctx.author.id,amount= random.randint(1000, 1500))
+		c_lvl = self.get_level(c_exp)
+		lvl_up = self.level_up_check(c_exp, n_exp)
+		text = f"{ctx.author.mention} , You got **${reward}** as your weekly check-in reward!\nYour new balace is **${n_bal}**"
+		if lvl_up:
+			text += f"\n\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
+			await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
+		await ctx.send(text)
 		
 
 def setup(bot):
