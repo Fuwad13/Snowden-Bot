@@ -50,13 +50,13 @@ class HeadsOrTails(ui.View):
 
 		return intr.user == self.ctx.author
 
-	@ui.button(label = 'Heads', style = discord.ButtonStyle.gray)
+	@ui.button(emoji = '\U0001f1ed', label = 'Heads', style = discord.ButtonStyle.green)
 	async def heads_button(self, button, intr):
 		self.clear_items()
 		self.value = True
 		self.stop()
 
-	@ui.button(label = 'Tails', style = discord.ButtonStyle.gray)
+	@ui.button(emoji = '\U0001f1f9',label = 'Tails', style = discord.ButtonStyle.blurple)
 	async def tails_buttton(self, button, intr):
 		self.clear_items()
 		self.value = False

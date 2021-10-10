@@ -132,7 +132,7 @@ class Games(commands.Cog):
 		if flag:
 			return await ctx.send("**You already have an account, you can keep playing**")
 		await self.bot.db.execute(""" INSERT INTO snowden_bg (id, created_at) VALUES ($1, $2); """, user_id, int(ctx.message.created_at.timestamp()))
-		embed = discord.Embed(title = "Welcome to Snowden's BattleGround!!", description = f"**Congrats!! {ctx.author}**\nYou got **$2500.00** and <:exp:896086434946097162>**500 exp*** as a reward for creating an account!", color = 0x2F3136)
+		embed = discord.Embed(title = "Welcome to Snowden's BattleGround!!", description = f"**Congrats!! {ctx.author}**\nYou got **$2000.00** and <:exp:896086434946097162>**500 exp** as a reward for creating an account!", color = 0x2F3136)
 		await ctx.send(embed = embed)
 
 	@commands.command(name = 'coinflip', aliases =[ 'cf', 'coinf'])
@@ -149,7 +149,7 @@ class Games(commands.Cog):
 
 		view = bs.HeadsOrTails(ctx)
 
-		embed = discord.Embed(title ='Coinflip', description = f"{ctx.author.name}, choose an option in next 15 seconds!", color = 0x2F3136)
+		embed = discord.Embed(title =f'Coinflip- ${amount}', description = f"{ctx.author.name}, choose an option in next 15 seconds!", color = 0x2F3136)
 
 		msg = await ctx.send(embed = embed , view = view)
 		
@@ -246,9 +246,9 @@ class Games(commands.Cog):
 		c_exp, n_exp = await self.update_exp(player_id = ctx.author.id,amount= random.randint(250, 500))
 		c_lvl = self.get_level(c_exp)
 		lvl_up = self.level_up_check(c_exp, n_exp)
-		text = f"{ctx.author.mention} , You got **${reward}** as your daily check-in reward!\nYour new balace is **${n_bal}**"
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your daily check-in reward!\nYour new balace is **${n_bal}**"
 		if lvl_up:
-			text += f"\n\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
 			await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
 		await ctx.send(text)
 
@@ -268,9 +268,9 @@ class Games(commands.Cog):
 		c_exp, n_exp = await self.update_exp(player_id = ctx.author.id,amount= random.randint(100, 200))
 		c_lvl = self.get_level(c_exp)
 		lvl_up = self.level_up_check(c_exp, n_exp)
-		text = f"{ctx.author.mention} , You got **${reward}** as your hourly rewards!\nYour new balace is **${n_bal}**"
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your hourly rewards!\nYour new balace is **${n_bal}**"
 		if lvl_up:
-			text += f"\n\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
 			await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
 		await ctx.send(text)
 
@@ -290,9 +290,9 @@ class Games(commands.Cog):
 		c_exp, n_exp = await self.update_exp(player_id = ctx.author.id,amount= random.randint(1000, 1500))
 		c_lvl = self.get_level(c_exp)
 		lvl_up = self.level_up_check(c_exp, n_exp)
-		text = f"{ctx.author.mention} , You got **${reward}** as your weekly check-in reward!\nYour new balace is **${n_bal}**"
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your weekly check-in reward!\nYour new balace is **${n_bal}**"
 		if lvl_up:
-			text += f"\n\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
 			await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
 		await ctx.send(text)
 		
