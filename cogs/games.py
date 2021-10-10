@@ -6,6 +6,9 @@ import typing
 import random
 from utils import buttons_and_selects as bs
 from games_utils import constants as cs 
+import json
+import time
+import humanize
 
 
 class Games(commands.Cog):
@@ -52,11 +55,21 @@ class Games(commands.Cog):
 			return True
 		return False
 
-	
-
+	async def get_cooldown_data(self, player_id : int, command_name : str = None):
+		if not command_name:
+			cd_data = await self.bot.db.fetchval(""" SELECT cooldowns FROM snowden_bg WHERE id = $1; """, player_id)
+			return json.loads(cd_data)
+		cd_data = await self.bot.db.fetchval(""" SELECT cooldowns FROM snowden_bg WHERE id = $1; """, player_id)
+		cd_dict = json.loads(cd_data)
+		return cd_dict[f'n_{command_name}']
 		
 
-
+	async def update_cooldowns(self, player_id : int, command_name : str ):
+		cd_data = await self.bot.db.fetchval(""" SELECT cooldowns FROM snowden_bg WHERE id = $1; """, player_id)
+		cd_dict = json.loads(cd_data)
+		cd_dict[f'n_{command_name}'] = int(time.time()) + cs.COOLDOWNS[f'{command_name}']
+		cd_json = json.dumps(cd_dict)
+		await self.bot.db.execute(""" UPDATE snowden_bg SET cooldowns = $1 WHERE id = $2; """, cd_json, player_id)
 
 
 	async def update_balance(self,*,player_id, amount, add : bool = True):
@@ -216,6 +229,21 @@ class Games(commands.Cog):
 	async def _cf_error(self, ctx, error):
 		if isinstance(error, commands.CommandOnCooldown):
 			await ctx.send(f"You're on cooldown! Retry after `{round(error.retry_after, 2)}` seconds")
+
+	@commands.command(name = 'daily', aliases = ['d'])
+	async def _daily(self, ctx):
+		flag = self.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey {ctx.author}, you don't have an account yet. To create one, run the `start` command! Thanks ")
+		#check for cooldown
+		current_time = int(time.time())
+		cd = self.get_cooldown_data(ctx.author.id, 'daily')
+		if current_time < cd:
+			return await ctx.send(f"{ctx.author.mention} **You can get the daily rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+		reward = random.randint(2500, 5000)
+		n_bal = await self.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await ctx.send(f"{ctx.author.mention} , You got **${reward}** as your daily check-in reward!\nYour new balace is **${n_bal}**")
+		
 
 def setup(bot):
 	bot.add_cog(Games(bot))

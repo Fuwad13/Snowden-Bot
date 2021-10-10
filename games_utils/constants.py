@@ -17,9 +17,12 @@ EXP_LEVELS = {
     '9' : 18500,
     '10' : 22000
 }
-#later
-COMMON_ITEMS = {
-    '1' : 'wooden_shield',
-    '2' : 'common_chest'
+
+COOLDOWNS = {
+    'hourly' : 3600,
+    'daily' : 86400,
+    'weekly' : 604800,
+    'monthly' : 2592000,
+    'work' : 3600
 }
 
