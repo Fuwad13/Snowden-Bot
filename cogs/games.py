@@ -232,7 +232,7 @@ class Games(commands.Cog):
 
 	@commands.command(name = 'daily', aliases = ['d'])
 	async def _daily(self, ctx):
-		flag = self.check_if_exists(ctx.author.id)
+		flag = await self.check_if_exists(ctx.author.id)
 		if not flag:
 			return await ctx.send(f"Hey {ctx.author}, you don't have an account yet. To create one, run the `start` command! Thanks ")
 		#check for cooldown
