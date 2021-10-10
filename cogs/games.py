@@ -238,10 +238,11 @@ class Games(commands.Cog):
 		#check for cooldown
 		current_time = int(time.time())
 		cd = await self.get_cooldown_data(ctx.author.id, 'daily')
-		if current_time < cd:
+		if current_time < int(cd):
 			return await ctx.send(f"{ctx.author.mention} **You can get the daily rewards again in** `{humanize.precisedelta(cd - current_time)}`")
 		reward = random.randint(2500, 5000)
 		n_bal = await self.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await self.update_cooldowns(ctx.author.id, 'daily')
 		await ctx.send(f"{ctx.author.mention} , You got **${reward}** as your daily check-in reward!\nYour new balace is **${n_bal}**")
 		
 
