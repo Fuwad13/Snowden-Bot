@@ -357,7 +357,7 @@ class Games(commands.Cog):
 			if not command in self.get_commands():
 				return await ctx.send('This command is not a games category command!')
 
-			cd = self.get_cooldown_data(ctx.author.id, str(command.name))
+			cd = await self.get_cooldown_data(ctx.author.id, str(command.name))
 			current_time = int(time.time())
 			if cd <= current_time:
 				embed.description= f"`{ctx.clean_prefix}{command.name} :` **Available to run now!**"
