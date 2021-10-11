@@ -4,6 +4,8 @@ from discord.ext import commands
 import asyncpg
 import typing
 import random
+
+from discord.ext.commands.cooldowns import Cooldown
 from utils import buttons_and_selects as bs
 from games_utils import constants as cs 
 import json
@@ -101,7 +103,7 @@ class Games(commands.Cog):
 
 		flag = await self.check_if_exists(player_id)
 		if not flag:
-			return await ctx.send(f"{player} don't have any account yet, to create one , run the `start` command first!")
+			return await ctx.send(f"**{player}** don't have any account yet, to create one , run the `{ctx.clean_prefix}start` command first!")
 		data = await self.get_user_inventory(player_id)
 		embed = discord.Embed(title = f"{player}'s Profile:", description = f"\U0001f3e6 Balance : **${float(data['balance'])}**\n<:exp:896086434946097162> Experience points : **{data['exp']}** EXP\n\U0001f4c8 Level : **{self.get_level(data['exp'])}**\nAccount created: <t:{data['created_at']}:f>")
 		await ctx.send(embed = embed)
@@ -118,7 +120,7 @@ class Games(commands.Cog):
 
 		flag = await self.check_if_exists(player_id)
 		if not flag:
-			return await ctx.send(f"{player} don't have any account yet, to create one , run the `start` command first!")
+			return await ctx.send(f"**{player}** doesn't have any account yet, to create one , run the `{ctx.clean_prefix}start` command first!")
 		data = await self.get_user_inventory(player_id)
 		balance = data['balance']
 		await ctx.send(f"{player}'s balance : **${balance}**")
@@ -140,7 +142,7 @@ class Games(commands.Cog):
 	async def _cf(self, ctx, amount : int = 500):
 		flag = await self.check_if_exists(ctx.author.id)
 		if not flag:
-			return await ctx.send("You don't have any account yet, to create one , run the `start` command first!")
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
 		balance = await self.bot.db.fetchval(""" SELECT balance FROM snowden_bg where id = $1; """, ctx.author.id)
 		if balance < amount:
 			return await ctx.send("Looks like you don't have enough money to gamble in coinflip!")
@@ -234,7 +236,7 @@ class Games(commands.Cog):
 	async def _daily(self, ctx):
 		flag = await self.check_if_exists(ctx.author.id)
 		if not flag:
-			return await ctx.send(f"Hey {ctx.author}, you don't have an account yet. To create one, run the `start` command! Thanks ")
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
 		#check for cooldown
 		current_time = int(time.time())
 		cd = await self.get_cooldown_data(ctx.author.id, 'daily')
@@ -256,7 +258,7 @@ class Games(commands.Cog):
 	async def _hourly(self, ctx):
 		flag = await self.check_if_exists(ctx.author.id)
 		if not flag:
-			return await ctx.send(f"Hey {ctx.author}, you don't have an account yet. To create one, run the `start` command! Thanks ")
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
 		#check for cooldown
 		current_time = int(time.time())
 		cd = await self.get_cooldown_data(ctx.author.id, 'hourly')
@@ -278,7 +280,7 @@ class Games(commands.Cog):
 	async def _weekly(self, ctx):
 		flag = await self.check_if_exists(ctx.author.id)
 		if not flag:
-			return await ctx.send(f"Hey {ctx.author}, you don't have an account yet. To create one, run the `start` command! Thanks ")
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
 		#check for cooldown
 		current_time = int(time.time())
 		cd = await self.get_cooldown_data(ctx.author.id, 'weekly')
@@ -295,7 +297,77 @@ class Games(commands.Cog):
 			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
 			await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
 		await ctx.send(text)
-		
+
+	@commands.command(name = 'monthly', aliases = ['mon', 'm'])
+	async def _monthly(self, ctx):
+		flag = await self.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		#check for cooldown
+		current_time = int(time.time())
+		cd = await self.get_cooldown_data(ctx.author.id, 'monthly')
+		if current_time < int(cd):
+			return await ctx.send(f"{ctx.author.mention} **You can get the monthly rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+		reward = random.randint(20000, 30000)
+		n_bal = await self.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await self.update_cooldowns(ctx.author.id, 'monthly')
+		c_exp, n_exp = await self.update_exp(player_id = ctx.author.id,amount= random.randint(2000, 3500))
+		c_lvl = self.get_level(c_exp)
+		lvl_up = self.level_up_check(c_exp, n_exp)
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your monthly check-in reward!\nYour new balace is **${n_bal}**"
+		if lvl_up:
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
+			await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
+		await ctx.send(text)
+
+	@commands.command(name = 'work', aliases = ['job', 'j'])
+	async def work(self, ctx):
+		flag = await self.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		#check for cooldown
+		current_time = int(time.time())
+		cd = await self.get_cooldown_data(ctx.author.id, 'work')
+		if current_time < int(cd):
+			return await ctx.send(f"{ctx.author.mention} **You can get the monthly rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+		reward = random.randint(1000, 1500)
+		n_bal = await self.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await self.update_cooldowns(ctx.author.id, 'work')
+		c_exp, n_exp = await self.update_exp(player_id = ctx.author.id,amount= random.randint(150, 300))
+		c_lvl = self.get_level(c_exp)
+		lvl_up = self.level_up_check(c_exp, n_exp)
+		text = f"{ctx.author.mention} , You earned **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **by working as a programmer(this is just a test, more things will be added soon)!\nYour new balace is **${n_bal}**"
+		if lvl_up:
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
+			await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
+		await ctx.send(text)
+
+	@commands.command(name = 'cooldowns', aliases = [ 'cooldown', 'cd'])
+	@commands.cooldown(1, 10, type = commands.BucketType.user)
+	async def _cooldowns(self, ctx, command: commands.Command = None):
+		flag = await self.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		embed = discord.Embed(title = f"Command Cooldowns for {ctx.author}:", color = 0x2F3136, timestamp = ctx.message.created_at)
+		embed.set_author(icon_url=ctx.author.display_avatar.with_static_format('png'), name = f"{ctx.author.name}")
+
+
+		if command:
+
+			if not command in self.get_commands():
+				return await ctx.send('This command is not a games category command!')
+
+			cd = self.get_cooldown_data(ctx.author.id, str(command.name))
+			current_time = int(time.time())
+			if cd <= current_time:
+				embed.description= f"`{ctx.clean_prefix}{command.name} :` **Available to run now!**"
+				return await ctx.send(embed = embed)
+
+			embed.description = f"`{ctx.clean_prefix}{command.name} :` **{humanize.precisedelta(cd - current_time)}** remaining to use again!"
+			return await ctx.send(embed= embed)
+
+				
+
 
 def setup(bot):
 	bot.add_cog(Games(bot))

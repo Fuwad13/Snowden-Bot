@@ -50,7 +50,7 @@ class SnowdenContext(commands.Context):
     
     async def send(self, content = None, **kwargs):
         ch = random.choice(
-            [":star: I'm still under development", ":star: Have you tried the new commands?", ":star: Support me by voting! oh no you can't vote me"]
+            [":star: I'm still under development, don't expect too much from me!", ":star: Have you tried the new commands?", ":star: Support me by voting! oh no you can't vote me yet :("]
         )
         if random.randint(1,15) == 9:
             content = f"{ch}\n\n{str(content) if content else ''}"
