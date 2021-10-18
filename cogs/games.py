@@ -342,29 +342,7 @@ class Games(commands.Cog):
 			await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
 		await ctx.send(text)
 
-	@commands.command(name = 'cooldowns', aliases = [ 'cooldown', 'cd'])
-	@commands.cooldown(1, 10, type = commands.BucketType.user)
-	async def _cooldowns(self, ctx, command: commands.Command = None):
-		flag = await self.check_if_exists(ctx.author.id)
-		if not flag:
-			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
-		embed = discord.Embed(title = f"Command Cooldowns for {ctx.author}:", color = 0x2F3136, timestamp = ctx.message.created_at)
-		embed.set_author(icon_url=ctx.author.display_avatar.with_static_format('png'), name = f"{ctx.author.name}")
-
-
-		if command:
-
-			if not command in self.get_commands():
-				return await ctx.send('This command is not a games category command!')
-
-			cd = await self.get_cooldown_data(ctx.author.id, str(command.name))
-			current_time = int(time.time())
-			if cd <= current_time:
-				embed.description= f"`{ctx.clean_prefix}{command.name} :` **Available to run now!**"
-				return await ctx.send(embed = embed)
-
-			embed.description = f"`{ctx.clean_prefix}{command.name} :` **{humanize.precisedelta(cd - current_time)}** remaining to use again!"
-			return await ctx.send(embed= embed)
+	
 
 				
 

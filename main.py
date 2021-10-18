@@ -13,6 +13,28 @@ from utils import help_cmd , buttons_and_selects
 import asyncpg
 import logging
 
+import ast
+import re
+import inspect
+
+def source(o):
+    s = inspect.getsource(o).split("\n")
+    indent = len(s[0]) - len(s[0].lstrip())
+    return "\n".join(i[indent:] for i in s)
+
+
+def ready():
+  source_ = source(discord.gateway.DiscordWebSocket.identify)
+  patched = re.sub(
+      r'([\'"]\$browser[\'"]:\s?[\'"]).+([\'"])',
+      r"\1Discord Android\2",
+      source_
+  )
+  loc = {}
+  exec(compile(ast.parse(patched), "<string>", "exec"),
+       discord.gateway.__dict__, loc)
+  discord.gateway.DiscordWebSocket.identify = loc["identify"]
+
 logger = logging.getLogger('discord')
 logger.setLevel(logging.WARNING)
 handler = logging.FileHandler(
@@ -115,10 +137,7 @@ async def on_command(ctx):
 #tasks
 
 
-@tasks.loop(seconds=60, count=2)
-async def activity_change_():
-    print("1")
-    await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.listening, name=f"@Snowden"))
+
 
 # dev essential commands
 
