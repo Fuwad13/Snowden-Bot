@@ -230,5 +230,6 @@ async def reloaderror(ctx, error):
 
 
 bot.loop.run_until_complete(create_db_pool())
+ready()
 bot.run(TOKEN)
 
