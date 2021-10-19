@@ -98,10 +98,10 @@ bot = SnowdenBot(
 
 # extensions
 INITIAL_EXTENSIONS = ['cogs.games', 'cogs.weather',
-                      'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku']
+                      'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku', 'cogs.owner']
 
 ALL_EXTENSIONS = ['cogs.games', 'cogs.weather',
-                  'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku']
+                  'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku' 'cogs.owner']
 
 
 if __name__ == "__main__":
