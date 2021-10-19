@@ -10,6 +10,7 @@ class Owner(commands.Cog):
 	@commands.command(name = 'dbexecute',aliases = ['dbexec'], hidden = True)
 	@commands.is_owner()
 	async def dbexec(self, ctx, query :str , *args):
+		print('check')
 		resp = await self.bot.db.execute(query, *args)
 		await ctx.send(f"Database Query execution done! `{resp}`")
 
