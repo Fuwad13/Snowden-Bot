@@ -7,13 +7,17 @@ class Owner(commands.Cog):
 		self.bot = bot
 
 
-	@commands.command(name = 'dbexecute',aliases = ['dbexec'], hidden = True)
+	@commands.group(name = 'db',aliases = ['psql'], hidden = True, invoke_without_command = True)
 	@commands.is_owner()
-	async def dbexec(self, ctx, query :str , *args):
-		print('check')
-		_id = int(*args)
-		resp = await self.bot.db.execute(query, _id)
-		await ctx.send(f"Database Query execution done! `{resp}`")
+	async def db(self, ctx):
+		await ctx.send("Ok")
+
+	
+	@db.command(name = 'fetchval', aliases = ['getval'], hidden = True)
+	@commands.is_owner()
+	async def _fetchval(self, ctx, query: str, *args):
+		val = await self.bot.db.fetchval(query, args)
+		await ctx.send(val)
 
 
 	
