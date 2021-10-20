@@ -15,8 +15,9 @@ class Owner(commands.Cog):
 	
 	@db.command(name = 'fetchval', aliases = ['getval'], hidden = True)
 	@commands.is_owner()
-	async def _fetchval(self, ctx, query: str, *args):
-		val = await self.bot.db.fetchval(query, args)
+	async def _fetchval(self, ctx, query: str, arg: int):
+		
+		val = await self.bot.db.fetchval(query, arg)
 		await ctx.send(val)
 
 

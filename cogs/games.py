@@ -167,7 +167,7 @@ class Games(commands.Cog):
 				c_lvl = self.get_level(c_exp)
 				lvl_up = self.level_up_check(c_exp, n_exp)
 
-				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Heads!** You chose **Heads**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp from this coinflip**"
+				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Heads!** You chose **Heads**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal:,}**\nYou gained <:exp:896086434946097162>**{g_exp} exp from this coinflip**"
 				if lvl_up:
 					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
 					await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
@@ -183,7 +183,7 @@ class Games(commands.Cog):
 
 				bal = await self.update_balance(player_id = ctx.author.id, amount = amount,add = False)
 				
-				text = f"\U0001f626 **Aw snap,**{ctx.author.name},\nThe coin landed on **Tails** You chose **Heads**, meaning that you've just lost **${amount}**!\n\nYour new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp from this coinflip** "
+				text = f"\U0001f626 **Aw snap,**{ctx.author.name},\nThe coin landed on **Tails** You chose **Heads**, meaning that you've just lost **${amount}**!\n\nYour new balance is **${bal:,}**\nYou gained <:exp:896086434946097162>**{g_exp} exp from this coinflip** "
 				if lvl_up:
 					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
 					await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
@@ -200,7 +200,7 @@ class Games(commands.Cog):
 				c_lvl = self.get_level(c_exp)
 				lvl_up = self.level_up_check(c_exp, n_exp)
 
-				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Tails!** You chose **Tails**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp from this coinflip**  "
+				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Tails!** You chose **Tails**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal:,}**\nYou gained <:exp:896086434946097162>**{g_exp} exp from this coinflip**  "
 				if lvl_up:
 					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
 					await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
@@ -216,7 +216,7 @@ class Games(commands.Cog):
 				lvl_up = self.level_up_check(c_exp, n_exp)
 
 
-				text = f"\U0001f626 **Aw snap,** {ctx.author.name},\nThe coin landed on **Heads** You chose **Tails**, meaning that you've just lost **${amount}**!\n\nYour new balance is **${bal}**\nYou gained <:exp:896086434946097162>**{g_exp} exp in this coinflip**  "
+				text = f"\U0001f626 **Aw snap,** {ctx.author.name},\nThe coin landed on **Heads** You chose **Tails**, meaning that you've just lost **${amount}**!\n\nYour new balance is **${bal:,}**\nYou gained <:exp:896086434946097162>**{g_exp} exp in this coinflip**  "
 				if lvl_up:
 					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **$1000**"
 					await self.update_balance(player_id = ctx.author.id,amount =  1000, add = True)
