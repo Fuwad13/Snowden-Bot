@@ -30,7 +30,7 @@ class BattleField(commands.Cog):
 		await self.bot.db.execute(""" INSERT INTO battlefield (p_id, created_at) VALUES ($1, $2); """, player_id, int(ctx.message.created_at.timestamp()))
 		await self.bot.db.execute(""" INSERT INTO inventory (p_id, common, rare, legendary, epic, mythic) VALUES ($1, $2, $3,$4, $4,$4); """, player_id, '{"police_vest_level_1" : 1}','{"rare_chest" : 1, "pain_killer" : 1 }', '{}')
 
-		embed = discord.Embed(title = f"Hey {ctx.author.name}, \U0001f44b Welcome to Snowden's BattleField!!", description = f"**\nYou got **$500** and <:exp:896086434946097162>**100 EXP** as a reward for entering the battlefield!\nYou also got:\n{cs.CHESTS_EMOJIS['rare']}`rare_chest x1`\n{ALL_ITEMS['police_vest_level_1']['emoiji']}`police_vest_level_1 x1`\n{ALL_ITEMS['pain_killer']['emoji']}`pain_killer x1`\nHope you enjoy!", color = 0x2F3136)
+		embed = discord.Embed(title = f"Hey {ctx.author.name}, \U0001f44b Welcome to Snowden's BattleField!!", description = f"**\nYou got **$500** and <:exp:896086434946097162>**100 EXP** as a reward for entering the battlefield!\nYou also got:\n{cs.CHESTS_EMOJIS['rare']}`rare_chest x1`\n{ALL_ITEMS['police_vest_level_1']['emoji']}`police_vest_level_1 x1`\n{ALL_ITEMS['pain_killer']['emoji']}`pain_killer x1`\nHope you enjoy!", color = 0x2F3136)
 		await ctx.send(embed = embed)
 
 
