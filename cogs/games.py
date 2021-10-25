@@ -6,8 +6,7 @@ import typing
 import random
 
 from discord.ext.commands.cooldowns import Cooldown
-from utils import buttons_and_selects as bs
-from games_utils import constants as cs 
+from utils import buttons_and_selects as bs 
 import json
 import time
 import humanize
