@@ -35,5 +35,5 @@ class BattleField(commands.Cog):
 
 
 def setup(bot):
-	bot.add_cog(Games(bot))
+	bot.add_cog(BattleField(bot))
 
