@@ -129,7 +129,7 @@ async def on_ready():
 
 @bot.event
 async def on_command(ctx):
-    logger.warning(f"command invoked : {ctx.command} in {ctx.channel.p_id} by {ctx.author}")
+    logger.warning(f"command invoked : {ctx.command} in {ctx.channel.id} by {ctx.author}")
 
 
 
