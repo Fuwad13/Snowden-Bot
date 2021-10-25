@@ -50,7 +50,7 @@ os.environ["JISHAKU_HIDE"] = "True"
 
 TOKEN = os.getenv("TOKEN")
 
-UPTIME_DICT = {'uts': ""}
+
 
 
 # ======================= Bot constructor =====================
@@ -97,11 +97,11 @@ bot = SnowdenBot(
 
 
 # extensions
-INITIAL_EXTENSIONS = ['cogs.games', 'cogs.weather',
-                      'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku', 'cogs.owner']
+INITIAL_EXTENSIONS = ['cogs.games',
+                      'cogs.image', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku', 'cogs.owner']
 
-ALL_EXTENSIONS = ['cogs.games', 'cogs.weather',
-                  'cogs.image', 'cogs.web_search', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku' 'cogs.owner']
+ALL_EXTENSIONS = ['cogs.games',
+                  'cogs.image', 'cogs.info', "cogs.misc", 'cogs.error_handler', 'jishaku' 'cogs.owner']
 
 
 if __name__ == "__main__":
@@ -117,20 +117,19 @@ async def create_db_pool():
     credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
     bot.db = await asyncpg.create_pool(dsn = f'{credential}')
 
-    await bot.db.execute(""" CREATE TABLE IF NOT EXISTS snowden_bg ( id bigint PRIMARY KEY, created_at bigint NOT NULL, balance numeric(14,2) default 2500.00, exp bigint default 500 , inventory json, cooldowns json default '{"n_hourly" : 0,"n_daily" : 0,"n_weekly" : 0,"n_monthly" : 0,"n_work" : 0}'); """)
+    
 
 #events =========
 @bot.event
 async def on_ready():
-    UPTIME_DICT["uts"] = str(int(time.time()))
-    bot.uptime = int(UPTIME_DICT["uts"])
+    bot.uptime = int(time.time())
     #activity_change_.start()
     print(f'logged in as {bot.user}')
-    bot.get_command("jishaku").hidden = True
+    
 
 @bot.event
 async def on_command(ctx):
-    logger.warning(f"command invoked : {ctx.command} in {ctx.channel.id} by {ctx.author}")
+    logger.warning(f"command invoked : {ctx.command} in {ctx.channel.p_id} by {ctx.author}")
 
 
 

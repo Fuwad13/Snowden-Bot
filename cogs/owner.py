@@ -1,13 +1,25 @@
 import discord
 from discord.ext import commands
+from games_utils import constants as cs
 
 
 class Owner(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
+	@commands.command(name= '@initdb', hidden = True)
+	@commands.is_owner()
+	async def _initdb(self, ctx):
+		try :
+			await self.bot.db.execute(""" CREATE TABLE IF NOT EXISTS battlefield ( p_id bigint PRIMARY KEY, created_at bigint NOT NULL,joinpos serial, balance bigint default 500, exp bigint default 100 ,opt_status boolean default false, cooldowns json default '{"n_hourly" : 0,"n_daily" : 0,"n_weekly" : 0,"n_monthly" : 0,"n_work" : 0, "n_loot" : 0, "n_attack" : 0, "n_heal" : 0, "n_opt_in_toggle" : 0}'); """)
 
-	@commands.group(name = 'db',aliases = ['psql'], hidden = True, invoke_without_command = True)
+			await self.bot.db.execute(""" CREATE TABLE IF NOT EXISTS inventory (p_id bigint, common json, rare json, legendary json, epic json, mythic json, CONSTRAINT fk_p_id FOREIGN KEY (p_id) REFERENCES battlefield(p_id)); """)
+		except:
+			await ctx.send(f"{cs.EMOJIS['redtick']} There was an unexpected error!")
+		
+
+
+	@commands.group(name = '@db',aliases = ['@psql'], hidden = True, invoke_without_command = True)
 	@commands.is_owner()
 	async def db(self, ctx):
 		await ctx.send("Ok")
