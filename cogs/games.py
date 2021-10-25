@@ -11,9 +11,9 @@ from games_utils import constants as cs
 import json
 import time
 import humanize
-from games_utils import helper, constants as cs
+from games_utils import helper
 from games_utils.items import ALL_ITEMS
-
+from games_utils import constants as cs
 
 class BattleField(commands.Cog):
 	def __init__(self, bot):
