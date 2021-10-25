@@ -1,4 +1,4 @@
-import json#rarity
+
 RARITY ={
     '1' : 'common',
     '2' : 'rare',
