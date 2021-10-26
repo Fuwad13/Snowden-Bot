@@ -352,4 +352,39 @@ ALL_ITEMS = {
         'used_by' : ['s686', 's1897'],
         'sell_price' : 100
     },
+    'common_chest' : {
+        'name' : 'common_chest',
+        'emoji' : '<:common_chest:901798708864253992>',
+        'description' : '',
+        'buy_price' : 150,
+        'sell_price' : 100
+    },
+    'rare_chest' : {
+        'name' : 'rare_chest',
+        'emoji' : '<:rare_chest:901798877726924810>',
+        'description' : '',
+        'buy_price' : 300,
+        'sell_price' : 150
+    },
+    'legendary_chest' : {
+        'name' : 'legendary_chest',
+        'emoji' : '<:legendary_chest:901799227758350426>',
+        'description' : '',
+        'buy_price' : 1000,
+        'sell_price' : 800
+    },
+    'epic_chest' : {
+        'name' : 'epic_chest',
+        'emoji' : '<:epic_chest:901799469006336080>',
+        'description' : '',
+        'buy_price' : 2000,
+        'sell_price' : 1500
+    },
+    'mythic_chest' : {
+        'name' : 'mythic_chest',
+        'emoji' : '<:mythic_chest:901800353757036594>',
+        'description' : '',
+        'buy_price' : None,
+        'sell_price' : 3000
+    },
 } 
