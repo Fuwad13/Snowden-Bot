@@ -39,9 +39,9 @@ class BattleField(commands.Cog):
 	async def _inventory(self, ctx, player : typing.Union[discord.Member, discord.User] = None):
 		if player is None:
 			if ctx.message.reference:
-				player = ctx.message.reference.resolved.author.id
+				player = ctx.message.reference.resolved.author
 			else:
-				player = ctx.author.id
+				player = ctx.author
 		player_id = player.id
 		flag = await self.bfh.check_if_exists(player_id)
 		if not flag:
