@@ -3,7 +3,7 @@ import asyncpg
 import constants as cs
 import time
 import json
-import items as itm
+import games_utils.items as itm
 
 class BattleFieldHelper:
 	def __init__(self, bot):
