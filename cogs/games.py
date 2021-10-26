@@ -51,11 +51,14 @@ class BattleField(commands.Cog):
 
 		embed = discord.Embed(title = f"**__{player}'s Inventory__**",color = 0x2F3136)
 		text = f"\U0001f3e6 **Balance**: ${t2['balance']}\n\U0001f4bc **Inventory Value**: ${inv_value}\n\U00002728 **Player value**: {t2['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(t2['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['greentick'] if t1['opt_status'] else cs.EMOJIS['redtick']}\n"
-		embed.description = text
+		embed.add_field(name='Status/profile', value=text)
+		embed.add_field(name="\U00002764 Health", value=f"soon")
+		embed.add_field(name="\U0001f6e1 Shield", value="soon")
+
 		inv_items = self.bfh.get_inventory_items(t2)
 		for r in inv_items.keys():
 			if inv_items[r]:
-				embed.add_field(name='test', value= inv_items[r])
+				embed.add_field(name=f"{cs.RARITY[r].upper()}", value= inv_items[r])
 
 		await ctx.send(embed= embed)
 
