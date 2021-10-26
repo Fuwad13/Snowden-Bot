@@ -3,6 +3,7 @@ import asyncpg
 import constants as cs
 import time
 import json
+import items as itm
 
 class BattleFieldHelper:
 	def __init__(self, bot):
@@ -19,14 +20,14 @@ class BattleFieldHelper:
 
 	async def update_exp(self, *,player_id :int, amount, add :bool = True ):
 		if add == True:
-			c_exp = await self.bot.db.fetchval(""" SELECT exp FROM battlefield WHERE p_id = $1 ;""", player_id)
+			c_exp = await self.bot.db.fetchval(""" SELECT exp FROM inventory WHERE p_id = $1 ;""", player_id)
 			n_exp = int(c_exp) + amount
-			await self.bot.db.execute(""" UPDATE battlefield SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
+			await self.bot.db.execute(""" UPDATE inventory SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
 
 		elif add == False:
-			c_exp = await self.bot.db.fetchval(""" SELECT exp FROM battlefield WHERE p_id = $1 ;""", player_id)
+			c_exp = await self.bot.db.fetchval(""" SELECT exp FROM inventory WHERE p_id = $1 ;""", player_id)
 			n_exp = int(c_exp) - amount
-			await self.bot.db.execute(""" UPDATE battlefield SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
+			await self.bot.db.execute(""" UPDATE inventory SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
 		return c_exp, n_exp
 
 	def get_level(self, exp : int):
@@ -65,19 +66,37 @@ class BattleFieldHelper:
 
 	async def update_balance(self,*,player_id, amount : int, add : bool = True):
 		if add == True:
-			bal = await self.bot.db.fetchval(""" SELECT balance FROM battlefield WHERE p_id = $1 ;""", player_id)
+			bal = await self.bot.db.fetchval(""" SELECT balance FROM inventory WHERE p_id = $1 ;""", player_id)
 			bal = int(bal) + amount
-			await self.bot.db.execute(""" UPDATE battlefield SET balance = $1 WHERE p_id = $2; """, bal, player_id)
+			await self.bot.db.execute(""" UPDATE inventory SET balance = $1 WHERE p_id = $2; """, bal, player_id)
 
 		elif add == False:
-			bal = await self.bot.db.fetchval(""" SELECT balance FROM battlefield WHERE p_id = $1 ;""", player_id)
+			bal = await self.bot.db.fetchval(""" SELECT balance FROM inventory WHERE p_id = $1 ;""", player_id)
 			bal = int(bal) - amount
-			await self.bot.db.execute(""" UPDATE battlefield SET balance = $1 WHERE p_id = $2; """, bal, player_id)
+			await self.bot.db.execute(""" UPDATE inventory SET balance = $1 WHERE p_id = $2; """, bal, player_id)
 		return bal
 
-	async def get_player_inventory(self, player_id : int):
-		data = await self.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;  """, player_id)
+	def get_item_data(self, item :str):
+		data = itm.ALL_ITEMS[item]
 		return data
+
+	def get_inventory_value(self, t2):
+		value : int = 0
+		for column in t2:
+			if isinstance(column, int):
+				continue
+			i_dict : dict = json.loads(column)
+			for item, count in i_dict.items():
+				unit_price = itm.ALL_ITEMS[str(item)]['sell_price']
+				value = value + unit_price*count
+		return value
+
+			
+
+	async def get_player_data(self, player_id : int):
+		t1 = await self.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;  """, player_id)
+		t2 = await self.bot.db.fetchrow(""" SELECT * FROM inventory where p_id = $1;  """, player_id)
+		return t1, t2
 
 	async def is_opted_in(self, player_id : int):
 		pass
