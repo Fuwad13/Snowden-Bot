@@ -13,8 +13,7 @@ class SnowdenHelp(commands.MinimalHelpCommand):
             }, verify_checks=False, show_hidden=False
         )
 	
-	async def get_command_signature(self, command):
-		return f"{self.context.clean_prefix}{command.qualified_name} {command.signature} "
+	
 
 	
 

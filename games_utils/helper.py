@@ -1,6 +1,6 @@
 import discord
 import asyncpg
-import constants as cs
+import games_utils.constants as cs
 import time
 import json
 import games_utils.items as itm
@@ -91,7 +91,20 @@ class BattleFieldHelper:
 				value = value + unit_price*count
 		return value
 
-			
+	def get_inventory_items(self, t2):
+		fields = {}
+		c = 1
+		for column in t2:
+			if isinstance(column, int):
+				continue
+			i_dict : dict = json.loads(column)
+			text = ""
+			for item, count in i_dict.items():
+				if item:
+					text+=f"{itm.ALL_ITEMS[str(item)]['emoji']} {str(item)} x{count}\n"
+			fields[str(c)] = text
+			c+=1
+		return fields
 
 	async def get_player_data(self, player_id : int):
 		t1 = await self.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;  """, player_id)
