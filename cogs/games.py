@@ -79,7 +79,7 @@ class BattleField(commands.Cog):
 		if not flag:
 			return await ctx.send(f"{ctx.author} hasn't started playing Battlefield yet, run {ctx.clean_prefix}start to start playing!")
 		opted_in = await self.bfh.get_opt_status(player_id)
-		n_opt : int= await self.bfh.get_cooldown_data(player_id,'n_opt_in_toggle')
+		n_opt : int= await self.bfh.get_cooldown_data(player_id,'opt_in_toggle')
 		c_opt = self.bfh.can_opt_out(n_opt)
 
 		embed = discord.Embed(title=f"{cs.EMOJIS['toggle_on'] if opted_in else cs.EMOJIS['toggle_off']} {ctx.author}'s opt in status:",color = 0x2F3136)
