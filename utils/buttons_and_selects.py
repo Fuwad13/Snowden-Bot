@@ -13,8 +13,6 @@ class ConfirmOrCancel(ui.View):
 	async def on_timeout(self):
 		pass
 
-		
-
 	async def interaction_check(self, intr):
 		if not self.ctx.author == intr.user:
 			await intr.response.send_message("Sorry, you can't interact to these buttons", ephemeral = True)
@@ -22,19 +20,12 @@ class ConfirmOrCancel(ui.View):
 
 	@ui.button(label = 'Confirm', style = discord.ButtonStyle.green)
 	async def confirm_button(self, button, interaction):
-		
-		
 		self.value = True
-		
-		
 		self.stop()
 
 	@ui.button(label = 'Cancel', style = discord.ButtonStyle.red)
 	async def cancel_button(self, button, interaction):
-		
-		
 		self.value = False
-		
 		self.stop()
 
 

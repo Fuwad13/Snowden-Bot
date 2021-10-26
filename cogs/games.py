@@ -63,13 +63,57 @@ class BattleField(commands.Cog):
 		await ctx.send(embed= embed)
 
 
-	@commands.command(name = 'items', aliases = ['item'], brief = "Gives you informations about any game item(s)", help = "Gives you informations about any game item(s). run `items [item_name]` to get information about a specific item.")
-	@commands.cooldown(1,5, BucketType.user)
+	@commands.command(name = 'items', aliases = ['item'], brief = "Gives you information about any game item(s)", help = "Gives you information about any game item(s). run `items [item_name]` to get information about a specific item.")
+	@commands.cooldown(1,3, BucketType.user)
 	async def _items(self, ctx, item_name : str = None):
 		if not item_name:
 			item_list = []
 			for item in ALL_ITEMS.keys():
 				pass
+
+	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt'], help= "Toggle your `opt` status if available. You can't toggle your `opt` status if you are on cooldown!")
+	@commands.cooldown(1,2,BucketType.user)
+	async def opt(self, ctx):
+		player_id = ctx.author
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{ctx.author} hasn't started playing Battlefield yet, run {ctx.clean_prefix}start to start playing!")
+		opted_in = await self.bfh.get_opt_status(player_id)
+		n_opt : int= await self.bfh.get_cooldown_data(player_id,'n_opt_in_toggle')
+		c_opt = self.bfh.can_opt_out(n_opt)
+
+		embed = discord.Embed(title=f"{cs.EMOJIS['toggle_on'] if opted_in else cs.EMOJIS['toggle_off']} {ctx.author}'s opt in status:",color = 0x2F3136)
+		text =f"You're currently {'**Opted in**' if opted_in else '**Opted out**'}!\n"
+		if not c_opt:
+			text+=f"Seems like you are on cooldown! You need to wait `{humanize.precisedelta(n_opt-int(time.time()))}` before you can toggle your `opt status`"
+			embed.description= text
+			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		text+=f"If you want to toggle your `opt status` then press `Confirm` or else press `Cancel` to cancel in next **30s**!"
+		embed.description = text
+		view = bs.ConfirmOrCancel(ctx, timeout=30)
+		view.msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed, view = view)
+		await view.wait()
+		view.clear_items()
+		if view.value == True:
+			ch = await self.bfh.set_opt_status(player_id, not opted_in)
+			embed.description+=f"\n{cs.EMOJIS['toggle_on'] if ch else cs.EMOJIS['toggle_off']} You've successfully toggled your `opt status`"
+			await view.msg.edit(embed = embed, view = view)
+
+		elif view.value == False:
+			embed.description+=f"\n{cs.EMOJIS['redtick']} You chose to stay {'**Opted in**' if opted_in else '**Opted out'}"
+			await view.msg.edit(embed = embed, view = view)
+
+		elif view.value == None:
+			embed.description+=f"\n:warning: You took too long to respond!"
+			await view.msg.edit(embed = embed, view = view)	
+
+
+
+	@commands.group(name= 'open', aliases = ['unbox', 'o'], brief= "Open chest(s) from your inventory", help= "Open chests to get random game items!Chances of getting items are based on their rarity.You might get items with higher tier rarity from a lower tier chest.", invoke_without_command= True)
+	@commands.cooldown(1,2, BucketType.user)
+	async def _open(self, ctx):
+		pass
+
 
 	
 

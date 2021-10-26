@@ -24,7 +24,7 @@ class Information(commands.Cog):
 		embed.set_image(url=avatar)
 		await ctx.send(embed=embed)
 
-	@commands.command(name = 'test')
+	@commands.command(name = 'test', hidden= True)
 	async def test(self, ctx):
 		em = discord.Embed(title = 'Test')
 		view = bs.ConfirmOrCancel(ctx,timeout=30)

@@ -111,10 +111,25 @@ class BattleFieldHelper:
 		t2 = await self.bot.db.fetchrow(""" SELECT * FROM inventory where p_id = $1;  """, player_id)
 		return t1, t2
 
-	async def is_opted_in(self, player_id : int):
-		pass
+	async def get_opt_status(self, player_id: int):
+		status : bool= await self.bot.db.fetchval(""" SELECT opt_status FROM battlefield where p_id = $1; """, player_id)
+		return status
+	async def set_opt_status(self, player_id :int, status : bool = True):
+		if status:
+			await self.bot.db.execute(""" UPDATE battlefield SET opt_status = true where p_id = $1;""", player_id)
+			return True
+		else:
+			await self.bot.db.execute(""" UPDATE battlefield SET opt_status = false where p_id = $1;""", player_id)
+			return False
 
-	async def toggle_opt(self, player_id: int):
-		pass
+		
+
+	def can_opt_out(self, n_opt_out: int):
+		if n_opt_out> int(time.time()):
+			return False
+		else:
+			return True
+
+
 
 	
