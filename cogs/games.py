@@ -50,7 +50,7 @@ class BattleField(commands.Cog):
 		inv_value = self.bfh.get_inventory_value(t2)
 
 		embed = discord.Embed(title = f"**__{player}'s Inventory__**",color = 0x2F3136)
-		text = f"\U0001f3e6 **Balance**: ${t2['balance']}\n\U0001f4bc **Inventory Value**: ${inv_value}\n\U00002728 **Player value**: {t2['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(t2['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['greentick'] if t1['opt_status'] else cs.EMOJIS['redtick']}\n"
+		text = f"\U0001f3e6 **Balance**: ${t2['balance']}\n\U0001f4bc **Inventory Value**: ${inv_value}\n\U00002728 **Player value**: ${t2['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(t2['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['greentick'] if t1['opt_status'] else cs.EMOJIS['redtick']}\n"
 		embed.add_field(name='Status/profile', value=text)
 		embed.add_field(name="\U00002764 Health", value=f"soon")
 		embed.add_field(name="\U0001f6e1 Shield", value="soon")
@@ -96,11 +96,12 @@ class BattleField(commands.Cog):
 		view.clear_items()
 		if view.value == True:
 			ch = await self.bfh.set_opt_status(player_id, not opted_in)
+			await self.bfh.update_cooldowns(player_id, 'opt_in_toggle')
 			embed.description+=f"\n{cs.EMOJIS['toggle_on'] if ch else cs.EMOJIS['toggle_off']} You've successfully toggled your `opt status`"
 			await view.msg.edit(embed = embed, view = view)
 
 		elif view.value == False:
-			embed.description+=f"\n{cs.EMOJIS['redtick']} You chose to stay {'**Opted in**' if opted_in else '**Opted out'}"
+			embed.description+=f"\n{cs.EMOJIS['redtick']} You chose to stay {'**Opted in**' if opted_in else '**Opted out**'}"
 			await view.msg.edit(embed = embed, view = view)
 
 		elif view.value == None:

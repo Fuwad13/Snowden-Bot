@@ -433,7 +433,8 @@ COOLDOWNS = {
     'weekly' : 604800,
     'monthly' : 2592000,
     'work' : 3600,
-    'loot' : 30
+    'loot' : 30,
+    'opt_in_toggle' : 43200
 }
 
 EXP_LEVELS = {
