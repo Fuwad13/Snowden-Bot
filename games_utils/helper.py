@@ -1,4 +1,5 @@
 import discord
+import random
 import asyncpg
 import games_utils.constants as cs
 import time
@@ -9,7 +10,7 @@ class BattleFieldHelper:
 	def __init__(self, bot):
 		self.bot = bot
 
-	async def check_if_exists(self, player_id):
+	async def check_if_exists(self, player_id : int):
 		flag = False
 		player = await self.bot.db.fetchval(""" SELECT p_id FROM battlefield WHERE p_id = $1 """, player_id)
 		if player:
@@ -91,7 +92,7 @@ class BattleFieldHelper:
 				value = value + unit_price*count
 		return value
 
-	def get_inventory_items(self, t2):
+	def get_inventory_items_str(self, t2):
 		fields = {}
 		c = 1
 		for column in t2:
@@ -100,11 +101,32 @@ class BattleFieldHelper:
 			i_dict : dict = json.loads(column)
 			text = ""
 			for item, count in i_dict.items():
-				if item:
-					text+=f"{itm.ALL_ITEMS[str(item)]['emoji']} {str(item)} x{count}\n"
+				try:
+					if item:
+						text+=f"{itm.ALL_ITEMS[str(item)]['emoji']} {str(item)} x{count}\n"
+				except: #keyerror
+					pass
 			fields[str(c)] = text
 			c+=1
 		return fields
+
+	def get_chests_count(self, t2):
+		"""Returns a dictionary of the filtered items in the following format: {'item_name' : count}"""
+		filtered_items = {'common_chest' : 0, 'rare_chest' : 0,'legendary_chest' : 0, 'epic_chest' : 0,'mythic_chest' : 0}
+		for column in t2:
+			if isinstance(column, int):
+				continue
+			i_dict : dict = json.loads(column)
+			text = ""
+			for item, count in i_dict.items():
+				try:
+					if item and 'chest' in str(item).lower():
+						filtered_items[str(item)] = count
+				except: #keyerror
+					pass
+			
+			
+		return filtered_items
 
 	async def get_player_data(self, player_id : int):
 		t1 = await self.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;  """, player_id)
@@ -133,6 +155,19 @@ class BattleFieldHelper:
 
 	def level_up_rewards(self, n_lvl : int):
 		pass
+
+	def get_items(self, *, by : str, query : str):
+		
+		item_list = [str(k) for k, v in itm.ALL_ITEMS.items() if v[by] == query]
+		
+		return item_list
+
+	def open_chest(self, chest : str, amount : int):
+		rarity_tier = chest.split('_')[0]
+		item_list = self.get_items(by = 'rarity', query= rarity_tier)
+		o_item = random.choice(item_list)
+		return o_item
+
 
 
 

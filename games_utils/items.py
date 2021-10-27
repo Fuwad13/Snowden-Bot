@@ -5,6 +5,7 @@ CD_UNIT = int(72)
 ALL_ITEMS = {
     'p92' : {
         'name' : 'p92_pistol',
+        'type' : 'weapon',
         'rarity' : 'common',
         'emoji' : '<:p92:901725176130052126>',
         'ammo' : '9mm',
@@ -16,6 +17,7 @@ ALL_ITEMS = {
     },
     'p18c' : {
         'name' : 'p18c_pistol',
+        'type' : 'weapon',
         'rarity' : 'rare',
         'emoji' : '<:p18c:901725472780591144>',
         'ammo' : '9mm',
@@ -27,6 +29,7 @@ ALL_ITEMS = {
     },
     'grenade' : {
         'name' : 'grenade',
+        'type' : 'weapon',
         'rarity' : 'legendary',
         'emoji' : '<:grenade:901571735403528294>',
         'ammo' : None,
@@ -38,6 +41,7 @@ ALL_ITEMS = {
     },
     'ak_47' : {
         'name' : 'ak_47',
+        'type' : 'weapon',
         'rarity' : 'legendary',
         'emoji' : '<:ak_47:901570473786228796>',
         'ammo' : '7_62mm',
@@ -49,6 +53,7 @@ ALL_ITEMS = {
     },
     'm416' : {
         'name' : 'm416',
+        'type' : 'weapon',
         'rarity' : 'legendary',
         'emoji' : '<:m416:901570478538391603>',
         'ammo' : '5_56mm',
@@ -60,6 +65,7 @@ ALL_ITEMS = {
     },
     'scar_l' : {
         'name' : 'scar_l',
+        'type' : 'weapon',
         'rarity' : 'legendary',
         'emoji' : '<:scar_l:901570493432336385>',
         'ammo' : '5_56mm',
@@ -71,6 +77,7 @@ ALL_ITEMS = {
     },
     'ump45' : {
         'name' : 'ump45',
+        'type' : 'weapon',
         'rarity' : 'rare',
         'emoji' : '<:ump45:901570488692793394>',
         'ammo' : '45acp',
@@ -82,6 +89,7 @@ ALL_ITEMS = {
     },
     'thompson' : {
         'name' : 'thompson',
+        'type' : 'weapon',
         'rarity' : 'rare',
         'emoji' : '<:thompson:901767201537818664>',
         'ammo' : '45acp',
@@ -93,6 +101,7 @@ ALL_ITEMS = {
     },
     'vector' : {
         'name' : 'thompson',
+        'type' : 'weapon',
         'rarity' : 'legendary',
         'emoji' : '<:vector:901571514762137692>',
         'ammo' : '45acp',
@@ -104,6 +113,7 @@ ALL_ITEMS = {
     },
     'win94' : {
         'name' : 'win94',
+        'type' : 'weapon',
         'rarity' : 'epic',
         'emoji' : '<:win94:901571519682072598>',
         'ammo' : '45acp',
@@ -115,6 +125,7 @@ ALL_ITEMS = {
     },
     'kar98k' : {
         'name' : 'kar98k',
+        'type' : 'weapon',
         'rarity' : 'epic',
         'emoji' : '<:kar98k_sniper_rifle:901570666774548570>',
         'ammo' : '7_62mm',
@@ -126,6 +137,7 @@ ALL_ITEMS = {
     },
     'm24' : {
         'name' : 'm24',
+        'type' : 'weapon',
         'rarity' : 'epic',
         'emoji' : '<:m24_sniper_rifle:901571401503342674>',
         'ammo' : '7_62mm',
@@ -137,6 +149,7 @@ ALL_ITEMS = {
     },
     'awm' : {
         'name' : 'awm',
+        'type' : 'weapon',
         'rarity' : 'mythic',
         'emoji' : '<:awm_sniper_rifle:901570671769964544>',
         'ammo' : '300magnum',
@@ -148,6 +161,7 @@ ALL_ITEMS = {
     },
     'groza' : {
         'name' : 'groza',
+        'type' : 'weapon',
         'rarity' : 'epic',
         'emoji' : '<:groza:901571406523953162>',
         'ammo' : '7_62mm',
@@ -159,6 +173,7 @@ ALL_ITEMS = {
     },
     'beryl' : {
         'name' : 'beryl',
+        'type' : 'weapon',
         'rarity' : 'legendary',
         'emoji' : '<:beryl_m762:901571411414487041>',
         'ammo' : '7_62mm',
@@ -170,6 +185,7 @@ ALL_ITEMS = {
     },
     'mini14' : {
         'name' : 'mini14',
+        'type' : 'weapon',
         'rarity' : 'epic',
         'emoji' : '<:mini14:901787010329612358>',
         'ammo' : '5_56mm',
@@ -181,6 +197,7 @@ ALL_ITEMS = {
     },
     'pan' : {
         'name' : 'pan',
+        'type' : 'weapon',
         'rarity' : 'rare',
         'emoji' : '<:pan:901575943699697685>',
         'ammo' : None,
@@ -192,6 +209,7 @@ ALL_ITEMS = {
     },
     'crowbar' : {
         'name' : 'crowbar',
+        'type' : 'weapon',
         'rarity' : 'common',
         'emoji' : '<:crowbar:901571396101111830>',
         'ammo' : None,
@@ -203,6 +221,7 @@ ALL_ITEMS = {
     },
     'sickle' : {
         'name' : 'sickle',
+        'type' : 'weapon',
         'rarity' : 'common',
         'emoji' : '<:sickle:901576064659239013>',
         'ammo' : None,
@@ -214,6 +233,7 @@ ALL_ITEMS = {
     },
     's686' : {
         'name' : 's686',
+        'type' : 'weapon',
         'rarity' : 'legendary',
         'emoji' : '<:s686:901787362458218506>',
         'ammo' : '12gauge',
@@ -225,6 +245,7 @@ ALL_ITEMS = {
     },
     's1897' : {
         'name' : 's1897',
+        'type' : 'weapon',
         'rarity' : 'rare',
         'emoji' : '<:s1897:901787644135092224>',
         'ammo' : '12gauge',
@@ -236,6 +257,7 @@ ALL_ITEMS = {
     },
     'pain_killer' : {
         'name' : 'pain_killer',
+        'type' : 'healing',
         'rarity' : 'rare',
         'emoji' : '<:painkiller:901570677105123378>',
         'hp_recover' : '15-20',
@@ -245,6 +267,7 @@ ALL_ITEMS = {
     },
     'bandage' : {
         'name' : 'bandage',
+        'type' : 'healing',
         'rarity' : 'common',
         'emoji' : '<:bandage:901574043449319434>',
         'hp_recover' : '7-12',
@@ -254,6 +277,7 @@ ALL_ITEMS = {
     },
     'first_aid_kit' : {
         'name' : 'first_aid_kit',
+        'type' : 'healing',
         'rarity' : 'legendary',
         'emoji' : '<:first_aid_kit:901570962863046706>',
         'hp_recover' : '50-75',
@@ -263,6 +287,7 @@ ALL_ITEMS = {
     },
     'med_kit' : {
         'name' : 'med_kit',
+        'type' : 'healing',
         'rarity' : 'epic',
         'emoji' : '<:medkit:901570967707467877>',
         'hp_recover' : '75-100',
@@ -272,6 +297,7 @@ ALL_ITEMS = {
     },
     'police_vest_level_1' : {
         'name' : 'police_vest_level_1',
+        'type' : 'armour',
         'rarity' : 'common',
         'emoji' : '<:police_vest_lvl_1:901511044973867098>',
         'shield_points' : 20,
@@ -280,6 +306,7 @@ ALL_ITEMS = {
     },
     'police_vest_level_2' : {
         'name' : 'police_vest_level_2',
+        'type' : 'armour',
         'rarity' : 'rare',
         'emoji' : '<:police_vest_lvl_2:901511128188854272>',
         'shield_points' : 30,
@@ -288,6 +315,7 @@ ALL_ITEMS = {
     },
     'military_armour_level_1' : {
         'name' : 'military_armour_level_1',
+        'type' : 'armour',
         'rarity' : 'legendary',
         'emoji' : '<:military_armour_lvl_1:901511267653652610>',
         'shield_points' : 50,
@@ -296,6 +324,7 @@ ALL_ITEMS = {
     },
     'military_armour_level_2' : {
         'name' : 'military_armour_level_2',
+        'type' : 'armour',
         'rarity' : 'epic',
         'emoji' : '<:military_armour_lvl_2:902144891692400660>',
         'shield_points' : 75,
@@ -304,6 +333,7 @@ ALL_ITEMS = {
     },
     'samurai_armour_set' : {
         'name' : 'samurai_armour_set',
+        'type' : 'armour',
         'rarity' : 'mythic',
         'emoji' : '<:samurai_armour_set:901510924207276122>',
         'shield_points' : 100,
@@ -312,6 +342,7 @@ ALL_ITEMS = {
     },
     '9mm' : {
         'name' : '9mm_bullet',
+        'type' : 'ammunition',
         'emoji' : '<:9mm:901772563825438720>',
         'rarity' : 'common',
         'used_by' : ['p92', 'p18c', 'uzi'],
@@ -319,6 +350,7 @@ ALL_ITEMS = {
     },
     '45acp' : {
         'name' : '45acp_bullet',
+        'type' : 'ammunition',
         'emoji' : '<:45acp:901772580552323102>',
         'rarity' : 'rare',
         'used_by' : ['thompson','ump45', 'win94', 'desert_eagle', 'vector'],
@@ -326,6 +358,7 @@ ALL_ITEMS = {
     },
     '5_56mm' : {
         'name' : '5_56mm_bullet',
+        'type' : 'ammunition',
         'emoji' : '<:5_56mm:901772574843867217>',
         'rarity' : 'legendary',
         'used_by' : ['m416', 'scar_l', 'mini14'],
@@ -333,6 +366,7 @@ ALL_ITEMS = {
     },
     '7_62mm' : {
         'name' : '7_62mm_bullet',
+        'type' : 'ammunition',
         'emoji' : '<:7_62mm:901772569349357598>',
         'rarity' : 'legendary',
         'used_by' : ['ak_47', 'groza', 'beryl', 'kar98k', 'm24'],
@@ -340,6 +374,7 @@ ALL_ITEMS = {
     },
     '300magnum' : {
         'name' : '300magnum_bullet',
+        'type' : 'ammunition',
         'emoji' : '<:300magnum:901772585665187840>',
         'rarity' : 'epic',
         'used_by' : ['awm'],
@@ -347,6 +382,7 @@ ALL_ITEMS = {
     },
     '12gauge' : {
         'name' : '12gauge_shells',
+        'type' : 'ammunition',
         'emoji' : '<:12gauge:901772615570579537>',
         'rarity' : 'rare',
         'used_by' : ['s686', 's1897'],
@@ -354,6 +390,8 @@ ALL_ITEMS = {
     },
     'common_chest' : {
         'name' : 'common_chest',
+        'type' : 'chest',
+        'rarity' : 'common',
         'emoji' : '<:common_chest:901798708864253992>',
         'description' : '',
         'buy_price' : 150,
@@ -361,6 +399,8 @@ ALL_ITEMS = {
     },
     'rare_chest' : {
         'name' : 'rare_chest',
+        'type' : 'chest',
+        'rarity' : 'rare',
         'emoji' : '<:rare_chest:901798877726924810>',
         'description' : '',
         'buy_price' : 300,
@@ -368,6 +408,8 @@ ALL_ITEMS = {
     },
     'legendary_chest' : {
         'name' : 'legendary_chest',
+        'type' : 'chest',
+        'rarity' : 'legendary',
         'emoji' : '<:legendary_chest:901799227758350426>',
         'description' : '',
         'buy_price' : 1000,
@@ -375,6 +417,8 @@ ALL_ITEMS = {
     },
     'epic_chest' : {
         'name' : 'epic_chest',
+        'type' : 'chest',
+        'rarity' : 'epic',
         'emoji' : '<:epic_chest:901799469006336080>',
         'description' : '',
         'buy_price' : 2000,
@@ -382,6 +426,8 @@ ALL_ITEMS = {
     },
     'mythic_chest' : {
         'name' : 'mythic_chest',
+        'type' : 'chest',
+        'rarity' : 'mythic',
         'emoji' : '<:mythic_chest:901800353757036594>',
         'description' : '',
         'buy_price' : None,

@@ -51,11 +51,11 @@ class BattleField(commands.Cog):
 
 		embed = discord.Embed(title = f"**__{player}'s Inventory__**",color = 0x2F3136)
 		text = f"\U0001f3e6 **Balance**: ${t2['balance']}\n\U0001f4bc **Inv. value**: ${inv_value}\n\U00002728 **Player value**: ${t2['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(t2['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['greentick'] if t1['opt_status'] else cs.EMOJIS['redtick']}\n"
-		embed.add_field(name='__Status/profile__', value=text)
+		embed.add_field(name='\U0001f4cb __Status/profile__', value=text)
 		embed.add_field(name="\U00002764 __Health__", value=f"soon")
 		embed.add_field(name="\U0001f6e1 __Shield__", value="soon")
 
-		inv_items = self.bfh.get_inventory_items(t2)
+		inv_items = self.bfh.get_inventory_items_str(t2)
 		for r in inv_items.keys():
 			if inv_items[r]:
 				embed.add_field(name=f"{cs.RARITY[r].upper()}", value= inv_items[r])
@@ -74,10 +74,10 @@ class BattleField(commands.Cog):
 	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt'], help= "Toggle your `opt` status if available. You can't toggle your `opt` status if you are on cooldown!")
 	@commands.cooldown(1,2,BucketType.user)
 	async def opt(self, ctx):
-		player_id = ctx.author
+		player_id = ctx.author.id
 		flag = await self.bfh.check_if_exists(player_id)
 		if not flag:
-			return await ctx.send(f"{ctx.author} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+			return await ctx.send(f"{ctx.author} you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		opted_in = await self.bfh.get_opt_status(player_id)
 		n_opt : int= await self.bfh.get_cooldown_data(player_id,'opt_in_toggle')
 		c_opt = self.bfh.can_opt_out(n_opt)
@@ -205,10 +205,20 @@ class BattleField(commands.Cog):
 			view.clear_items()
 			await msg.edit(embed = embed, view = view)
 
-	@commands.group(name= 'open', aliases = ['unbox', 'o'], brief= "Open chest(s) from your inventory", help= "Open chests to get random game items!Chances of getting items are based on their rarity.You might get items with higher tier rarity from a lower tier chest.", invoke_without_command= True)
-	@commands.cooldown(1,2, BucketType.user)
+	@commands.group(name= 'open', aliases = ['unbox', 'o', 'un'], brief= "Open chest(s) from your inventory", help= "Open chests to get random game items!Chances of getting items are based on their rarity.You might get items with higher tier rarity from a lower tier chest.", invoke_without_command= True)
+	@commands.cooldown(1,5, BucketType.user)
 	async def _open(self, ctx):
-		pass
+		player_id = ctx.author.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		embed = discord.Embed(title = f"{ctx.author.name}, You currently have...", color = 0x2F3136)
+		inv_table = await self.bot.db.fetchrow(""" SELECT * FROM inventory where p_id = $1;  """, player_id)
+		chest_dict = self.bfh.get_chests_count(inv_table)
+		text= f"• {cs.CHESTS_EMOJIS['common']} x{chest_dict['common_chest']} `common chest(s)`\n• {cs.CHESTS_EMOJIS['rare']} x{chest_dict['rare_chest']} `rare chest(s)`\n• {cs.CHESTS_EMOJIS['legendary']} x{chest_dict['legendary_chest']} `legendary chest(s)`\n• {cs.CHESTS_EMOJIS['epic']} x{chest_dict['epic_chest']} `epic chest(s)`\n• {cs.CHESTS_EMOJIS['mythic']} x{chest_dict['myhtic_chest']} `mythic chest(s)`\nuse `{ctx.clean_prefix}open [chest] [amount]` to open your chests to get random items!"
+		embed.description= text
+		await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+
 
 
 	
