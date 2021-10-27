@@ -50,7 +50,7 @@ class BattleField(commands.Cog):
 		inv_value = self.bfh.get_inventory_value(t2)
 
 		embed = discord.Embed(title = f"**__{player}'s Inventory__**",color = 0x2F3136)
-		text = f"\U0001f3e6 **Balance**: ${t2['balance']}\n\U0001f4bc **Inv. value**: ${inv_value}\n\U00002728 **Player value**: ${t2['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(t2['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['greentick'] if t1['opt_status'] else cs.EMOJIS['redtick']}\n"
+		text = f"\U0001f3e6 **Balance**: ${t2['balance']}\n\U0001f4bc **Inv. value**: ${inv_value}\n\U00002728 **Player value**: ${t2['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(t2['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['toggle_on'] if t1['opt_status'] else cs.EMOJIS['toggle_off']}\n"
 		embed.add_field(name='\U0001f4cb __Status/profile__', value=text)
 		embed.add_field(name="\U00002764 __Health__", value=f"soon")
 		embed.add_field(name="\U0001f6e1 __Shield__", value="soon")
@@ -214,10 +214,41 @@ class BattleField(commands.Cog):
 			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		embed = discord.Embed(title = f"{ctx.author.name}, You currently have...", color = 0x2F3136)
 		inv_table = await self.bot.db.fetchrow(""" SELECT * FROM inventory where p_id = $1;  """, player_id)
-		chest_dict = self.bfh.get_chests_count(inv_table)
+		chest_dict = self.bfh.get_chest_counts(inv_table)
 		text= f"• {cs.CHESTS_EMOJIS['common']} x{chest_dict['common_chest']} `common chest(s)`\n• {cs.CHESTS_EMOJIS['rare']} x{chest_dict['rare_chest']} `rare chest(s)`\n• {cs.CHESTS_EMOJIS['legendary']} x{chest_dict['legendary_chest']} `legendary chest(s)`\n• {cs.CHESTS_EMOJIS['epic']} x{chest_dict['epic_chest']} `epic chest(s)`\n• {cs.CHESTS_EMOJIS['mythic']} x{chest_dict['mythic_chest']} `mythic chest(s)`\nuse `{ctx.clean_prefix}open [chest] [amount]` to open your chests to get random items!"
 		embed.description= text
 		await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+
+	@_open.command(name= 'common', aliases = ['c', 'cmn', 'com'], help= "Open common chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	@commands.cooldown(1,5, BucketType.user)
+	async def _common(self, ctx, amount : int = 1):
+		player_id = ctx.author.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		inv_table = await self.bfh.get_inventory_table(player_id)
+		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
+		if chest_counts['common_chest'] < amount:
+			return await ctx.send(f"{ctx.author.mention}, You don't have that amount of chests in your inventory!")
+		elif amount <= 0:
+			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
+		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `common chest(s)` from your inventory.....",color = 0x2F3136)
+		msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		if amount == 1:
+			
+			o_item = self.bfh.open_chest('common_chest')
+			await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
+			await self.bfh.update_inventory(player_id = player_id, _item = 'common_chest',amount= -1)
+			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `common chest` from your inventory. You got:"
+			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
+			# add embed image later
+			await msg.edit(embed= embed)
+		elif amount > 1:
+			pass
+		
+
+
+
 
 
 

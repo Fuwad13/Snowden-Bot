@@ -81,6 +81,10 @@ class BattleFieldHelper:
 		data = itm.ALL_ITEMS[item]
 		return data
 
+	async def get_inventory_table(self, player_id :int):
+		inv_table = await self.bot.db.fetchrow(""" SELECT * FROM inventory where p_id = $1; """, player_id)
+		return inv_table
+
 	def get_inventory_value(self, t2):
 		value : int = 0
 		for column in t2:
@@ -110,7 +114,7 @@ class BattleFieldHelper:
 			c+=1
 		return fields
 
-	def get_chests_count(self, t2):
+	def get_chest_counts(self, t2):
 		"""Returns a dictionary of the filtered items in the following format: {'item_name' : count}"""
 		filtered_items = {'common_chest' : 0, 'rare_chest' : 0,'legendary_chest' : 0, 'epic_chest' : 0,'mythic_chest' : 0}
 		for column in t2:
@@ -144,8 +148,19 @@ class BattleFieldHelper:
 			await self.bot.db.execute(""" UPDATE battlefield SET opt_status = false where p_id = $1;""", player_id)
 			return False
 	
-	async def update_inventory(self,*,player_id : int, items):
-		pass
+	async def update_inventory(self,*,player_id : int, _item : str, amount : int):
+		"""Update a player's inventory for one item"""
+		inv_table = await self.get_inventory_table(player_id)
+		rarity_tier :str = itm.ALL_ITEMS[_item]['rarity']
+		t_dict  = json.loads(inv_table[rarity_tier])
+		try:
+			t_dict[_item]+=amount
+		except KeyError:
+			t_dict[_item] = amount
+		t_json = json.dumps(t_dict)
+		query = f"UPDATE inventory SET {rarity_tier} = $1 WHERE p_id = $2;"
+		await self.bot.db.execute(query, t_json, player_id)
+
 
 	def can_opt_out(self, n_opt_out: int):
 		if n_opt_out> int(time.time()):
@@ -162,7 +177,7 @@ class BattleFieldHelper:
 		
 		return item_list
 
-	def open_chest(self, chest : str, amount : int):
+	def open_chest(self, chest : str):
 		rarity_tier = chest.split('_')[0]
 		item_list = self.get_items(by = 'rarity', query= rarity_tier)
 		o_item = random.choice(item_list)
