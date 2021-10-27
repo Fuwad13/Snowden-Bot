@@ -1,5 +1,6 @@
 import discord
 from discord import embeds
+from discord import player
 from discord.ext import commands
 import asyncpg
 import typing
@@ -229,7 +230,7 @@ class BattleField(commands.Cog):
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['common_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have that amount of chests in your inventory!")
+			return await ctx.send(f"{ctx.author.mention}, You don't have {amount} `common chest(s)`, sorry.")
 		elif amount <= 0:
 			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
 		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `common chest(s)` from your inventory.....",color = 0x2F3136)
@@ -244,13 +245,330 @@ class BattleField(commands.Cog):
 			# add embed image later
 			await msg.edit(embed= embed)
 		elif amount > 1:
-			pass
-		
+			items_dict = {}
+			items_list = []
+			for i in range(0, amount):
+				o_item = self.bfh.open_chest('common_chest')
+				items_list.append(o_item)
+				try:
+					if items_dict[o_item]:
+						items_dict[o_item]+=1
+				except KeyError:
+					items_dict[o_item] = 1
+			try:
+				if items_dict['common_chest']:
+					items_dict['common_chest']+=-amount
+			except KeyError:
+				items_dict['common_chest'] = -amount
+			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+			r_str = '\n'.join(r_list)
+			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `common chest(s)` from your inventory. You got:"
+			embed.description = r_str
+			await msg.edit(embed= embed)
 
+	@_open.command(name= 'rare', aliases = ['r', 'rar'], help= "Open rare chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	@commands.cooldown(1,5, BucketType.user)
+	async def _rare(self, ctx, amount : int = 1):
+		player_id = ctx.author.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		inv_table = await self.bfh.get_inventory_table(player_id)
+		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
+		if chest_counts['rare_chest'] < amount:
+			return await ctx.send(f"{ctx.author.mention}, You don't have {amount} `rare chest(s)`, sorry.")
+		elif amount <= 0:
+			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
+		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `rare chest(s)` from your inventory.....",color = 0x2F3136)
+		msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		if amount == 1:
+			
+			o_item = self.bfh.open_chest('rare_chest')
+			await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
+			await self.bfh.update_inventory(player_id = player_id, _item = 'rare_chest',amount= -1)
+			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `rare chest` from your inventory. You got:"
+			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
+			# add embed image later
+			await msg.edit(embed= embed)
+		elif amount > 1:
+			items_dict = {}
+			items_list = []
+			for i in range(0, amount):
+				o_item = self.bfh.open_chest('rare_chest')
+				items_list.append(o_item)
+				try:
+					if items_dict[o_item]:
+						items_dict[o_item]+=1
+				except KeyError:
+					items_dict[o_item] = 1
+			try:
+				if items_dict['rare_chest']:
+					items_dict['rare_chest']+=-amount
+			except KeyError:
+				items_dict['rare_chest'] = -amount
+			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+			r_str = '\n'.join(r_list)
+			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `rare chest(s)` from your inventory. You got:"
+			embed.description = r_str
+			await msg.edit(embed= embed)
 
+	@_open.command(name= 'legendary', aliases = ['l', 'leg', 'le', 'legen'], help= "Open legendary chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	@commands.cooldown(1,5, BucketType.user)
+	async def _legendary(self, ctx, amount : int = 1):
+		player_id = ctx.author.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		inv_table = await self.bfh.get_inventory_table(player_id)
+		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
+		if chest_counts['legendary_chest'] < amount:
+			return await ctx.send(f"{ctx.author.mention}, You don't have {amount} `legendary chest(s)`, sorry.")
+		elif amount <= 0:
+			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
+		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `legendary chest(s)` from your inventory.....",color = 0x2F3136)
+		msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		if amount == 1:
+			
+			o_item = self.bfh.open_chest('legendary_chest')
+			await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
+			await self.bfh.update_inventory(player_id = player_id, _item = 'legendary_chest',amount= -1)
+			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `legendary chest` from your inventory. You got:"
+			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
+			# add embed image later
+			await msg.edit(embed= embed)
+		elif amount > 1:
+			items_dict = {}
+			items_list = []
+			for i in range(0, amount):
+				o_item = self.bfh.open_chest('legendary_chest')
+				items_list.append(o_item)
+				try:
+					if items_dict[o_item]:
+						items_dict[o_item]+=1
+				except KeyError:
+					items_dict[o_item] = 1
+			try:
+				if items_dict['legendary_chest']:
+					items_dict['legendary_chest']+=-amount
+			except KeyError:
+				items_dict['legendary_chest'] = -amount
+			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+			r_str = '\n'.join(r_list)
+			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `legendary chest(s)` from your inventory. You got:"
+			embed.description = r_str
+			await msg.edit(embed= embed)
 
+	@_open.command(name= 'epic', aliases = ['e', 'ep', 'epc'], help= "Open epic chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	@commands.cooldown(1,5, BucketType.user)
+	async def _epic(self, ctx, amount : int = 1):
+		player_id = ctx.author.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		inv_table = await self.bfh.get_inventory_table(player_id)
+		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
+		if chest_counts['epic_chest'] < amount:
+			return await ctx.send(f"{ctx.author.mention}, You don't have {amount} `epic chest(s)`, sorry.")
+		elif amount <= 0:
+			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
+		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `epic chest(s)` from your inventory.....",color = 0x2F3136)
+		msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		if amount == 1:
+			
+			o_item = self.bfh.open_chest('epic_chest')
+			await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
+			await self.bfh.update_inventory(player_id = player_id, _item = 'epic_chest',amount= -1)
+			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `epic chest` from your inventory. You got:"
+			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
+			# add embed image later
+			await msg.edit(embed= embed)
+		elif amount > 1:
+			items_dict = {}
+			items_list = []
+			for i in range(0, amount):
+				o_item = self.bfh.open_chest('epic_chest')
+				items_list.append(o_item)
+				try:
+					if items_dict[o_item]:
+						items_dict[o_item]+=1
+				except KeyError:
+					items_dict[o_item] = 1
+			try:
+				if items_dict['epic_chest']:
+					items_dict['epic_chest']+=-amount
+			except KeyError:
+				items_dict['epic_chest'] = -amount
+			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+			r_str = '\n'.join(r_list)
+			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `epic chest(s)` from your inventory. You got:"
+			embed.description = r_str
+			await msg.edit(embed= embed)
 
+	@_open.command(name= 'mythic', aliases = ['m', 'myth', 'mtc', 'mth', 'mc'], help= "Open mythic chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	@commands.cooldown(1,5, BucketType.user)
+	async def _mythic(self, ctx, amount : int = 1):
+		player_id = ctx.author.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		inv_table = await self.bfh.get_inventory_table(player_id)
+		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
+		if chest_counts['mythic_chest'] < amount:
+			return await ctx.send(f"{ctx.author.mention}, You don't have {amount} `mythic chest(s)`, sorry.")
+		elif amount <= 0:
+			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
+		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `mythic chest(s)` from your inventory.....",color = 0x2F3136)
+		msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		if amount == 1:
+			
+			o_item = self.bfh.open_chest('mythic_chest')
+			await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
+			await self.bfh.update_inventory(player_id = player_id, _item = 'mythic_chest',amount= -1)
+			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `mythic chest` from your inventory. You got:"
+			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
+			# add embed image later
+			await msg.edit(embed= embed)
+		elif amount > 1:
+			items_dict = {}
+			items_list = []
+			for i in range(0, amount):
+				o_item = self.bfh.open_chest('mythic_chest')
+				items_list.append(o_item)
+				try:
+					if items_dict[o_item]:
+						items_dict[o_item]+=1
+				except KeyError:
+					items_dict[o_item] = 1
+			try:
+				if items_dict['mythic_chest']:
+					items_dict['mythic_chest']+=-amount
+			except KeyError:
+				items_dict['mythic_chest'] = -amount
+			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+			r_str = '\n'.join(r_list)
+			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `mythic chest(s)` from your inventory. You got:"
+			embed.description = r_str
+			await msg.edit(embed= embed)
 
+	@commands.command(name = 'daily', aliases = ['d'])
+	async def _daily(self, ctx):
+		flag = await self.bfh.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		#check for cooldown
+		current_time = int(time.time())
+		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'daily')
+		if current_time < int(cd):
+			return await ctx.send(f"{ctx.author.mention} **You can get the daily rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+		reward = random.randint(200, 300)
+		n_bal = await self.bfh.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await self.bfh.update_cooldowns(ctx.author.id, 'daily')
+		c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= random.randint(150, 200))
+		c_lvl = self.bfh.get_level(c_exp)
+		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your daily check-in reward!\nYour new balace is **${n_bal:,}**"
+		if lvl_up:
+			lvl_up_m = random.randint(100,200)*(c_lvl+1)
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
+			await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
+		await ctx.send(text)
+
+	@commands.command(name = 'hourly', aliases = ['h'])
+	async def _hourly(self, ctx):
+		flag = await self.bfh.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		#check for cooldown
+		current_time = int(time.time())
+		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'hourly')
+		if current_time < int(cd):
+			return await ctx.send(f"{ctx.author.mention} **You can get hourly rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+		reward = random.randint(50,75)
+		n_bal = await self.bfh.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await self.bfh.update_cooldowns(ctx.author.id, 'hourly')
+		c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= random.randint(50, 100))
+		c_lvl = self.bfh.get_level(c_exp)
+		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your hourly rewards!\nYour new balace is **${n_bal}**"
+		if lvl_up:
+			lvl_up_m = random.randint(100,200)*(c_lvl+1)
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
+			await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
+		await ctx.send(text)
+
+	@commands.command(name = 'weekly', aliases = ['w'])
+	async def _weekly(self, ctx):
+		flag = await self.bfh.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		#check for cooldown
+		current_time = int(time.time())
+		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'weekly')
+		if current_time < int(cd):
+			return await ctx.send(f"{ctx.author.mention} **You can get the weekly rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+		reward = random.randint(800, 1000)
+		n_bal = await self.bfh.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await self.bfh.update_cooldowns(ctx.author.id, 'weekly')
+		c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= random.randint(400, 600))
+		c_lvl = self.bfh.get_level(c_exp)
+		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your weekly check-in reward!\nYour new balace is **${n_bal}**"
+		if lvl_up:
+			lvl_up_m = random.randint(100,200)*(c_lvl+1)
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
+			await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
+		await ctx.send(text)
+
+	@commands.command(name = 'monthly', aliases = ['mon', 'm'])
+	async def _monthly(self, ctx):
+		flag = await self.bfh.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		#check for cooldown
+		current_time = int(time.time())
+		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'monthly')
+		if current_time < int(cd):
+			return await ctx.send(f"{ctx.author.mention} **You can get the monthly rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+		reward = random.randint(1500, 2000)
+		n_bal = await self.bfh.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await self.bfh.update_cooldowns(ctx.author.id, 'monthly')
+		c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= random.randint(450, 500))
+		c_lvl = self.bfh.get_level(c_exp)
+		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your monthly check-in reward!\nYour new balace is **${n_bal}**"
+		if lvl_up:
+			lvl_up_m = random.randint(100,200)*(c_lvl+1)
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
+			await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
+		await ctx.send(text)
+
+	@commands.command(name = 'work', aliases = ['job', 'j'])
+	async def work(self, ctx):
+		flag = await self.bfh.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		#check for cooldown
+		current_time = int(time.time())
+		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'work')
+		if current_time < int(cd):
+			return await ctx.send(f"{ctx.author.mention} **You can get the monthly rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+		reward = random.randint(100, 150)
+		n_bal = await self.bfh.update_balance(player_id = ctx.author.id, amount = reward, add = True)
+		await self.bfh.update_cooldowns(ctx.author.id, 'work')
+		c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= random.randint(100, 150))
+		c_lvl = self.bfh.get_level(c_exp)
+		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
+		text = f"{ctx.author.mention} , You earned **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **by working as a programmer(this is just a test, more things will be added soon)!\nYour new balace is **${n_bal}**"
+		if lvl_up:
+			lvl_up_m = random.randint(100,200)*(c_lvl+1)
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
+			await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
+		await ctx.send(text)
 
 	
 

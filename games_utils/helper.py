@@ -161,6 +161,19 @@ class BattleFieldHelper:
 		query = f"UPDATE inventory SET {rarity_tier} = $1 WHERE p_id = $2;"
 		await self.bot.db.execute(query, t_json, player_id)
 
+	async def bulk_update_inventory(self,*, player_id : int, items_dict : dict):
+		inv_table = await self.get_inventory_table(player_id)
+		for item, count in items_dict.items():
+			rarity_tier : str =  itm.ALL_ITEMS[str(item)]['rarity']
+			t_dict = json.loads(inv_table[rarity_tier])
+			try:
+				t_dict[str(item)]+= int(count)
+			except KeyError:
+				t_dict[str(item)] = int(count)
+			t_json = json.dumps(t_dict)
+			query = f"UPDATE inventory SET {rarity_tier} = $1 WHERE p_id = $2;"
+			await self.bot.db.execute(query, t_json, player_id)
+
 
 	def can_opt_out(self, n_opt_out: int):
 		if n_opt_out> int(time.time()):
