@@ -18,20 +18,20 @@ class BattleFieldHelper:
 			flag = False
 		return flag
 
-	async def update_exp(self, *,player_id :int, amount, add :bool = True ):
+	async def update_exp(self, *,player_id :int, amount : int, add :bool = True ):
 		if add == True:
-			c_exp = await self.bot.db.fetchval(""" SELECT exp FROM inventory WHERE p_id = $1 ;""", player_id)
-			n_exp = int(c_exp) + amount
+			c_exp : int = await self.bot.db.fetchval(""" SELECT exp FROM inventory WHERE p_id = $1 ;""", player_id)
+			n_exp = c_exp + amount
 			await self.bot.db.execute(""" UPDATE inventory SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
 
 		elif add == False:
-			c_exp = await self.bot.db.fetchval(""" SELECT exp FROM inventory WHERE p_id = $1 ;""", player_id)
-			n_exp = int(c_exp) - amount
+			c_exp :int= await self.bot.db.fetchval(""" SELECT exp FROM inventory WHERE p_id = $1 ;""", player_id)
+			n_exp= c_exp - amount
 			await self.bot.db.execute(""" UPDATE inventory SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
 		return c_exp, n_exp
 
-	def get_level(self, exp : int):
-		level = 0
+	def get_level(self, exp : int) :
+		level = int(0)
 		for l, e in cs.EXP_LEVELS.items():
 
 			if exp >= e:
@@ -66,13 +66,13 @@ class BattleFieldHelper:
 
 	async def update_balance(self,*,player_id, amount : int, add : bool = True):
 		if add == True:
-			bal = await self.bot.db.fetchval(""" SELECT balance FROM inventory WHERE p_id = $1 ;""", player_id)
-			bal = int(bal) + amount
+			bal :int = await self.bot.db.fetchval(""" SELECT balance FROM inventory WHERE p_id = $1 ;""", player_id)
+			bal = bal + amount
 			await self.bot.db.execute(""" UPDATE inventory SET balance = $1 WHERE p_id = $2; """, bal, player_id)
 
 		elif add == False:
-			bal = await self.bot.db.fetchval(""" SELECT balance FROM inventory WHERE p_id = $1 ;""", player_id)
-			bal = int(bal) - amount
+			bal :int = await self.bot.db.fetchval(""" SELECT balance FROM inventory WHERE p_id = $1 ;""", player_id)
+			bal = bal - amount
 			await self.bot.db.execute(""" UPDATE inventory SET balance = $1 WHERE p_id = $2; """, bal, player_id)
 		return bal
 
@@ -121,14 +121,18 @@ class BattleFieldHelper:
 		else:
 			await self.bot.db.execute(""" UPDATE battlefield SET opt_status = false where p_id = $1;""", player_id)
 			return False
-
-		
+	
+	async def update_inventory(self,*,player_id : int, items):
+		pass
 
 	def can_opt_out(self, n_opt_out: int):
 		if n_opt_out> int(time.time()):
 			return False
 		else:
 			return True
+
+	def level_up_rewards(self, n_lvl : int):
+		pass
 
 
 

@@ -45,7 +45,7 @@ class BattleField(commands.Cog):
 		player_id = player.id
 		flag = await self.bfh.check_if_exists(player_id)
 		if not flag:
-			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run {ctx.clean_prefix}start to start playing!")
+			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		t1, t2 = await self.bfh.get_player_data(player_id)
 		inv_value = self.bfh.get_inventory_value(t2)
 
@@ -77,7 +77,7 @@ class BattleField(commands.Cog):
 		player_id = ctx.author
 		flag = await self.bfh.check_if_exists(player_id)
 		if not flag:
-			return await ctx.send(f"{ctx.author} hasn't started playing Battlefield yet, run {ctx.clean_prefix}start to start playing!")
+			return await ctx.send(f"{ctx.author} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		opted_in = await self.bfh.get_opt_status(player_id)
 		n_opt : int= await self.bfh.get_cooldown_data(player_id,'opt_in_toggle')
 		c_opt = self.bfh.can_opt_out(n_opt)
@@ -88,7 +88,7 @@ class BattleField(commands.Cog):
 			text+=f"Seems like you are on cooldown! You need to wait `{humanize.precisedelta(n_opt-int(time.time()))}` before you can toggle your `opt status`"
 			embed.description= text
 			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
-		text+=f"If you want to toggle your `opt status` then press `Confirm` or else press `Cancel` to cancel in next **30s**!"
+		text+=f"If you want to toggle your `opt status` then press `Confirm` or else press `Cancel` to cancel in the next **30s**!"
 		embed.description = text
 		view = bs.ConfirmOrCancel(ctx, timeout=30)
 		view.msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed, view = view)
@@ -96,7 +96,8 @@ class BattleField(commands.Cog):
 		view.clear_items()
 		if view.value == True:
 			ch = await self.bfh.set_opt_status(player_id, not opted_in)
-			await self.bfh.update_cooldowns(player_id, 'opt_in_toggle')
+			if ch:
+				await self.bfh.update_cooldowns(player_id, 'opt_in_toggle')
 			embed.description+=f"\n{cs.EMOJIS['toggle_on'] if ch else cs.EMOJIS['toggle_off']} You've successfully toggled your `opt status`"
 			await view.msg.edit(embed = embed, view = view)
 
@@ -108,7 +109,101 @@ class BattleField(commands.Cog):
 			embed.description+=f"\n:warning: You took too long to respond!"
 			await view.msg.edit(embed = embed, view = view)	
 
+	@commands.command(name = 'coinflip', aliases =[ 'cf', 'coinf'], help = "Gamble on coinflip! Choose your option and see if your lucky!")
+	@commands.cooldown(2,10, commands.BucketType.user)
+	async def _cf(self, ctx, amount : int = 50):
+		flag = await self.bfh.check_if_exists(ctx.author.id)
+		if not flag:
+			return await ctx.send(f"{ctx.author.mention},you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		balance = await self.bot.db.fetchval(""" SELECT balance FROM inventory where p_id = $1; """, ctx.author.id)
+		if balance < amount:
+			return await ctx.send("Looks like you don't have enough money to gamble on coinflip!")
+		if amount > 10000 or amount < 50:
+			return await ctx.send("Minimum amount of gambling is **$50** and Maximum amount of gambling is **$10000**")
 
+		view = bs.HeadsOrTails(ctx)
+
+		embed = discord.Embed(title =f'Coinflip- ${amount}', description = f"{ctx.author.name}, choose an option in next 15 seconds!", color = 0x2F3136)
+
+		msg = await ctx.send(content = f"{ctx.author.mention} ->",embed = embed , view = view)
+		
+
+		await view.wait()
+		if view.value == True:
+			won_or_lost = random.randint(0,1)
+			if won_or_lost == 1:
+				g_exp = random.randint(40,50)
+				c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= g_exp)
+				bal = await self.bfh.update_balance(player_id = ctx.author.id,amount =  amount, add = True)
+				
+				c_lvl : int= self.bfh.get_level(c_exp)
+				lvl_up = self.bfh.level_up_check(c_exp, n_exp)
+
+				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Heads!** You chose **Heads**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal:,}**\nYou gained <:exp:896086434946097162>**{g_exp} exp from this coinflip**"
+				if lvl_up:
+					lvl_up_m = random.randint(100,200)*(c_lvl+1)
+
+					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained "
+					await self.update_balance(player_id = ctx.author.id,amount =  lvl_up_m, add = True)
+				embed.description = text
+				await msg.edit(embed = embed , view = view)
+
+			elif won_or_lost == 0:
+				g_exp = random.randint(20,25)
+				c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= g_exp)
+
+				c_lvl : int = self.bfh.get_level(c_exp)
+				lvl_up = self.bfh.level_up_check(c_exp, n_exp)
+
+				bal = await self.bfh.update_balance(player_id = ctx.author.id, amount = amount,add = False)
+				
+				text = f"\U0001f626 **Aw snap,**{ctx.author.name},\nThe coin landed on **Tails** You chose **Heads**, meaning that you've just lost **${amount}**!\n\nYour new balance is **${bal:,}**\nYou gained <:exp:896086434946097162>**{g_exp} exp from this coinflip** "
+				if lvl_up:
+					lvl_up_m = random.randint(100,200)*(c_lvl+1)
+
+					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
+					await self.bfh.update_balance(player_id = ctx.author.id,amount =  lvl_up_m, add = True)
+				embed.description = text
+				await msg.edit(embed = embed , view = view)
+		
+		elif view.value == False:
+			won_or_lost = random.randint(0,1)
+			if won_or_lost == 1:
+				g_exp = random.randint(40,50)
+				c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= g_exp)
+				bal = await self.bfh.update_balance(player_id = ctx.author.id,amount = amount, add = True)
+				
+				c_lvl : int = self.bfh.get_level(c_exp)
+				lvl_up = self.bfh.level_up_check(c_exp, n_exp)
+
+				text = f"\U0001f38a **Congrats** {ctx.author.name},\nThe coin landed on **Tails!** You chose **Tails**, meaning that you've just won **${amount}**!! \n\nYour new balance is **${bal:,}**\nYou gained <:exp:896086434946097162>**{g_exp} exp from this coinflip**  "
+				if lvl_up:
+					lvl_up_m = random.randint(100,200)*(c_lvl+1)
+					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
+					await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
+				embed.description = text
+				await msg.edit(embed = embed , view = view)
+
+			elif won_or_lost == 0:
+				g_exp = random.randint(20,25)
+				c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= g_exp)
+				bal = await self.bfh.update_balance(player_id = ctx.author.id,amount = amount, add =False)
+				
+				c_lvl : int = self.bfh.get_level(c_exp)
+				lvl_up = self.bfh.level_up_check(c_exp, n_exp)
+
+
+				text = f"\U0001f626 **Aw snap,** {ctx.author.name},\nThe coin landed on **Heads** You chose **Tails**, meaning that you've just lost **${amount}**!\n\nYour new balance is **${bal:,}**\nYou gained <:exp:896086434946097162>**{g_exp} exp in this coinflip**  "
+				if lvl_up:
+					lvl_up_m = random.randint(100,200)*(c_lvl+1)
+					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
+					await self.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
+				embed.description = text
+				await msg.edit(embed = embed , view = view)
+		else:
+			embed.description = "Timed out!"
+			view.clear_items()
+			await msg.edit(embed = embed, view = view)
 
 	@commands.group(name= 'open', aliases = ['unbox', 'o'], brief= "Open chest(s) from your inventory", help= "Open chests to get random game items!Chances of getting items are based on their rarity.You might get items with higher tier rarity from a lower tier chest.", invoke_without_command= True)
 	@commands.cooldown(1,2, BucketType.user)
