@@ -121,7 +121,7 @@ class BattleFieldHelper:
 			for item, count in i_dict.items():
 				try:
 					if item and count != 0:
-						text+=f"{itm.ALL_ITEMS[str(item)]['emoji']} {str(item).replace('_',' ')} x{count}\n"
+						text+=f"{itm.ALL_ITEMS[str(item)]['emoji']} {str(item).replace('_',' ')} `x{count}`\n"
 				except: #keyerror
 					pass
 			fields[str(c)] = text

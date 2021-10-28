@@ -333,6 +333,7 @@ class BattleField(commands.Cog):
 					items_dict['common_chest']+=-amount
 			except KeyError:
 				items_dict['common_chest'] = -amount
+			print(items_dict)
 			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
 			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
 			r_str = '\n'.join(r_list)
