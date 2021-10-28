@@ -658,27 +658,27 @@ class BattleField(commands.Cog):
 			await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
 		await ctx.send(text)
 
-	@commands.commad(name = 'loot', alias= ['l'], help= "soon")
+	@commands.command(name = 'loot', alias= ['l'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _loot(self, ctx):
 		await ctx.send("SOON")
 
-	@commands.commad(name = 'buy', alias= ['b'], help= "soon")
+	@commands.command(name = 'buy', alias= ['b'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _buy(self, ctx):
 		await ctx.send("SOON")
 
-	@commands.commad(name = 'sell', alias= ['s'], help= "soon")
+	@commands.command(name = 'sell', alias= ['s'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _sell(self, ctx):
 		await ctx.send("SOON")
 
-	@commands.commad(name = 'attack', alias= ['a'], help= "soon")
+	@commands.command(name = 'attack', alias= ['a'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _attack(self, ctx):
 		await ctx.send("SOON")
 
-	@commands.commad(name = 'heal', alias= ['h'], help= "soon")
+	@commands.command(name = 'heal', alias= ['h'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _heal(self, ctx):
 		await ctx.send("SOON")
