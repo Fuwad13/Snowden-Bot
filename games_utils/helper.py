@@ -176,10 +176,11 @@ class BattleFieldHelper:
 		await self.bot.db.execute(query, t_json, player_id)
 
 	async def bulk_update_inventory(self,*, player_id : int, items_dict : dict):
-		inv_table = await self.get_inventory_table(player_id)
-		print(f"inside helper: {items_dict}")
+		
+		
 		try:
 			for item, count in items_dict.items():
+				inv_table = await self.get_inventory_table(player_id)
 				rarity_tier : str =  itm.ALL_ITEMS[str(item)]['rarity']
 				t_dict = json.loads(inv_table[rarity_tier])
 				try:
