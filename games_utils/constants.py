@@ -453,3 +453,36 @@ EXP_LEVELS = {
     '14' : 15100,
     '15' : 17500
 }
+
+HP_EMOJIS = {
+    'left_full' : '<:hp_l_full:902306058398203905>',
+    'left_half' : '<:hp_l_half:902309398909689856>',
+    'middle_full' : '<:hp_m_full:902306480156442674>',
+    'middle_half' : '<:hp_m_half:902311217115316344>',
+    'right_full' : '<:hp_r_full:902306574637338664>',
+    'right_half' : '<:hp_r_half:902308931232231425>',
+    'middle_empty' : '<:m_empty:902308055167930438>',
+    'right_empty' : '<:r_empty:902307804860284968>'
+}
+
+SHIELD_EMOJIS = {
+    'left_full' : '<:sh_l_full:902456199667134464>',
+    'left_half' : '<:sh_l_half:902456898106826763>',
+    'middle_full' : '<:sh_m_full:902456332899209217>',
+    'middle_half' : '<:sh_m_half:902456433931599902>',
+    'right_full' : '<:sh_r_full:902458981358919711>',
+    'right_half' : '<:sh_r_half:902458685786296340>',
+    'middle_empty' : '<:m_empty:902308055167930438>',
+    'right_empty' : '<:r_empty:902307804860284968>'
+}
+EXP_EMOJIS = {
+    'left_full' : '<:exp_l_full:902306957342421052>',
+    'left_half' : '<:exp_l_half:902459783909613599>',
+    'middle_full' : '<:exp_m_full:902307086363398254>',
+    'middle_half' : '<:exp_m_half:902460294104764416>',
+    'right_full' : '<:exp_r_full:902460647927853067>',
+    'right_half' : '<:exp_r_half:902461637099933736>',
+    'middle_empty' : '<:m_empty:902308055167930438>',
+    'right_empty' : '<:r_empty:902307804860284968>'
+}
+

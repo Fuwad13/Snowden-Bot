@@ -54,8 +54,8 @@ class BattleField(commands.Cog):
 		embed = discord.Embed(title = f"**__{player}'s Inventory__**",color = 0x2F3136)
 		text = f"\U0001f3e6 **Balance**: ${t2['balance']}\n\U0001f4bc **Inv. value**: ${inv_value}\n\U00002728 **Player value**: ${t2['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(t2['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['toggle_on'] if t1['opt_status'] else cs.EMOJIS['toggle_off']}\n"
 		embed.add_field(name='\U0001f4cb __Status/profile__', value=text)
-		embed.add_field(name="\U00002764 __Health__", value=f"soon")
-		embed.add_field(name="\U0001f6e1 __Shield__", value="soon")
+		embed.add_field(name="\U00002764 __Health__", value=f"{cs.HP_EMOJIS['left_full']}{cs.HP_EMOJIS['middle_full']*3}{cs.HP_EMOJIS['right_full']}")
+		embed.add_field(name="\U0001f6e1 __Shield__", value=f"{cs.SHIELD_EMOJIS['left_full']}{cs.SHIELD_EMOJIS['middle_full']*3}{cs.SHIELD_EMOJIS['right_full']}")
 
 		inv_items = self.bfh.get_inventory_items_str(t2)
 		for r in inv_items.keys():
@@ -85,7 +85,7 @@ class BattleField(commands.Cog):
 		embed = discord.Embed(title = f"{item_dict['emoji']} **{item_dict['name']}**",  color =0x2F3136)
 		embed.add_field(name= ":star2: __Rarity__", value = f"`{item_dict['rarity'].upper()}`", inline = False)
 		if item_dict['type'] == 'weapon':
-			embed.add_field(name=":dart: Damage", value = f"**{item_dict['damage']} hp** `(min-max)`\n`{item_dict['damage_type']}`")
+			embed.add_field(name=":boom: Damage", value = f"**{item_dict['damage']} hp** `(min-max)`\n`{item_dict['damage_type']}`")
 			embed.add_field(name=":alarm_clock: Cooldown", value=f"**{self.bfh.format_cooldown(item_dict['cooldown'])}**")
 			if item_dict['ammo']:
 				embed.add_field(name=":placard: Ammunition", value = f"**{item_dict['ammo']}**")
@@ -95,7 +95,7 @@ class BattleField(commands.Cog):
 			embed.set_thumbnail(url = self.bot.get_emoji(int(item_dict['emoji'].split(':')[-1][:-1:])).url)
 			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
 		if item_dict['type'] == 'healing':
-			embed.add_field(name=":dart: Health Recover", value = f"**{item_dict['hp_recover']} hp** `(min-max)`")
+			embed.add_field(name=":heart: Health Recover", value = f"**{item_dict['hp_recover']} hp** `(min-max)`")
 			embed.add_field(name=":alarm_clock: Cooldown", value=f"**{self.bfh.format_cooldown(item_dict['cooldown'])}**")
 			if item_dict['buy_price']:
 				embed.add_field(name=":dollar: Buy price", value= f"**${item_dict['buy_price']}**")
