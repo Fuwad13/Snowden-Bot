@@ -10,7 +10,7 @@ ALL_ITEMS = {
         'emoji' : '<:p92:901725176130052126>',
         'ammo' : '9mm',
         'damage' : '15-18',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*18,
         'buy_price' : 150,
         'sell_price' : 100
@@ -22,7 +22,7 @@ ALL_ITEMS = {
         'emoji' : '<:p18c:901725472780591144>',
         'ammo' : '9mm',
         'damage' : '20-25',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*25,
         'buy_price' : 200,
         'sell_price' : 150
@@ -34,7 +34,7 @@ ALL_ITEMS = {
         'emoji' : '<:grenade:901571735403528294>',
         'ammo' : None,
         'damage' : '30-40',
-        'damage_type' : 'burst_damage',
+        'damage_type' : 'burst damage',
         'cooldown' : CD_UNIT*40,
         'buy_price' : None,
         'sell_price' : 800
@@ -46,7 +46,7 @@ ALL_ITEMS = {
         'emoji' : '<:ak_47:901570473786228796>',
         'ammo' : '7_62mm',
         'damage' : '35-50',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*50,
         'buy_price' : None,
         'sell_price' : 1200
@@ -58,7 +58,7 @@ ALL_ITEMS = {
         'emoji' : '<:m416:901570478538391603>',
         'ammo' : '5_56mm',
         'damage' : '38-45',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*45,
         'buy_price' : None,
         'sell_price' : 1000
@@ -70,7 +70,7 @@ ALL_ITEMS = {
         'emoji' : '<:scar_l:901570493432336385>',
         'ammo' : '5_56mm',
         'damage' : '35-40',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*40,
         'buy_price' : None,
         'sell_price' : 900
@@ -82,7 +82,7 @@ ALL_ITEMS = {
         'emoji' : '<:ump45:901570488692793394>',
         'ammo' : '45acp',
         'damage' : '28-33',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*33,
         'buy_price' : None,
         'sell_price' : 800
@@ -94,7 +94,7 @@ ALL_ITEMS = {
         'emoji' : '<:thompson:901767201537818664>',
         'ammo' : '45acp',
         'damage' : '25-30',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*30,
         'buy_price' : None,
         'sell_price' : 700
@@ -106,7 +106,7 @@ ALL_ITEMS = {
         'emoji' : '<:vector:901571514762137692>',
         'ammo' : '45acp',
         'damage' : '33-40',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*40,
         'buy_price' : None,
         'sell_price' : 850
@@ -118,7 +118,7 @@ ALL_ITEMS = {
         'emoji' : '<:win94:901571519682072598>',
         'ammo' : '45acp',
         'damage' : '60-75',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*75,
         'buy_price' : None,
         'sell_price' : 2000
@@ -130,7 +130,7 @@ ALL_ITEMS = {
         'emoji' : '<:kar98k_sniper_rifle:901570666774548570>',
         'ammo' : '7_62mm',
         'damage' : '70-80',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*80,
         'buy_price' : None,
         'sell_price' : 2200
@@ -142,7 +142,7 @@ ALL_ITEMS = {
         'emoji' : '<:m24_sniper_rifle:901571401503342674>',
         'ammo' : '7_62mm',
         'damage' : '75-85',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*85,
         'buy_price' : None,
         'sell_price' : 2300
@@ -154,7 +154,7 @@ ALL_ITEMS = {
         'emoji' : '<:awm_sniper_rifle:901570671769964544>',
         'ammo' : '300magnum',
         'damage' : '85-100',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*100,
         'buy_price' : None,
         'sell_price' : 3500
@@ -166,7 +166,7 @@ ALL_ITEMS = {
         'emoji' : '<:groza:901571406523953162>',
         'ammo' : '7_62mm',
         'damage' : '48-63',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*63,
         'buy_price' : None,
         'sell_price' : 2000
@@ -178,7 +178,7 @@ ALL_ITEMS = {
         'emoji' : '<:beryl_m762:901571411414487041>',
         'ammo' : '7_62mm',
         'damage' : '38-48',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*48,
         'buy_price' : None,
         'sell_price' : 1150
@@ -190,7 +190,7 @@ ALL_ITEMS = {
         'emoji' : '<:mini14:901787010329612358>',
         'ammo' : '5_56mm',
         'damage' : '48-55',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*55,
         'buy_price' : None,
         'sell_price' : 1600
@@ -202,7 +202,7 @@ ALL_ITEMS = {
         'emoji' : '<:pan:901575943699697685>',
         'ammo' : None,
         'damage' : '22-27',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*27,
         'buy_price' : None,
         'sell_price' : 250
@@ -214,7 +214,7 @@ ALL_ITEMS = {
         'emoji' : '<:crowbar:901571396101111830>',
         'ammo' : None,
         'damage' : '12-15',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*15,
         'buy_price' : 100,
         'sell_price' : 80
@@ -226,7 +226,7 @@ ALL_ITEMS = {
         'emoji' : '<:sickle:901576064659239013>',
         'ammo' : None,
         'damage' : '12-14',
-        'damage_type' : 'single_target',
+        'damage_type' : 'single target',
         'cooldown' : CD_UNIT*14,
         'buy_price' : 90,
         'sell_price' : 75
@@ -238,7 +238,7 @@ ALL_ITEMS = {
         'emoji' : '<:s686:901787362458218506>',
         'ammo' : '12gauge',
         'damage' : '28-38',
-        'damage_type' : 'burst_damage',
+        'damage_type' : 'burst damage',
         'cooldown' : CD_UNIT*38,
         'buy_price' : None,
         'sell_price' : 750
@@ -250,7 +250,7 @@ ALL_ITEMS = {
         'emoji' : '<:s1897:901787644135092224>',
         'ammo' : '12gauge',
         'damage' : '18-25',
-        'damage_type' : 'burst_damage',
+        'damage_type' : 'burst damage',
         'cooldown' : CD_UNIT*25,
         'buy_price' : None,
         'sell_price' : 500
@@ -346,6 +346,7 @@ ALL_ITEMS = {
         'emoji' : '<:9mm:901772563825438720>',
         'rarity' : 'common',
         'used_by' : ['p92', 'p18c', 'uzi'],
+        'buy_price' : None,
         'sell_price' : 75
     },
     '45acp' : {
@@ -354,6 +355,7 @@ ALL_ITEMS = {
         'emoji' : '<:45acp:901772580552323102>',
         'rarity' : 'rare',
         'used_by' : ['thompson','ump45', 'win94', 'desert_eagle', 'vector'],
+        'buy_price' : None,
         'sell_price' : 150
     },
     '5_56mm' : {
@@ -362,6 +364,7 @@ ALL_ITEMS = {
         'emoji' : '<:5_56mm:901772574843867217>',
         'rarity' : 'legendary',
         'used_by' : ['m416', 'scar_l', 'mini14'],
+        'buy_price' : None,
         'sell_price' : 220
     },
     '7_62mm' : {
@@ -370,6 +373,7 @@ ALL_ITEMS = {
         'emoji' : '<:7_62mm:901772569349357598>',
         'rarity' : 'legendary',
         'used_by' : ['ak_47', 'groza', 'beryl', 'kar98k', 'm24'],
+        'buy_price' : None,
         'sell_price' : 250
     },
     '300magnum' : {
@@ -378,6 +382,7 @@ ALL_ITEMS = {
         'emoji' : '<:300magnum:901772585665187840>',
         'rarity' : 'epic',
         'used_by' : ['awm'],
+        'buy_price' : None,
         'sell_price' : 450
     },
     '12gauge' : {
@@ -386,6 +391,7 @@ ALL_ITEMS = {
         'emoji' : '<:12gauge:901772615570579537>',
         'rarity' : 'rare',
         'used_by' : ['s686', 's1897'],
+        'buy_price' : None,
         'sell_price' : 100
     },
     'common_chest' : {
@@ -393,7 +399,7 @@ ALL_ITEMS = {
         'type' : 'chest',
         'rarity' : 'common',
         'emoji' : '<:common_chest:901798708864253992>',
-        'description' : '',
+        'description' : 'soon',
         'buy_price' : 150,
         'sell_price' : 100
     },
@@ -402,7 +408,7 @@ ALL_ITEMS = {
         'type' : 'chest',
         'rarity' : 'rare',
         'emoji' : '<:rare_chest:901798877726924810>',
-        'description' : '',
+        'description' : 'soon',
         'buy_price' : 300,
         'sell_price' : 150
     },
@@ -411,7 +417,7 @@ ALL_ITEMS = {
         'type' : 'chest',
         'rarity' : 'legendary',
         'emoji' : '<:legendary_chest:901799227758350426>',
-        'description' : '',
+        'description' : 'soon',
         'buy_price' : 1000,
         'sell_price' : 800
     },
@@ -420,7 +426,7 @@ ALL_ITEMS = {
         'type' : 'chest',
         'rarity' : 'epic',
         'emoji' : '<:epic_chest:901799469006336080>',
-        'description' : '',
+        'description' : 'soon',
         'buy_price' : 2000,
         'sell_price' : 1500
     },
@@ -429,7 +435,7 @@ ALL_ITEMS = {
         'type' : 'chest',
         'rarity' : 'mythic',
         'emoji' : '<:mythic_chest:901800353757036594>',
-        'description' : '',
+        'description' : 'soon',
         'buy_price' : None,
         'sell_price' : 3000
     },

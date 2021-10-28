@@ -31,6 +31,20 @@ class BattleFieldHelper:
 			await self.bot.db.execute(""" UPDATE inventory SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
 		return c_exp, n_exp
 
+	def format_cooldown(self, seconds: int):
+		d = int(seconds/86400)
+		if d == 0:
+			h = int(seconds/3600)
+			m = int((seconds%3600)/60)
+			s = seconds%60
+			formatted = f"{h}:{m}:{s}"
+		else:
+			h = int((seconds%86400)/3600)
+			m = int((seconds%3600)/60)
+			s = seconds%60
+			formatted = f"{d}d:{h}h:{m}m:{s}s"
+		return formatted
+
 	def get_level(self, exp : int) :
 		level = int(0)
 		for l, e in cs.EXP_LEVELS.items():
@@ -106,8 +120,8 @@ class BattleFieldHelper:
 			text = ""
 			for item, count in i_dict.items():
 				try:
-					if item:
-						text+=f"{itm.ALL_ITEMS[str(item)]['emoji']} {str(item)} x{count}\n"
+					if item and count != 0:
+						text+=f"{itm.ALL_ITEMS[str(item)]['emoji']} {str(item).replace('_',' ')} x{count}\n"
 				except: #keyerror
 					pass
 			fields[str(c)] = text
@@ -163,16 +177,21 @@ class BattleFieldHelper:
 
 	async def bulk_update_inventory(self,*, player_id : int, items_dict : dict):
 		inv_table = await self.get_inventory_table(player_id)
-		for item, count in items_dict.items():
-			rarity_tier : str =  itm.ALL_ITEMS[str(item)]['rarity']
-			t_dict = json.loads(inv_table[rarity_tier])
-			try:
-				t_dict[str(item)]+= int(count)
-			except KeyError:
-				t_dict[str(item)] = int(count)
-			t_json = json.dumps(t_dict)
-			query = f"UPDATE inventory SET {rarity_tier} = $1 WHERE p_id = $2;"
-			await self.bot.db.execute(query, t_json, player_id)
+		try:
+			for item, count in items_dict.items():
+				rarity_tier : str =  itm.ALL_ITEMS[str(item)]['rarity']
+				t_dict = json.loads(inv_table[rarity_tier])
+				try:
+					t_dict[str(item)]+= int(count)
+				except KeyError:
+					t_dict[str(item)] = int(count)
+				t_json = json.dumps(t_dict)
+				query = f"UPDATE inventory SET {rarity_tier} = $1 WHERE p_id = $2;"
+				await self.bot.db.execute(query, t_json, player_id)
+				return True
+		except Exception as e:
+			print(e)
+			return False
 
 
 	def can_opt_out(self, n_opt_out: int):

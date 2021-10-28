@@ -1,11 +1,15 @@
 import discord
 from discord.ext import commands
 from games_utils import constants as cs
+from games_utils import helper
+import typing
+import json
 
 
 class Owner(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
+		self.bfh = helper.BattleFieldHelper(bot)
 
 	@commands.command(name= '@initdb', hidden = True)
 	@commands.is_owner()
@@ -31,6 +35,19 @@ class Owner(commands.Cog):
 		
 		val = await self.bot.db.fetchval(query, arg)
 		await ctx.send(val)
+
+	@commands.command(name = '@updateinv', aliases = ['@updinv', '@updateinventory'], hidden = True)
+	@commands.is_owner()
+	async def updateinv(self, ctx, player : typing.Union[discord.Member, discord.User], *,json_str : str):
+		player_id = player.id
+		inv_table = self.bfh.get_inventory_table(player_id)
+		items_dict = json.loads(json_str)
+		success = await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict
+		)
+		if success:
+			await ctx.reply(f"{cs.EMOJIS['greentick']}")
+
+
 
 
 	

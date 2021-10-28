@@ -5,6 +5,7 @@ from discord.ext import commands
 import asyncpg
 import typing
 import random
+import asyncio
 
 from discord.ext.commands.cooldowns import BucketType, Cooldown
 from utils import buttons_and_selects as bs 
@@ -66,13 +67,84 @@ class BattleField(commands.Cog):
 
 	@commands.command(name = 'items', aliases = ['item'], brief = "Gives you information about any game item(s)", help = "Gives you information about any game item(s). run `items [item_name]` to get information about a specific item.")
 	@commands.cooldown(1,3, BucketType.user)
-	async def _items(self, ctx, item_name : str = None):
+	async def _items(self, ctx, *,item_name : str = None):
 		if not item_name:
 			item_list = []
 			for item in ALL_ITEMS.keys():
-				pass
+				item_list.append(str(item))
+			r_str = ', '.join(item_list)
+			embed = discord.Embed(title = "Snowden's Battlefield : All items ->", color =0x2F3136 )
+			embed.description = f"`{r_str}`"
+			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
 
-	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt'], help= "Toggle your `opt` status if available. You can't toggle your `opt` status if you are on cooldown!")
+		item_name_n = item_name.replace(' ', '_')
+		try:
+			item_dict = ALL_ITEMS[item_name_n]
+		except KeyError:
+			return await ctx.send(f"No item named `{item_name}`found")
+		embed = discord.Embed(title = f"{item_dict['emoji']} **{item_dict['name']}**",  color =0x2F3136)
+		embed.add_field(name= ":star2: __Rarity__", value = f"`{item_dict['rarity'].upper()}`", inline = False)
+		if item_dict['type'] == 'weapon':
+			embed.add_field(name=":dart: Damage", value = f"**{item_dict['damage']} hp** `(min-max)`\n`{item_dict['damage_type']}`")
+			embed.add_field(name=":alarm_clock: Cooldown", value=f"**{self.bfh.format_cooldown(item_dict['cooldown'])}**")
+			if item_dict['ammo']:
+				embed.add_field(name=":placard: Ammunition", value = f"**{item_dict['ammo']}**")
+			if item_dict['buy_price']:
+				embed.add_field(name=":dollar: Buy price", value= f"**${item_dict['buy_price']}**")
+			embed.add_field(name=":dollar: Sell price", value=f"**${item_dict['sell_price']}**")
+			embed.set_thumbnail(url = self.bot.get_emoji(int(item_dict['emoji'].split(':')[-1][:-1:])).url)
+			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		if item_dict['type'] == 'healing':
+			embed.add_field(name=":dart: Health Recover", value = f"**{item_dict['hp_recover']} hp** `(min-max)`")
+			embed.add_field(name=":alarm_clock: Cooldown", value=f"**{self.bfh.format_cooldown(item_dict['cooldown'])}**")
+			if item_dict['buy_price']:
+				embed.add_field(name=":dollar: Buy price", value= f"**${item_dict['buy_price']}**")
+			embed.add_field(name=":dollar: Sell price", value=f"**${item_dict['sell_price']}**")
+			embed.set_thumbnail(url = self.bot.get_emoji(int(item_dict['emoji'].split(':')[-1][:-1:])).url)
+			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		if item_dict['type'] == 'armour':
+			embed.add_field(name= ":shield: Shield Points", value=f"**{item_dict['shield_points']}**")
+			if item_dict['buy_price']:
+				embed.add_field(name=":dollar: Buy price", value= f"**${item_dict['buy_price']}**")
+			embed.add_field(name=":dollar: Sell price", value=f"**${item_dict['sell_price']}**")
+			embed.set_thumbnail(url = self.bot.get_emoji(int(item_dict['emoji'].split(':')[-1][:-1:])).url)
+			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		if item_dict["type"] == 'ammunition':
+			embed.add_field(name= ":page_with_curl: Used by", value=f"{item_dict['used_by']}")
+			embed.add_field(name=":dollar: Sell price", value=f"**${item_dict['sell_price']}**")
+			embed.set_thumbnail(url = self.bot.get_emoji(int(item_dict['emoji'].split(':')[-1][:-1:])).url)
+			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		if item_dict['type'] == 'chest':
+			embed.description = item_dict['description']
+			if item_dict['buy_price']:
+				embed.add_field(name=":dollar: Buy price", value= f"**${item_dict['buy_price']}**")
+			embed.add_field(name=":dollar: Sell price", value=f"**${item_dict['sell_price']}**")
+			embed.set_thumbnail(url = self.bot.get_emoji(int(item_dict['emoji'].split(':')[-1][:-1:])).url)
+			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+
+	@commands.command(name= 'cooldowns', aliases = ['cd', 'cools','cool', 'cds'], help= "Get all battlefield command cooldowns for you/a player.")
+	@commands.cooldown(1,3, BucketType.user)
+	async def _cooldowns(self, ctx, player : typing.Union[discord.Member, discord.User]):
+		if player is None:
+			if ctx.message.reference:
+				player = ctx.message.reference.resolved.author
+			else:
+				player = ctx.author
+		player_id = player.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		cd_dict : dict = await self.bfh.get_cooldown_data(player_id)
+		embed = discord.Embed(title = f"__{player}'s cooldowns:__",color =0x2F3136)
+		now = int(time.time())
+		for n_c, t in cd_dict.items():
+			embed.add_field(name=f"__{str(n_c).split('n_', 1)[1]}__", value= f"**{'Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
+		await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+
+
+		
+
+	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt', 'opt_in_toggle'], help= "Toggle your `opt` status if available. You can't toggle your `opt` status if you are on cooldown!")
 	@commands.cooldown(1,2,BucketType.user)
 	async def opt(self, ctx):
 		player_id = ctx.author.id
@@ -230,7 +302,7 @@ class BattleField(commands.Cog):
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['common_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have {amount} `common chest(s)`, sorry.")
+			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `common chest(s)`, sorry.")
 		elif amount <= 0:
 			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
 		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `common chest(s)` from your inventory.....",color = 0x2F3136)
@@ -243,6 +315,7 @@ class BattleField(commands.Cog):
 			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `common chest` from your inventory. You got:"
 			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
 			# add embed image later
+			await asyncio.sleep(2)
 			await msg.edit(embed= embed)
 		elif amount > 1:
 			items_dict = {}
@@ -265,6 +338,7 @@ class BattleField(commands.Cog):
 			r_str = '\n'.join(r_list)
 			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `common chest(s)` from your inventory. You got:"
 			embed.description = r_str
+			await asyncio.sleep(2)
 			await msg.edit(embed= embed)
 
 	@_open.command(name= 'rare', aliases = ['r', 'rar'], help= "Open rare chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
@@ -277,7 +351,7 @@ class BattleField(commands.Cog):
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['rare_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have {amount} `rare chest(s)`, sorry.")
+			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `rare chest(s)`, sorry.")
 		elif amount <= 0:
 			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
 		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `rare chest(s)` from your inventory.....",color = 0x2F3136)
@@ -290,6 +364,7 @@ class BattleField(commands.Cog):
 			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `rare chest` from your inventory. You got:"
 			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
 			# add embed image later
+			await asyncio.sleep(2)
 			await msg.edit(embed= embed)
 		elif amount > 1:
 			items_dict = {}
@@ -312,6 +387,7 @@ class BattleField(commands.Cog):
 			r_str = '\n'.join(r_list)
 			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `rare chest(s)` from your inventory. You got:"
 			embed.description = r_str
+			await asyncio.sleep(2)
 			await msg.edit(embed= embed)
 
 	@_open.command(name= 'legendary', aliases = ['l', 'leg', 'le', 'legen'], help= "Open legendary chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
@@ -324,7 +400,7 @@ class BattleField(commands.Cog):
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['legendary_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have {amount} `legendary chest(s)`, sorry.")
+			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `legendary chest(s)`, sorry.")
 		elif amount <= 0:
 			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
 		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `legendary chest(s)` from your inventory.....",color = 0x2F3136)
@@ -337,6 +413,7 @@ class BattleField(commands.Cog):
 			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `legendary chest` from your inventory. You got:"
 			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
 			# add embed image later
+			await asyncio.sleep(2)
 			await msg.edit(embed= embed)
 		elif amount > 1:
 			items_dict = {}
@@ -359,6 +436,7 @@ class BattleField(commands.Cog):
 			r_str = '\n'.join(r_list)
 			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `legendary chest(s)` from your inventory. You got:"
 			embed.description = r_str
+			await asyncio.sleep(2)
 			await msg.edit(embed= embed)
 
 	@_open.command(name= 'epic', aliases = ['e', 'ep', 'epc'], help= "Open epic chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
@@ -371,7 +449,7 @@ class BattleField(commands.Cog):
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['epic_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have {amount} `epic chest(s)`, sorry.")
+			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `epic chest(s)`, sorry.")
 		elif amount <= 0:
 			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
 		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `epic chest(s)` from your inventory.....",color = 0x2F3136)
@@ -384,6 +462,7 @@ class BattleField(commands.Cog):
 			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `epic chest` from your inventory. You got:"
 			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
 			# add embed image later
+			await asyncio.sleep(2)
 			await msg.edit(embed= embed)
 		elif amount > 1:
 			items_dict = {}
@@ -406,6 +485,7 @@ class BattleField(commands.Cog):
 			r_str = '\n'.join(r_list)
 			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `epic chest(s)` from your inventory. You got:"
 			embed.description = r_str
+			await asyncio.sleep(2)
 			await msg.edit(embed= embed)
 
 	@_open.command(name= 'mythic', aliases = ['m', 'myth', 'mtc', 'mth', 'mc'], help= "Open mythic chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
@@ -418,7 +498,7 @@ class BattleField(commands.Cog):
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['mythic_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have {amount} `mythic chest(s)`, sorry.")
+			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `mythic chest(s)`, sorry.")
 		elif amount <= 0:
 			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
 		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `mythic chest(s)` from your inventory.....",color = 0x2F3136)
@@ -431,6 +511,7 @@ class BattleField(commands.Cog):
 			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `mythic chest` from your inventory. You got:"
 			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
 			# add embed image later
+			await asyncio.sleep(2)
 			await msg.edit(embed= embed)
 		elif amount > 1:
 			items_dict = {}
@@ -453,6 +534,7 @@ class BattleField(commands.Cog):
 			r_str = '\n'.join(r_list)
 			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `mythic chest(s)` from your inventory. You got:"
 			embed.description = r_str
+			await asyncio.sleep(2)
 			await msg.edit(embed= embed)
 
 	@commands.command(name = 'daily', aliases = ['d'])
@@ -471,7 +553,9 @@ class BattleField(commands.Cog):
 		c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= random.randint(150, 200))
 		c_lvl = self.bfh.get_level(c_exp)
 		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
-		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your daily check-in reward!\nYour new balace is **${n_bal:,}**"
+
+		await self.bfh.update_inventory(player_id=ctx.author.id, _item = 'rare_chest', amount = 1)
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['rare']}`rare chest x1` **as your daily check-in reward!\nYour new balace is **${n_bal:,}**"
 		if lvl_up:
 			lvl_up_m = random.randint(100,200)*(c_lvl+1)
 			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
@@ -494,7 +578,8 @@ class BattleField(commands.Cog):
 		c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= random.randint(50, 100))
 		c_lvl = self.bfh.get_level(c_exp)
 		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
-		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your hourly rewards!\nYour new balace is **${n_bal}**"
+		await self.bfh.update_inventory(player_id=ctx.author.id, _item = 'common_chest', amount = 1)
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['common']}`common chest x1` **as your hourly rewards!\nYour new balace is **${n_bal}**"
 		if lvl_up:
 			lvl_up_m = random.randint(100,200)*(c_lvl+1)
 			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
@@ -517,7 +602,8 @@ class BattleField(commands.Cog):
 		c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= random.randint(400, 600))
 		c_lvl = self.bfh.get_level(c_exp)
 		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
-		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your weekly check-in reward!\nYour new balace is **${n_bal}**"
+		await self.bfh.update_inventory(player_id=ctx.author.id, _item = 'legendary_chest', amount = 1)
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['legendary']}`legendary chest x1` **as your weekly check-in reward!\nYour new balace is **${n_bal}**"
 		if lvl_up:
 			lvl_up_m = random.randint(100,200)*(c_lvl+1)
 			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
@@ -540,7 +626,8 @@ class BattleField(commands.Cog):
 		c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= random.randint(450, 500))
 		c_lvl = self.bfh.get_level(c_exp)
 		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
-		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **as your monthly check-in reward!\nYour new balace is **${n_bal}**"
+		await self.bfh.update_inventory(player_id=ctx.author.id, _item = 'legendary_chest', amount = 2)
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['legendary']}`legendary chest x2` **as your monthly check-in reward!\nYour new balace is **${n_bal}**"
 		if lvl_up:
 			lvl_up_m = random.randint(100,200)*(c_lvl+1)
 			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
@@ -563,13 +650,38 @@ class BattleField(commands.Cog):
 		c_exp, n_exp = await self.bfh.update_exp(player_id = ctx.author.id,amount= random.randint(100, 150))
 		c_lvl = self.bfh.get_level(c_exp)
 		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
-		text = f"{ctx.author.mention} , You earned **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP **by working as a programmer(this is just a test, more things will be added soon)!\nYour new balace is **${n_bal}**"
+		await self.bfh.update_inventory(player_id=ctx.author.id, _item = 'common_chest', amount = 1)
+		text = f"{ctx.author.mention} , You earned **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['common']}`common chest x1` **by working as a programmer(this is just a test, more things will be added soon)!\nYour new balace is **${n_bal}**"
 		if lvl_up:
 			lvl_up_m = random.randint(100,200)*(c_lvl+1)
 			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
 			await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
 		await ctx.send(text)
 
+	@commands.commad(name = 'loot', alias= ['l'], help= "soon")
+	@commands.cooldown(1,3, BucketType.user)
+	async def _loot(self, ctx):
+		await ctx.send("SOON")
+
+	@commands.commad(name = 'buy', alias= ['b'], help= "soon")
+	@commands.cooldown(1,3, BucketType.user)
+	async def _buy(self, ctx):
+		await ctx.send("SOON")
+
+	@commands.commad(name = 'sell', alias= ['s'], help= "soon")
+	@commands.cooldown(1,3, BucketType.user)
+	async def _sell(self, ctx):
+		await ctx.send("SOON")
+
+	@commands.commad(name = 'attack', alias= ['a'], help= "soon")
+	@commands.cooldown(1,3, BucketType.user)
+	async def _attack(self, ctx):
+		await ctx.send("SOON")
+
+	@commands.commad(name = 'heal', alias= ['h'], help= "soon")
+	@commands.cooldown(1,3, BucketType.user)
+	async def _heal(self, ctx):
+		await ctx.send("SOON")
 	
 
 def setup(bot):

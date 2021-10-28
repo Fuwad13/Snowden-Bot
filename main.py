@@ -60,11 +60,11 @@ intents = discord.Intents(messages=True, guilds=True,
 
 def get_prefix(bot, message):
 
-    prefixes = ['sd', 'Sd', 'snow', 'SD', 'Snow']
+    prefixes = ['sd', 'Sd', 'S/', 'SD', 's/']
 
     if not message.guild:
 
-        return 'sd'
+        return 's/'
 
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
