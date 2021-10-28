@@ -188,7 +188,7 @@ class BattleFieldHelper:
 				t_json = json.dumps(t_dict)
 				query = f"UPDATE inventory SET {rarity_tier} = $1 WHERE p_id = $2;"
 				await self.bot.db.execute(query, t_json, player_id)
-				return True
+			return True
 		except Exception as e:
 			print(e)
 			return False
