@@ -177,6 +177,7 @@ class BattleFieldHelper:
 
 	async def bulk_update_inventory(self,*, player_id : int, items_dict : dict):
 		inv_table = await self.get_inventory_table(player_id)
+		print(f"inside helper: {items_dict}")
 		try:
 			for item, count in items_dict.items():
 				rarity_tier : str =  itm.ALL_ITEMS[str(item)]['rarity']
@@ -187,10 +188,8 @@ class BattleFieldHelper:
 				except KeyError:
 					t_dict[str(item)] = int(count)
 				t_json = json.dumps(t_dict)
-				print(t_json)
 				query = f"UPDATE inventory SET {rarity_tier} = $1 WHERE p_id = $2;"
 				con = await self.bot.db.execute(query, t_json, player_id)
-				print(con)
 			return True
 		except Exception as e:
 			print(e)

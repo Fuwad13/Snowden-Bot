@@ -383,7 +383,10 @@ class BattleField(commands.Cog):
 					items_dict['rare_chest']+=-amount
 			except KeyError:
 				items_dict['rare_chest'] = -amount
-			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+
+			print(f"inside cmd : {items_dict}\ntype{type(items_dict)}")
+			test = await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+			print(test)
 			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
 			r_str = '\n'.join(r_list)
 			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `rare chest(s)` from your inventory. You got:"
