@@ -182,7 +182,8 @@ class BattleFieldHelper:
 				rarity_tier : str =  itm.ALL_ITEMS[str(item)]['rarity']
 				t_dict = json.loads(inv_table[rarity_tier])
 				try:
-					t_dict[str(item)]+= int(count)
+					if t_dict[str(item)]:
+						t_dict[str(item)]+= int(count)
 				except KeyError:
 					t_dict[str(item)] = int(count)
 				t_json = json.dumps(t_dict)
