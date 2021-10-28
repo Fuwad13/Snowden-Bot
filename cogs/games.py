@@ -124,7 +124,7 @@ class BattleField(commands.Cog):
 
 	@commands.command(name= 'cooldowns', aliases = ['cd', 'cools','cool', 'cds'], help= "Get all battlefield command cooldowns for you/a player.")
 	@commands.cooldown(1,3, BucketType.user)
-	async def _cooldowns(self, ctx, player : typing.Union[discord.Member, discord.User]):
+	async def _cooldowns(self, ctx, player : typing.Union[discord.Member, discord.User] = None):
 		if player is None:
 			if ctx.message.reference:
 				player = ctx.message.reference.resolved.author
@@ -144,7 +144,7 @@ class BattleField(commands.Cog):
 
 		
 
-	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt', 'opt_in_toggle'], help= "Toggle your `opt` status if available. You can't toggle your `opt` status if you are on cooldown!")
+	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt', 'opt_in_toggle'], help= "Toggle your `opt` status if it's available. You can't toggle your `opt` status if you are on cooldown!")
 	@commands.cooldown(1,2,BucketType.user)
 	async def opt(self, ctx):
 		player_id = ctx.author.id

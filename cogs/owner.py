@@ -40,7 +40,7 @@ class Owner(commands.Cog):
 	@commands.is_owner()
 	async def updateinv(self, ctx, player : typing.Union[discord.Member, discord.User], *,json_str : str):
 		player_id = player.id
-		inv_table = self.bfh.get_inventory_table(player_id)
+		
 		items_dict = json.loads(json_str)
 		success = await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict
 		)
