@@ -80,7 +80,7 @@ class BattleField(commands.Cog):
 		flag = await self.bfh.check_if_exists(player_id)
 		if not flag:
 			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = self.bfh.get_inventory_table(player_id)
+		inv_table = await self.bfh.get_inventory_table(player_id)
 		bal : int = inv_table['balance']
 		await ctx.send(f"**{player}'s** balance: **${bal:,}**")
 
