@@ -59,7 +59,7 @@ class Owner(commands.Cog):
 		r = await self.bot.db.execute("UPDATE inventory SET exp = $1 where p_id = $2;", amount, player_id)
 		await ctx.send(str(r))
 
-	@_set.command(name = "hp", aliases = ['HP'], hidden = True)
+	@_set.command(name = "hp", hidden = True)
 	@commands.is_owner()
 	async def _sethp(self, ctx, player : typing.Union[discord.Member, discord.User], amount : int):
 		player_id = player.id
