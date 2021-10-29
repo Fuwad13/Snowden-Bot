@@ -45,7 +45,7 @@ class Owner(commands.Cog):
 		success = await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict
 		)
 		if success:
-			await ctx.reply(f"{cs.EMOJIS['greetick']} Successfully updated inventory for {player.name}")
+			await ctx.reply(f"{cs.EMOJIS['greentick']} Successfully updated inventory for {player.name}")
 
 	@commands.group(name = '@set', help = "Set/Update a player's hp/xp/sp or other things", hidden = True, invoke_without_command = True)
 	@commands.is_owner()
