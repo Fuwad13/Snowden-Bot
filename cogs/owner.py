@@ -45,7 +45,35 @@ class Owner(commands.Cog):
 		success = await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict
 		)
 		if success:
-			await ctx.reply(f"{cs.EMOJIS['greentick']}")
+			await ctx.reply(f"{cs.EMOJIS['greetick']} Successfully updated inventory for {player.name}")
+
+	@commands.group(name = '@set', help = "Set/Update a player's hp/xp/sp or other things", hidden = True, invoke_without_command = True)
+	@commands.is_owner()
+	async def _set(self,ctx):
+		await ctx.send("Set/Update a player's hp , xp , sp or other stuffs!")
+
+	@_set.command(name = "exp", aliases = ['xp'], hidden = True)
+	@commands.is_owner()
+	async def _setexp(self, ctx, player : typing.Union[discord.Member, discord.User], amount : int):
+		player_id = player.id
+		r = await self.bot.db.execute("UPDATE inventory SET exp = $1 where p_id = $2;", amount, player_id)
+		await ctx.send(str(r))
+
+	@_set.command(name = "hp", aliases = ['HP'], hidden = True)
+	@commands.is_owner()
+	async def _sethp(self, ctx, player : typing.Union[discord.Member, discord.User], amount : int):
+		player_id = player.id
+		r = await self.bot.db.execute("UPDATE inventory SET hp = $1 where p_id = $2;", amount, player_id)
+		await ctx.send(str(r))
+
+	@_set.command(name = "sp", aliases = ['shieldpoint', 'shp', 'ap'], hidden = True)
+	@commands.is_owner()
+	async def _setsp(self, ctx, player : typing.Union[discord.Member, discord.User], amount : int):
+		player_id = player.id
+		r = await self.bot.db.execute("UPDATE inventory SET sp = $1 where p_id = $2;", amount, player_id)
+		await ctx.send(str(r))
+
+	
 
 
 

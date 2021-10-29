@@ -57,15 +57,47 @@ class BattleField(commands.Cog):
 		text = f"\U0001f3e6 **Balance**: ${t2['balance']}\n\U0001f4bc **Inv. value**: ${inv_value}\n\U00002728 **Player value**: ${t2['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(t2['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['toggle_on'] if t1['opt_status'] else cs.EMOJIS['toggle_off']}\n"
 		embed.add_field(name='\U0001f4cb __Status/profile__', value=text)
 		embed.add_field(name="\U00002764 __Health__", value=f"{current_hp}/100\n{self.bfh.get_bar_emojis('hp', current_hp, 100)}")
-		embed.add_field(name="\U0001f6e1 __Armour__", value=f"{current_sp}\n{self.bfh.get_bar_emojis('shield', current_sp, 100)}")
+		shield_str = f"{current_sp}\n{self.bfh.get_bar_emojis('shield', current_sp, 100)}" if current_sp else "Not equipped"
+		embed.add_field(name="\U0001f6e1 __Armour__", value=shield_str)
 
 		inv_items = self.bfh.get_inventory_items_str(t2)
 		for r in inv_items.keys():
 			if inv_items[r]:
-				embed.add_field(name=f"{cs.RARITY[r].upper()}", value= inv_items[r])
+				embed.add_field(name=f"**{cs.RARITY[r].upper()}**", value= inv_items[r])
 
 		await ctx.send(embed= embed)
 
+	@commands.command(name= 'balance', aliases = ['bal', 'money'], help = "Shows your/ a player's balance")
+	@commands.guild_only()
+	@commands.cooldown(1,3, BucketType.user)
+	async def _balance(self, ctx, player : typing.Union[discord.Member, discord.User]= None):
+		if player is None:
+			if ctx.message.reference:
+				player = ctx.message.reference.resolved.author
+			else:
+				player = ctx.author
+		player_id = player.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		inv_table = self.bfh.get_inventory_table(player_id)
+		bal : int = inv_table['balance']
+		await ctx.send(f"**{player}'s** balance: **${bal:,}**")
+
+	@commands.command(name = 'profile', aliases = ['pro', 'prof'], help = "Shows a player's profile")
+	@commands.guild_only()
+	@commands.cooldown(1,3, BucketType.user)
+	async def _profile(self, ctx, player : typing.Union[discord.Member, discord.User] = None):
+		if player is None:
+			if ctx.message.reference:
+				player = ctx.message.reference.resolved.author
+			else:
+				player = ctx.author
+		player_id = player.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		await ctx.send("SOON")
 
 	@commands.command(name = 'items', aliases = ['item'], brief = "Gives you information about any game item(s)", help = "Gives you information about any game item(s). run `items [item_name]` to get information about a specific item.")
 	@commands.cooldown(1,3, BucketType.user)
@@ -687,6 +719,11 @@ class BattleField(commands.Cog):
 	@commands.command(name = 'heal', alias= ['h'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _heal(self, ctx):
+		await ctx.send("SOON")
+
+	@commands.command(name= 'players', alises = ['player', 'activeplayers'], help = "Shows currently opted in players count and information")
+	@commands.cooldown(1,3, BucketType.user)
+	async def players(self, ctx):
 		await ctx.send("SOON")
 	
 
