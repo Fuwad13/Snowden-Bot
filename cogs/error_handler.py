@@ -12,6 +12,11 @@ class ErrorHandler(commands.Cog):
 		
 		if hasattr(ctx.command, 'on_error'):
 			return
+		cog = ctx.cog
+		if cog:
+			if cog._get_overridden_method(cog.cog_command_error) is not None:
+				return
+			
 
 		
 
