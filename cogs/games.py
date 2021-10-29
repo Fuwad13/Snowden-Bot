@@ -50,12 +50,14 @@ class BattleField(commands.Cog):
 			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		t1, t2 = await self.bfh.get_player_data(player_id)
 		inv_value = self.bfh.get_inventory_value(t2)
+		current_hp : int = t2['hp']
+		current_sp : int = t2['sp']
 
 		embed = discord.Embed(title = f"**__{player}'s Inventory__**",color = 0x2F3136)
 		text = f"\U0001f3e6 **Balance**: ${t2['balance']}\n\U0001f4bc **Inv. value**: ${inv_value}\n\U00002728 **Player value**: ${t2['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(t2['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['toggle_on'] if t1['opt_status'] else cs.EMOJIS['toggle_off']}\n"
 		embed.add_field(name='\U0001f4cb __Status/profile__', value=text)
-		embed.add_field(name="\U00002764 __Health__", value=f"{cs.HP_EMOJIS['left_full']}{cs.HP_EMOJIS['middle_full']*3}{cs.HP_EMOJIS['right_full']}")
-		embed.add_field(name="\U0001f6e1 __Shield__", value=f"{cs.SHIELD_EMOJIS['left_full']}{cs.SHIELD_EMOJIS['middle_full']*3}{cs.SHIELD_EMOJIS['right_full']}")
+		embed.add_field(name="\U00002764 __Health__", value=f"{current_hp}/100\n{self.bfh.get_bar_emojis('hp', current_hp, 100)}")
+		embed.add_field(name="\U0001f6e1 __Armour__", value=f"{current_sp}\n{self.bfh.get_bar_emojis('shield', current_sp, 100)}")
 
 		inv_items = self.bfh.get_inventory_items_str(t2)
 		for r in inv_items.keys():

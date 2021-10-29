@@ -5,6 +5,7 @@ import games_utils.constants as cs
 import time
 import json
 import games_utils.items as itm
+import math
 
 class BattleFieldHelper:
 	def __init__(self, bot):
@@ -218,7 +219,53 @@ class BattleFieldHelper:
 		o_item = random.choice(item_list)
 		return o_item
 
+	
 
+	def get_bar_emojis(self, _for : str ,current : int, _max : int):
+		"""Returns the bar emoji str for current hp/armour/exp status"""
+		unit = 100/_max
+		percentage = math.ceil(current*unit)
+		if "hp" in _for.lower():
+			emoji_dict = cs.HP_EMOJIS
+		elif "armour" in _for.lower() or "shield" in _for.lower():
+			emoji_dict = cs.SHIELD_EMOJIS
+		elif "exp" in _for.lower():
+			emoji_dict = cs.EXP_EMOJIS
+
+		if percentage > 90:
+			bar = f"{emoji_dict['left_full']}{emoji_dict['middle_full']*3}{emoji_dict['right_full']}"
+			return bar
+		elif percentage > 80:
+			bar = f"{emoji_dict['left_full']}{emoji_dict['middle_full']*3}{emoji_dict['right_half']}"
+			return bar
+		elif percentage > 70:
+			bar = f"{emoji_dict['left_full']}{emoji_dict['middle_full']*3}{emoji_dict['right_empty']}"
+			return bar
+		elif percentage > 60:
+			bar = f"{emoji_dict['left_full']}{emoji_dict['middle_full']*2}{emoji_dict['middle_half']}{emoji_dict['right_empty']}"
+			return bar
+		elif percentage > 50:
+			bar = f"{emoji_dict['left_full']}{emoji_dict['middle_full']}{emoji_dict['middle_full']}{emoji_dict['middle_empty']}{emoji_dict['right_empty']}"
+			return bar
+		elif percentage > 40:
+			bar = f"{emoji_dict['left_full']}{emoji_dict['middle_full']}{emoji_dict['middle_half']}{emoji_dict['middle_empty']}{emoji_dict['right_empty']}"
+			return bar
+		elif percentage > 30:
+			bar = f"{emoji_dict['left_full']}{emoji_dict['middle_full']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['right_empty']}"
+			return bar
+		elif percentage > 20:
+			bar = f"{emoji_dict['left_full']}{emoji_dict['middle_half']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['right_empty']}"
+			return bar
+		elif percentage > 10:
+			bar = f"{emoji_dict['left_full']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['right_empty']}"
+			return bar
+		elif percentage > 0:
+			bar = f"{emoji_dict['left_half']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['right_empty']}"
+			return bar
+
+
+
+		
 
 
 	
