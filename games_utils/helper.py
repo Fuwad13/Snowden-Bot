@@ -263,6 +263,10 @@ class BattleFieldHelper:
 			bar = f"{emoji_dict['left_half']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['right_empty']}"
 			return bar
 
+	
+
+
+	
 
 
 		

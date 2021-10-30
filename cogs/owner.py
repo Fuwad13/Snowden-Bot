@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.core import check
 from games_utils import constants as cs
 from games_utils import helper
 import typing
@@ -11,11 +12,11 @@ class Owner(commands.Cog):
 		self.bot = bot
 		self.bfh = helper.BattleFieldHelper(bot)
 
-	@commands.command(name= '@initdb', hidden = True)
+	@commands.command(name= '/initdb', hidden = True)
 	@commands.is_owner()
 	async def _initdb(self, ctx):
 		try :
-			await self.bot.db.execute(""" CREATE TABLE IF NOT EXISTS battlefield ( p_id bigint PRIMARY KEY, created_at bigint NOT NULL,joinpos serial,opt_status boolean default false, cooldowns json default '{"n_hourly" : 0,"n_daily" : 0,"n_weekly" : 0,"n_monthly" : 0,"n_work" : 0, "n_loot" : 0, "n_attack" : 0, "n_heal" : 0, "n_opt_in_toggle" : 0}', stats json default '{}'); """)
+			await self.bot.db.execute(""" CREATE TABLE IF NOT EXISTS battlefield ( p_id bigint PRIMARY KEY, created_at bigint NOT NULL,joinpos serial,opt_status boolean default false, cooldowns json default '{"n_hourly" : 0,"n_daily" : 0,"n_weekly" : 0,"n_monthly" : 0,"n_work" : 0, "n_loot" : 0, "n_attack" : 0, "n_heal" : 0, "n_opt_in_toggle" : 0}', stats json default '{}', equipments json default '{"armour" : 0, "weapon" : "ak_47"}'); """)
 
 			await self.bot.db.execute(""" CREATE TABLE IF NOT EXISTS inventory (p_id bigint, balance bigint default 500, exp bigint default 100 , hp int default 100, sp int default 0, common json default '{}', rare json default '{}', legendary json default '{}', epic json default '{}', mythic json default '{}', CONSTRAINT fk_p_id FOREIGN KEY (p_id) REFERENCES battlefield(p_id)); """)
 		except:
@@ -23,7 +24,7 @@ class Owner(commands.Cog):
 		
 
 
-	@commands.group(name = '@db',aliases = ['@psql'], hidden = True, invoke_without_command = True)
+	@commands.group(name = '/db',aliases = ['/psql'], hidden = True, invoke_without_command = True)
 	@commands.is_owner()
 	async def db(self, ctx):
 		await ctx.send("Ok")
@@ -36,7 +37,7 @@ class Owner(commands.Cog):
 		val = await self.bot.db.fetchval(query, arg)
 		await ctx.send(val)
 
-	@commands.command(name = '@updateinv', aliases = ['@updinv', '@updateinventory'], hidden = True)
+	@commands.command(name = '/updateinv', aliases = ['/updinv', '/updateinventory'], hidden = True)
 	@commands.is_owner()
 	async def updateinv(self, ctx, player : typing.Union[discord.Member, discord.User], *,json_str : str):
 		player_id = player.id
@@ -47,7 +48,7 @@ class Owner(commands.Cog):
 		if success:
 			await ctx.reply(f"{cs.EMOJIS['greentick']} Successfully updated inventory for {player.name}")
 
-	@commands.group(name = '@set', help = "Set/Update a player's hp/xp/sp or other things", hidden = True, invoke_without_command = True)
+	@commands.group(name = '/set', help = "Set/Update a player's hp/xp/sp or other things", hidden = True, invoke_without_command = True)
 	@commands.is_owner()
 	async def _set(self,ctx):
 		await ctx.send("Set/Update a player's hp , xp , sp or other stuffs!")
@@ -72,6 +73,17 @@ class Owner(commands.Cog):
 		player_id = player.id
 		r = await self.bot.db.execute("UPDATE inventory SET sp = $1 where p_id = $2;", amount, player_id)
 		await ctx.send(str(r))
+
+	@commands.command(name = "/cleanup", aliases = ['/clean'],hidden = True )
+	@commands.is_owner()
+	async def _cleanup(self, ctx, amount : int = 10):
+		def is_snowden(message):
+			return message.author == self.bot.user
+
+		deleted = await ctx.channel.purge(limit = amount, check = is_snowden)
+
+		await ctx.send(f"**Deleted {len(deleted)} message(s)**", delete_after = 5)
+		
 
 	
 

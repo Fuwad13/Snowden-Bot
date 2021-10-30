@@ -726,6 +726,7 @@ class BattleField(commands.Cog):
 	@commands.command(name= 'players', alises = ['player', 'activeplayers'], help = "Shows currently opted in players count and information")
 	@commands.cooldown(1,3, BucketType.user)
 	async def players(self, ctx):
+		
 		await ctx.send("SOON")
 	
 
