@@ -80,10 +80,10 @@ class Owner(commands.Cog):
 		def is_snowden(message):
 			return message.author == self.bot.user
 
-		deleted = await ctx.channel.purge(limit = amount, check = is_snowden)
+		deleted = await ctx.channel.purge(limit = amount, check = is_snowden, bulk = False)
 
 		await ctx.send(f"**Deleted {len(deleted)} message(s)**", delete_after = 5)
-		
+
 
 	
 

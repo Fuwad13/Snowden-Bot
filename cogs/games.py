@@ -33,9 +33,9 @@ class BattleField(commands.Cog):
 		if flag:
 			return await ctx.send("**You already have an account, you can keep playing!**")
 		await self.bot.db.execute(""" INSERT INTO battlefield (p_id, created_at) VALUES ($1, $2); """, player_id, int(ctx.message.created_at.timestamp()))
-		await self.bot.db.execute(""" INSERT INTO inventory (p_id, common, rare) VALUES ($1, $2, $3); """, player_id, '{"police_vest_level_1" : 1}','{"rare_chest" : 1, "pain_killer" : 1 }')
+		await self.bot.db.execute(""" INSERT INTO inventory (p_id, common, rare) VALUES ($1, $2, $3); """, player_id, '{"p92" : 1, "common_chest" : 2}','{"rare_chest" : 1, "pain_killer" : 1 }')
 
-		embed = discord.Embed(title = f"Hey {ctx.author.name}, \U0001f44b Welcome to Snowden's BattleField!!", description = f"You got **$500** and <:exp:896086434946097162>**100 EXP** as a reward for entering the battlefield!\nYou also got:\n• {cs.CHESTS_EMOJIS['rare']}`rare_chest x1`\n• {ALL_ITEMS['police_vest_level_1']['emoji']}`police_vest_level_1 x1`\n• {ALL_ITEMS['pain_killer']['emoji']}`pain_killer x1`\nHope you enjoy!", color = 0x2F3136)
+		embed = discord.Embed(title = f"Hey {ctx.author.name}, \U0001f44b Welcome to Snowden's BattleField!!", description = f"You got **$500** and <:exp:896086434946097162>**100 EXP** as a reward for entering the battlefield!\nYou also got:• {ALL_ITEMS['common_chest']['emoji']}`common chest x1`\n• {cs.CHESTS_EMOJIS['rare']}`rare chest x1`\n• {ALL_ITEMS['p92']['emoji']}`p92 x1`\n• {ALL_ITEMS['pain_killer']['emoji']}`pain killer x1`\nHope you enjoy!", color = 0x2F3136)
 		await ctx.reply(embed = embed)
 
 	@commands.command(name= 'inventory', aliases = ['inv'], brief= "Shows player inventory", help = "Shows player inventory, only if the user has an account.")
@@ -159,6 +159,7 @@ class BattleField(commands.Cog):
 			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
 
 	@commands.command(name= 'cooldowns', aliases = ['cd', 'cools','cool', 'cds'], help= "Get all battlefield command cooldowns for you/a player.")
+	@commands.guild_only()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _cooldowns(self, ctx, player : typing.Union[discord.Member, discord.User] = None):
 		if player is None:
@@ -181,7 +182,7 @@ class BattleField(commands.Cog):
 		
 
 	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt', 'opt_in_toggle'], help= "Toggle your `opt` status if it's available. You can't toggle your `opt` status if you are on cooldown!")
-	@commands.cooldown(1,2,BucketType.user)
+	@commands.cooldown(1,5,BucketType.user)
 	async def opt(self, ctx):
 		player_id = ctx.author.id
 		flag = await self.bfh.check_if_exists(player_id)
@@ -219,7 +220,7 @@ class BattleField(commands.Cog):
 			await view.msg.edit(embed = embed, view = view)	
 
 	@commands.command(name = 'coinflip', aliases =[ 'cf', 'coinf'], help = "Gamble on coinflip! Choose your option and see if your lucky!")
-	@commands.cooldown(2,10, commands.BucketType.user)
+	@commands.cooldown(2,6, commands.BucketType.user)
 	async def _cf(self, ctx, amount : int = 50):
 		flag = await self.bfh.check_if_exists(ctx.author.id)
 		if not flag:
@@ -578,6 +579,7 @@ class BattleField(commands.Cog):
 			await msg.edit(embed= embed)
 
 	@commands.command(name = 'daily', aliases = ['d'])
+	@commands.cooldown(1,3, BucketType.user)
 	async def _daily(self, ctx):
 		flag = await self.bfh.check_if_exists(ctx.author.id)
 		if not flag:
@@ -603,6 +605,7 @@ class BattleField(commands.Cog):
 		await ctx.send(text)
 
 	@commands.command(name = 'hourly', aliases = ['h'])
+	@commands.cooldown(1,3, BucketType.user)
 	async def _hourly(self, ctx):
 		flag = await self.bfh.check_if_exists(ctx.author.id)
 		if not flag:
@@ -627,6 +630,7 @@ class BattleField(commands.Cog):
 		await ctx.send(text)
 
 	@commands.command(name = 'weekly', aliases = ['w'])
+	@commands.cooldown(1,3, BucketType.user)
 	async def _weekly(self, ctx):
 		flag = await self.bfh.check_if_exists(ctx.author.id)
 		if not flag:
@@ -651,6 +655,7 @@ class BattleField(commands.Cog):
 		await ctx.send(text)
 
 	@commands.command(name = 'monthly', aliases = ['mon', 'm'])
+	@commands.cooldown(1,3, BucketType.user)
 	async def _monthly(self, ctx):
 		flag = await self.bfh.check_if_exists(ctx.author.id)
 		if not flag:
@@ -675,6 +680,7 @@ class BattleField(commands.Cog):
 		await ctx.send(text)
 
 	@commands.command(name = 'work', aliases = ['job', 'j'])
+	@commands.cooldown(1,3, BucketType.user)
 	async def work(self, ctx):
 		flag = await self.bfh.check_if_exists(ctx.author.id)
 		if not flag:
@@ -713,9 +719,31 @@ class BattleField(commands.Cog):
 	async def _sell(self, ctx):
 		await ctx.send("SOON")
 
+	@commands.command(name = 'trade', alias= ['tr'], help= "soon")
+	@commands.cooldown(1,3, BucketType.user)
+	async def _trade(self, ctx):
+		await ctx.send("SOON")
+
 	@commands.command(name = 'attack', alias= ['a'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
-	async def _attack(self, ctx):
+	async def _attack(self, ctx, target : discord.Member):
+		target_id = target.id
+		player_id = ctx.author.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			return await ctx.send(f"Hey **{ctx.author}**, you haven't started playing Battlefield yet. To start, run the `{ctx.clean_prefix}start` command! Thanks ")
+		flag_2 = await self.bfh.check_if_exists(target_id)
+		if not flag_2:
+			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! Can't attack him before he starts playing and opt in!")
+		player_opt_status = await self.bfh.get_opt_status(player_id)
+		target_opt_status = await self.bfh.get_opt_status(target_id)
+		if not player_opt_status:
+			return await ctx.send(f"{ctx.author.mention}, You are **not** opted in currently! To attack other players , you need to be opted in. run **{ctx.clean_prefix}opt** to `opt in` and attack other players!")
+		if not target_opt_status:
+			return await ctx.send(f"**{target}** is not opted in to the Battlefield currently, you can't attack them rn!")
+		
+		
+
 		await ctx.send("SOON")
 
 	@commands.command(name = 'heal', alias= ['h'], help= "soon")
@@ -724,10 +752,14 @@ class BattleField(commands.Cog):
 		await ctx.send("SOON")
 
 	@commands.command(name= 'players', alises = ['player', 'activeplayers'], help = "Shows currently opted in players count and information")
+	@commands.guild_only()
 	@commands.cooldown(1,3, BucketType.user)
 	async def players(self, ctx):
-		
-		await ctx.send("SOON")
+		total_players = await self.bot.db.fetchval("SELECT count(*) FROM battlefield;")
+		opted_list = len(await self.bot.db.fetch("SELECT p_id FROM battlefield WHERE opt_status = $1", True))
+		embed = discord.Embed(title = "Player count for Snowden's Battlefield!", color = 0x2F3136)
+		embed.description = f"**__Total players__**: {total_players}\n\n\n**__Opted in__**: {opted_list}"
+		await ctx.send(embed = embed)
 	
 
 def setup(bot):
