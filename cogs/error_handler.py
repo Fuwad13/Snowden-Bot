@@ -16,6 +16,27 @@ class ErrorHandler(commands.Cog):
 		if cog:
 			if cog._get_overridden_method(cog.cog_command_error) is not None:
 				return
+		error = getattr(error, 'original', error)
+
+		if isinstance(error, commands.CommandNotFound):
+			return
+		elif isinstance(error, commands.DisabledCommand):
+			await ctx.send(f'{ctx.command} has been disabled.')
+
+		elif isinstance(error, commands.NoPrivateMessage):
+			await ctx.send(f"This command can only be run in a guild/server.")
+
+		elif isinstance(error, commands.CommandOnCooldown):
+			await ctx.send(f"You're on cooldown! Please retry after `{error.retry_after:.2}` seconds")
+
+		elif isinstance(error, commands.NotOwner):
+			await ctx.send('Fuck you')
+
+		elif isinstance(error, commands.BotMissingPermissions):
+			return
+
+			
+
 			
 
 		
