@@ -21,8 +21,7 @@ class BattleField(commands.Cog):
 		self.bot = bot
 		self.bfh = helper.BattleFieldHelper(bot)
 
-	async def cog_command_error(self, ctx, error):
-		return await ctx.send(error)
+	
 
 
 	@commands.command(name = 'start', aliases = ['enter', 'init'], brief = "Creates an account for playing in Battlefield!", help = "Enter the `Snowden's BattleField` by creating an account!")
