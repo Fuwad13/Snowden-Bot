@@ -54,7 +54,7 @@ class BattleField(commands.Cog):
 		current_sp : int = rec['sp']
 
 		embed = discord.Embed(title = f"**__{player}'s Inventory__**",color = 0x2F3136)
-		text = f"\U0001f3e6 **Balance**: ${rec['balance']}\n\U0001f4bc **Inv. value**: ${inv_value}\n\U00002728 **Player value**: ${rec['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(rec['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['toggle_on'] if rec['opt_status'] else cs.EMOJIS['toggle_off']}\n"
+		text = f"\U0001f3e6 **Balance**         : ${rec['balance']}\n\U0001f4bc **Inventory value** : ${inv_value}\n\U00002728 **Player value**    : ${rec['balance']+inv_value}\n\U0001f4c8 **Level**           : {self.bfh.get_level(rec['exp'])}\n\U00002694 **Opt in status**   : {cs.EMOJIS['toggle_on'] if rec['opt_status'] else cs.EMOJIS['toggle_off']}\n"
 		embed.add_field(name='\U0001f4cb __Status/profile__', value=text, inline = False)
 		embed.add_field(name="\U00002764 __Health__", value=f"{current_hp}/100\n{self.bfh.get_bar_emojis('hp', current_hp, 100)}")
 		weap, sh = self.bfh.get_equipments(rec)
