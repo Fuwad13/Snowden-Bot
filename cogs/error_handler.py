@@ -3,6 +3,9 @@ import discord
 import sys 
 import traceback
 
+from discord.ext.commands import errors
+from utils.errors import NotStartedPlaying, NotOptedIn
+
 class ErrorHandler(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -32,8 +35,11 @@ class ErrorHandler(commands.Cog):
 		elif isinstance(error, commands.NotOwner):
 			await ctx.send('Fuck you')
 
-		elif isinstance(error, commands.BotMissingPermissions):
-			return
+		elif isinstance(error, NotStartedPlaying):
+			await ctx.send(error)
+
+		elif isinstance(error, NotOptedIn):
+			await ctx.send(error)
 
 			
 

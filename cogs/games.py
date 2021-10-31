@@ -15,7 +15,7 @@ import humanize
 from games_utils import helper
 from games_utils.items import ALL_ITEMS
 import games_utils.constants as cs
-
+from utils.decorators import has_started
 class BattleField(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -180,14 +180,12 @@ class BattleField(commands.Cog):
 
 
 		
-
+	
 	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt', 'opt_in_toggle'], help= "Toggle your `opt` status if it's available. You can't toggle your `opt` status if you are on cooldown!")
+	@has_started()
 	@commands.cooldown(1,5,BucketType.user)
 	async def opt(self, ctx):
 		player_id = ctx.author.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{ctx.author} you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		opted_in = await self.bfh.get_opt_status(player_id)
 		n_opt : int= await self.bfh.get_cooldown_data(player_id,'opt_in_toggle')
 		c_opt = self.bfh.can_opt_out(n_opt)
@@ -220,11 +218,12 @@ class BattleField(commands.Cog):
 			await view.msg.edit(embed = embed, view = view)	
 
 	@commands.command(name = 'coinflip', aliases =[ 'cf', 'coinf'], help = "Gamble on coinflip! Choose your option and see if your lucky!")
+	@has_started()
 	@commands.cooldown(2,6, commands.BucketType.user)
 	async def _cf(self, ctx, amount : int = 50):
-		flag = await self.bfh.check_if_exists(ctx.author.id)
-		if not flag:
-			return await ctx.send(f"{ctx.author.mention},you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		# flag = await self.bfh.check_if_exists(ctx.author.id)
+		# if not flag:
+		# 	return await ctx.send(f"{ctx.author.mention},you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		balance = await self.bot.db.fetchval(""" SELECT balance FROM inventory where p_id = $1; """, ctx.author.id)
 		if balance < amount:
 			return await ctx.send("Looks like you don't have enough money to gamble on coinflip!")
@@ -316,12 +315,13 @@ class BattleField(commands.Cog):
 			await msg.edit(embed = embed, view = view)
 
 	@commands.group(name= 'open', aliases = ['unbox', 'o', 'un'], brief= "Open chest(s) from your inventory", help= "Open chests to get random game items!Chances of getting items are based on their rarity.You might get items with higher tier rarity from a lower tier chest.", invoke_without_command= True)
+	@has_started()
 	@commands.cooldown(1,5, BucketType.user)
 	async def _open(self, ctx):
 		player_id = ctx.author.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		# flag = await self.bfh.check_if_exists(player_id)
+		# if not flag:
+		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		embed = discord.Embed(title = f"{ctx.author.name}, You currently have...", color = 0x2F3136)
 		inv_table = await self.bot.db.fetchrow(""" SELECT * FROM inventory where p_id = $1;  """, player_id)
 		chest_dict = self.bfh.get_chest_counts(inv_table)
@@ -330,12 +330,13 @@ class BattleField(commands.Cog):
 		await ctx.send(f"{ctx.author.mention} ->", embed = embed)
 
 	@_open.command(name= 'common', aliases = ['c', 'cmn', 'com'], help= "Open common chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	@has_started()
 	@commands.cooldown(1,5, BucketType.user)
 	async def _common(self, ctx, amount : int = 1):
 		player_id = ctx.author.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		# flag = await self.bfh.check_if_exists(player_id)
+		# if not flag:
+		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['common_chest'] < amount:
@@ -380,12 +381,13 @@ class BattleField(commands.Cog):
 			await msg.edit(embed= embed)
 
 	@_open.command(name= 'rare', aliases = ['r', 'rar'], help= "Open rare chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	@has_started()
 	@commands.cooldown(1,5, BucketType.user)
 	async def _rare(self, ctx, amount : int = 1):
 		player_id = ctx.author.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		# flag = await self.bfh.check_if_exists(player_id)
+		# if not flag:
+		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['rare_chest'] < amount:
@@ -432,12 +434,13 @@ class BattleField(commands.Cog):
 			await msg.edit(embed= embed)
 
 	@_open.command(name= 'legendary', aliases = ['l', 'leg', 'le', 'legen'], help= "Open legendary chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	@has_started()
 	@commands.cooldown(1,5, BucketType.user)
 	async def _legendary(self, ctx, amount : int = 1):
 		player_id = ctx.author.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		# flag = await self.bfh.check_if_exists(player_id)
+		# if not flag:
+		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['legendary_chest'] < amount:
@@ -481,12 +484,13 @@ class BattleField(commands.Cog):
 			await msg.edit(embed= embed)
 
 	@_open.command(name= 'epic', aliases = ['e', 'ep', 'epc'], help= "Open epic chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	@has_started()
 	@commands.cooldown(1,5, BucketType.user)
 	async def _epic(self, ctx, amount : int = 1):
 		player_id = ctx.author.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		# flag = await self.bfh.check_if_exists(player_id)
+		# if not flag:
+		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['epic_chest'] < amount:
@@ -530,12 +534,13 @@ class BattleField(commands.Cog):
 			await msg.edit(embed= embed)
 
 	@_open.command(name= 'mythic', aliases = ['m', 'myth', 'mtc', 'mth', 'mc'], help= "Open mythic chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	@has_started()
 	@commands.cooldown(1,5, BucketType.user)
 	async def _mythic(self, ctx, amount : int = 1):
 		player_id = ctx.author.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		# flag = await self.bfh.check_if_exists(player_id)
+		# if not flag:
+		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		inv_table = await self.bfh.get_inventory_table(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['mythic_chest'] < amount:
@@ -579,11 +584,12 @@ class BattleField(commands.Cog):
 			await msg.edit(embed= embed)
 
 	@commands.command(name = 'daily', aliases = ['d'])
+	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _daily(self, ctx):
-		flag = await self.bfh.check_if_exists(ctx.author.id)
-		if not flag:
-			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		# flag = await self.bfh.check_if_exists(ctx.author.id)
+		# if not flag:
+		# 	return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
 		#check for cooldown
 		current_time = int(time.time())
 		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'daily')
@@ -605,11 +611,12 @@ class BattleField(commands.Cog):
 		await ctx.send(text)
 
 	@commands.command(name = 'hourly', aliases = ['h'])
+	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _hourly(self, ctx):
-		flag = await self.bfh.check_if_exists(ctx.author.id)
-		if not flag:
-			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		# flag = await self.bfh.check_if_exists(ctx.author.id)
+		# if not flag:
+		# 	return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
 		#check for cooldown
 		current_time = int(time.time())
 		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'hourly')
@@ -630,11 +637,12 @@ class BattleField(commands.Cog):
 		await ctx.send(text)
 
 	@commands.command(name = 'weekly', aliases = ['w'])
+	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _weekly(self, ctx):
-		flag = await self.bfh.check_if_exists(ctx.author.id)
-		if not flag:
-			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		# flag = await self.bfh.check_if_exists(ctx.author.id)
+		# if not flag:
+		# 	return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
 		#check for cooldown
 		current_time = int(time.time())
 		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'weekly')
@@ -655,11 +663,12 @@ class BattleField(commands.Cog):
 		await ctx.send(text)
 
 	@commands.command(name = 'monthly', aliases = ['mon', 'm'])
+	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _monthly(self, ctx):
-		flag = await self.bfh.check_if_exists(ctx.author.id)
-		if not flag:
-			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		# flag = await self.bfh.check_if_exists(ctx.author.id)
+		# if not flag:
+		# 	return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
 		#check for cooldown
 		current_time = int(time.time())
 		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'monthly')
@@ -680,11 +689,12 @@ class BattleField(commands.Cog):
 		await ctx.send(text)
 
 	@commands.command(name = 'work', aliases = ['job', 'j'])
+	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def work(self, ctx):
-		flag = await self.bfh.check_if_exists(ctx.author.id)
-		if not flag:
-			return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
+		# flag = await self.bfh.check_if_exists(ctx.author.id)
+		# if not flag:
+		# 	return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
 		#check for cooldown
 		current_time = int(time.time())
 		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'work')
@@ -725,13 +735,14 @@ class BattleField(commands.Cog):
 		await ctx.send("SOON")
 
 	@commands.command(name = 'attack', alias= ['a'], help= "soon")
+	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _attack(self, ctx, target : discord.Member):
 		target_id = target.id
 		player_id = ctx.author.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"Hey **{ctx.author}**, you haven't started playing Battlefield yet. To start, run the `{ctx.clean_prefix}start` command! Thanks ")
+		# flag = await self.bfh.check_if_exists(player_id)
+		# if not flag:
+		# 	return await ctx.send(f"Hey **{ctx.author}**, you haven't started playing Battlefield yet. To start, run the `{ctx.clean_prefix}start` command! Thanks ")
 		flag_2 = await self.bfh.check_if_exists(target_id)
 		if not flag_2:
 			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! Can't attack him before he starts playing and opt in!")
