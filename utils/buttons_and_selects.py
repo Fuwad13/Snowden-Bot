@@ -88,7 +88,7 @@ class InventoryEmbeds(ui.View):
 	async def on_timeout(self):
 		c = 0
 		for item in self.children:
-			self.remove_item(item)
+			self.clear_items()
 			
 		await self.message.edit(view = self)
 			
