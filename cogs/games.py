@@ -763,7 +763,7 @@ class BattleField(commands.Cog):
 
 		await ctx.send("SOON")
 
-	@commands.command(name = 'heal', aliases= ['h'], help= "soon")
+	@commands.command(name = 'heal', aliases= ['healing'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _heal(self, ctx):
 		await ctx.send("SOON")
