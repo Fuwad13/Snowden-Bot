@@ -65,7 +65,7 @@ class BattleField(commands.Cog):
 			shield_str = 'Not equipped'
 		
 		embed.add_field(name="\U0001f6e1 __Armour__", value=shield_str)
-		embed.add_field(name= ":toolbox: __Equipments__", value = f"**__Weapon__**: {ALL_ITEMS[weap]['emoji'] if weap else ' '}{ALL_ITEMS[weap]['name'] if weap else 'Not equipped'}\n\n{ALL_ITEMS[sh]['emoji'] if sh else ' '}{ALL_ITEMS[sh]['name'] if sh else 'Not equipped'}**")
+		embed.add_field(name= ":toolbox: __Equipments__", value = f"**__Weapon__**: {ALL_ITEMS[weap]['emoji'] if weap else ' '}{ALL_ITEMS[weap]['name'] if weap else 'Not equipped'}\n\n**__Armour__**: {ALL_ITEMS[sh]['emoji'] if sh else ' '}{ALL_ITEMS[sh]['name'] if sh else 'Not equipped'}")
 		embed2 = discord.Embed(title = f"**__{player}'s Inventory__** [items]",color = 0x2F3136)
 
 		inv_items = self.bfh.get_inventory_items_str(rec)

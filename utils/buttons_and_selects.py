@@ -89,9 +89,7 @@ class InventoryEmbeds(ui.View):
 		c = 0
 		for item in self.children:
 			self.remove_item(item)
-			c+=1
-			if c == 3:
-				break
+			
 		await self.message.edit(view = self)
 			
 	
