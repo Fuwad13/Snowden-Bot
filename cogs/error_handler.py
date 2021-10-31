@@ -33,7 +33,7 @@ class ErrorHandler(commands.Cog):
 			await ctx.send(f"You're on cooldown! Please retry after `{error.retry_after:.2}` seconds")
 
 		elif isinstance(error, commands.NotOwner):
-			await ctx.send('Fuck you')
+			await ctx.send('L')
 
 		elif isinstance(error, NotStartedPlaying):
 			await ctx.send(error)

@@ -4,7 +4,7 @@
 CD_UNIT = int(72)
 ALL_ITEMS = {
     'p92' : {
-        'name' : 'p92_pistol',
+        'name' : 'p92',
         'type' : 'weapon',
         'rarity' : 'common',
         'emoji' : '<:p92:901725176130052126>',
@@ -16,7 +16,7 @@ ALL_ITEMS = {
         'sell_price' : 100
     },
     'p18c' : {
-        'name' : 'p18c_pistol',
+        'name' : 'p18c',
         'type' : 'weapon',
         'rarity' : 'rare',
         'emoji' : '<:p18c:901725472780591144>',
@@ -40,7 +40,7 @@ ALL_ITEMS = {
         'sell_price' : 800
     },
     'ak_47' : {
-        'name' : 'ak_47',
+        'name' : 'ak 47',
         'type' : 'weapon',
         'rarity' : 'legendary',
         'emoji' : '<:ak_47:901570473786228796>',
@@ -64,7 +64,7 @@ ALL_ITEMS = {
         'sell_price' : 1000
     },
     'scar_l' : {
-        'name' : 'scar_l',
+        'name' : 'scar l',
         'type' : 'weapon',
         'rarity' : 'legendary',
         'emoji' : '<:scar_l:901570493432336385>',
@@ -100,7 +100,7 @@ ALL_ITEMS = {
         'sell_price' : 700
     },
     'vector' : {
-        'name' : 'thompson',
+        'name' : 'vector',
         'type' : 'weapon',
         'rarity' : 'legendary',
         'emoji' : '<:vector:901571514762137692>',
@@ -256,7 +256,7 @@ ALL_ITEMS = {
         'sell_price' : 500
     },
     'pain_killer' : {
-        'name' : 'pain_killer',
+        'name' : 'pain killer',
         'type' : 'healing',
         'rarity' : 'rare',
         'emoji' : '<:painkiller:901570677105123378>',
@@ -276,7 +276,7 @@ ALL_ITEMS = {
         'sell_price' : 35
     },
     'first_aid_kit' : {
-        'name' : 'first_aid_kit',
+        'name' : 'first aid kit',
         'type' : 'healing',
         'rarity' : 'legendary',
         'emoji' : '<:first_aid_kit:901570962863046706>',
@@ -286,7 +286,7 @@ ALL_ITEMS = {
         'sell_price' : 250
     },
     'med_kit' : {
-        'name' : 'med_kit',
+        'name' : 'med kit',
         'type' : 'healing',
         'rarity' : 'epic',
         'emoji' : '<:medkit:901570967707467877>',
@@ -296,7 +296,7 @@ ALL_ITEMS = {
         'sell_price' : 500
     },
     'police_vest_level_1' : {
-        'name' : 'police_vest_level_1',
+        'name' : 'police vest level 1',
         'type' : 'armour',
         'rarity' : 'common',
         'emoji' : '<:police_vest_lvl_1:901511044973867098>',
@@ -305,7 +305,7 @@ ALL_ITEMS = {
         'sell_price' : 400
     },
     'police_vest_level_2' : {
-        'name' : 'police_vest_level_2',
+        'name' : 'police vest level 2',
         'type' : 'armour',
         'rarity' : 'rare',
         'emoji' : '<:police_vest_lvl_2:901511128188854272>',
@@ -314,7 +314,7 @@ ALL_ITEMS = {
         'sell_price' : 450
     },
     'military_armour_level_1' : {
-        'name' : 'military_armour_level_1',
+        'name' : 'military armour level 1',
         'type' : 'armour',
         'rarity' : 'legendary',
         'emoji' : '<:military_armour_lvl_1:901511267653652610>',
@@ -323,7 +323,7 @@ ALL_ITEMS = {
         'sell_price' : 800
     },
     'military_armour_level_2' : {
-        'name' : 'military_armour_level_2',
+        'name' : 'military armour level 2',
         'type' : 'armour',
         'rarity' : 'epic',
         'emoji' : '<:military_armour_lvl_2:902144891692400660>',
@@ -332,7 +332,7 @@ ALL_ITEMS = {
         'sell_price' : 2000
     },
     'samurai_armour_set' : {
-        'name' : 'samurai_armour_set',
+        'name' : 'samurai armour set',
         'type' : 'armour',
         'rarity' : 'mythic',
         'emoji' : '<:samurai_armour_set:901510924207276122>',
@@ -341,7 +341,7 @@ ALL_ITEMS = {
         'sell_price' : 3000
     },
     '9mm' : {
-        'name' : '9mm_bullet',
+        'name' : '9mm bullet',
         'type' : 'ammunition',
         'emoji' : '<:9mm:901772563825438720>',
         'rarity' : 'common',
@@ -350,7 +350,7 @@ ALL_ITEMS = {
         'sell_price' : 75
     },
     '45acp' : {
-        'name' : '45acp_bullet',
+        'name' : '45acp bullet',
         'type' : 'ammunition',
         'emoji' : '<:45acp:901772580552323102>',
         'rarity' : 'rare',
@@ -359,7 +359,7 @@ ALL_ITEMS = {
         'sell_price' : 150
     },
     '5_56mm' : {
-        'name' : '5_56mm_bullet',
+        'name' : '5.56mm bullet',
         'type' : 'ammunition',
         'emoji' : '<:5_56mm:901772574843867217>',
         'rarity' : 'legendary',
@@ -368,7 +368,7 @@ ALL_ITEMS = {
         'sell_price' : 220
     },
     '7_62mm' : {
-        'name' : '7_62mm_bullet',
+        'name' : '7.62mm bullet',
         'type' : 'ammunition',
         'emoji' : '<:7_62mm:901772569349357598>',
         'rarity' : 'legendary',
@@ -377,7 +377,7 @@ ALL_ITEMS = {
         'sell_price' : 250
     },
     '300magnum' : {
-        'name' : '300magnum_bullet',
+        'name' : '.300magnum bullet',
         'type' : 'ammunition',
         'emoji' : '<:300magnum:901772585665187840>',
         'rarity' : 'epic',
@@ -386,7 +386,7 @@ ALL_ITEMS = {
         'sell_price' : 450
     },
     '12gauge' : {
-        'name' : '12gauge_shells',
+        'name' : '12gauge shells',
         'type' : 'ammunition',
         'emoji' : '<:12gauge:901772615570579537>',
         'rarity' : 'rare',
@@ -395,7 +395,7 @@ ALL_ITEMS = {
         'sell_price' : 100
     },
     'common_chest' : {
-        'name' : 'common_chest',
+        'name' : 'common chest',
         'type' : 'chest',
         'rarity' : 'common',
         'emoji' : '<:common_chest:901798708864253992>',
@@ -404,7 +404,7 @@ ALL_ITEMS = {
         'sell_price' : 100
     },
     'rare_chest' : {
-        'name' : 'rare_chest',
+        'name' : 'rare chest',
         'type' : 'chest',
         'rarity' : 'rare',
         'emoji' : '<:rare_chest:901798877726924810>',
@@ -413,7 +413,7 @@ ALL_ITEMS = {
         'sell_price' : 150
     },
     'legendary_chest' : {
-        'name' : 'legendary_chest',
+        'name' : 'legendary chest',
         'type' : 'chest',
         'rarity' : 'legendary',
         'emoji' : '<:legendary_chest:901799227758350426>',
@@ -422,7 +422,7 @@ ALL_ITEMS = {
         'sell_price' : 800
     },
     'epic_chest' : {
-        'name' : 'epic_chest',
+        'name' : 'epic chest',
         'type' : 'chest',
         'rarity' : 'epic',
         'emoji' : '<:epic_chest:901799469006336080>',
@@ -431,7 +431,7 @@ ALL_ITEMS = {
         'sell_price' : 1500
     },
     'mythic_chest' : {
-        'name' : 'mythic_chest',
+        'name' : 'mythic chest',
         'type' : 'chest',
         'rarity' : 'mythic',
         'emoji' : '<:mythic_chest:901800353757036594>',

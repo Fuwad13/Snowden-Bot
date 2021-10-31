@@ -15,7 +15,7 @@ import humanize
 from games_utils import helper
 from games_utils.items import ALL_ITEMS
 import games_utils.constants as cs
-from utils.decorators import has_started
+from utils.decorators import has_started, is_opted, has_ref_started
 class BattleField(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -32,13 +32,14 @@ class BattleField(commands.Cog):
 		flag = await self.bfh.check_if_exists(player_id)
 		if flag:
 			return await ctx.send("**You already have an account, you can keep playing!**")
-		await self.bot.db.execute(""" INSERT INTO battlefield (p_id, created_at) VALUES ($1, $2); """, player_id, int(ctx.message.created_at.timestamp()))
-		await self.bot.db.execute(""" INSERT INTO inventory (p_id, common, rare) VALUES ($1, $2, $3); """, player_id, '{"p92" : 1, "common_chest" : 2}','{"rare_chest" : 1, "pain_killer" : 1 }')
+		await self.bot.db.execute(""" INSERT INTO battlefield (p_id, created_at, common, rare) VALUES ($1, $2, $3, $4, $5); """, player_id, int(ctx.message.created_at.timestamp()),'{"p92" : 1, "common_chest" : 2}','{"rare_chest" : 1, "pain_killer" : 1 }' )
+		
 
-		embed = discord.Embed(title = f"Hey {ctx.author.name}, \U0001f44b Welcome to Snowden's BattleField!!", description = f"You got **$500** and <:exp:896086434946097162>**100 EXP** as a reward for entering the battlefield!\nYou also got:\n• {ALL_ITEMS['common_chest']['emoji']}`common chest x1`\n• {cs.CHESTS_EMOJIS['rare']}`rare chest x1`\n• {ALL_ITEMS['p92']['emoji']}`p92 x1`\n• {ALL_ITEMS['pain_killer']['emoji']}`pain killer x1`\nHope you enjoy!", color = 0x2F3136)
+		embed = discord.Embed(title = f"Hey {ctx.author.name}, \U0001f44b Welcome to Snowden's BattleField!!", description = f"You got **$500** and <:exp:896086434946097162>**100 EXP** as a reward for entering the battlefield!\nYou also got:\n• {ALL_ITEMS['common_chest']['emoji']}`common chest x2`\n• {cs.CHESTS_EMOJIS['rare']}`rare chest x1`\n• {ALL_ITEMS['p92']['emoji']}`p92 x1`\n• {ALL_ITEMS['pain_killer']['emoji']}`pain killer x1`\nHope you enjoy!", color = 0x2F3136)
 		await ctx.reply(embed = embed)
 
 	@commands.command(name= 'inventory', aliases = ['inv'], brief= "Shows player inventory", help = "Shows player inventory, only if the user has an account.")
+	@has_ref_started()
 	@commands.cooldown(1,5, type= BucketType.user)
 	async def _inventory(self, ctx, player : typing.Union[discord.Member, discord.User] = None):
 		if player is None:
@@ -47,30 +48,37 @@ class BattleField(commands.Cog):
 			else:
 				player = ctx.author
 		player_id = player.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		t1, t2 = await self.bfh.get_player_data(player_id)
-		inv_value = self.bfh.get_inventory_value(t2)
-		current_hp : int = t2['hp']
-		current_sp : int = t2['sp']
+		rec = await self.bfh.get_player_data(player_id)
+		inv_value = self.bfh.get_inventory_value(rec)
+		current_hp : int = rec['hp']
+		current_sp : int = rec['sp']
 
 		embed = discord.Embed(title = f"**__{player}'s Inventory__**",color = 0x2F3136)
-		text = f"\U0001f3e6 **Balance**: ${t2['balance']}\n\U0001f4bc **Inv. value**: ${inv_value}\n\U00002728 **Player value**: ${t2['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(t2['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['toggle_on'] if t1['opt_status'] else cs.EMOJIS['toggle_off']}\n"
-		embed.add_field(name='\U0001f4cb __Status/profile__', value=text)
+		text = f"\U0001f3e6 **Balance**: ${rec['balance']}\n\U0001f4bc **Inv. value**: ${inv_value}\n\U00002728 **Player value**: ${rec['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(rec['exp'])}\n\U00002694 **Opt in status**: {cs.EMOJIS['toggle_on'] if rec['opt_status'] else cs.EMOJIS['toggle_off']}\n"
+		embed.add_field(name='\U0001f4cb __Status/profile__', value=text, inline = False)
 		embed.add_field(name="\U00002764 __Health__", value=f"{current_hp}/100\n{self.bfh.get_bar_emojis('hp', current_hp, 100)}")
-		shield_str = f"{current_sp}\n{self.bfh.get_bar_emojis('shield', current_sp, 100)}" if current_sp else "Not equipped"
+		weap, sh = self.bfh.get_equipments(rec)
+		if current_sp:
+			sh_p = ALL_ITEMS[sh]['shield_points']
+			shield_str = f"{current_sp}\n{self.bfh.get_bar_emojis('armour', current_sp, sh_p)}"
+		else: 
+			shield_str = 'Not equipped'
+		
 		embed.add_field(name="\U0001f6e1 __Armour__", value=shield_str)
+		embed.add_field(name= ":toolbox: __Equipments__", value = f"**__Weapon__**: {ALL_ITEMS[weap]['emoji'] if weap else ' '}{ALL_ITEMS[weap]['name'] if weap else 'Not equipped'}\n\n{ALL_ITEMS[sh]['emoji'] if sh else ' '}{ALL_ITEMS[sh]['name'] if sh else 'Not equipped'}**")
+		embed2 = discord.Embed(title = f"**__{player}'s Inventory__** [items]",color = 0x2F3136)
 
-		inv_items = self.bfh.get_inventory_items_str(t2)
+		inv_items = self.bfh.get_inventory_items_str(rec)
 		for r in inv_items.keys():
 			if inv_items[r]:
-				embed.add_field(name=f"**{cs.RARITY[r].upper()}**", value= inv_items[r])
+				embed2.add_field(name=f"**{cs.RARITY[r].upper()}**", value= inv_items[r])
+		view = bs.InventoryEmbeds(ctx,embed, embed2)
 
-		await ctx.send(embed= embed)
+		view.message = await ctx.send(embed= embed, view = view)
 
 	@commands.command(name= 'balance', aliases = ['bal', 'money'], help = "Shows your/ a player's balance")
 	@commands.guild_only()
+	@has_ref_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _balance(self, ctx, player : typing.Union[discord.Member, discord.User]= None):
 		if player is None:
@@ -79,15 +87,14 @@ class BattleField(commands.Cog):
 			else:
 				player = ctx.author
 		player_id = player.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = await self.bfh.get_inventory_table(player_id)
+		
+		inv_table = await self.bfh.get_player_data(player_id)
 		bal : int = inv_table['balance']
 		await ctx.send(f"**{player}'s** balance: **${bal:,}**")
 
 	@commands.command(name = 'profile', aliases = ['pro', 'prof'], help = "Shows a player's profile")
 	@commands.guild_only()
+	@has_ref_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _profile(self, ctx, player : typing.Union[discord.Member, discord.User] = None):
 		if player is None:
@@ -96,9 +103,6 @@ class BattleField(commands.Cog):
 			else:
 				player = ctx.author
 		player_id = player.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		await ctx.send("SOON")
 
 	@commands.command(name = 'items', aliases = ['item'], brief = "Gives you information about any game item(s)", help = "Gives you information about any game item(s). run `items [item_name]` to get information about a specific item.")
@@ -160,6 +164,7 @@ class BattleField(commands.Cog):
 
 	@commands.command(name= 'cooldowns', aliases = ['cd', 'cools','cool', 'cds'], help= "Get all battlefield command cooldowns for you/a player.")
 	@commands.guild_only()
+	@has_ref_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _cooldowns(self, ctx, player : typing.Union[discord.Member, discord.User] = None):
 		if player is None:
@@ -168,9 +173,7 @@ class BattleField(commands.Cog):
 			else:
 				player = ctx.author
 		player_id = player.id
-		flag = await self.bfh.check_if_exists(player_id)
-		if not flag:
-			return await ctx.send(f"{player} hasn't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		
 		cd_dict : dict = await self.bfh.get_cooldown_data(player_id)
 		embed = discord.Embed(title = f"__{player}'s cooldowns:__",color =0x2F3136)
 		now = int(time.time())
@@ -182,6 +185,7 @@ class BattleField(commands.Cog):
 		
 	
 	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt', 'opt_in_toggle'], help= "Toggle your `opt` status if it's available. You can't toggle your `opt` status if you are on cooldown!")
+	@commands.guild_only()
 	@has_started()
 	@commands.cooldown(1,5,BucketType.user)
 	async def opt(self, ctx):
@@ -224,7 +228,7 @@ class BattleField(commands.Cog):
 		# flag = await self.bfh.check_if_exists(ctx.author.id)
 		# if not flag:
 		# 	return await ctx.send(f"{ctx.author.mention},you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		balance = await self.bot.db.fetchval(""" SELECT balance FROM inventory where p_id = $1; """, ctx.author.id)
+		balance = await self.bot.db.fetchval(""" SELECT balance FROM battlefield where p_id = $1; """, ctx.author.id)
 		if balance < amount:
 			return await ctx.send("Looks like you don't have enough money to gamble on coinflip!")
 		if amount > 10000 or amount < 50:
@@ -323,7 +327,7 @@ class BattleField(commands.Cog):
 		# if not flag:
 		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		embed = discord.Embed(title = f"{ctx.author.name}, You currently have...", color = 0x2F3136)
-		inv_table = await self.bot.db.fetchrow(""" SELECT * FROM inventory where p_id = $1;  """, player_id)
+		inv_table = await self.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;  """, player_id)
 		chest_dict = self.bfh.get_chest_counts(inv_table)
 		text= f"• {cs.CHESTS_EMOJIS['common']} x{chest_dict['common_chest']} `common chest(s)`\n• {cs.CHESTS_EMOJIS['rare']} x{chest_dict['rare_chest']} `rare chest(s)`\n• {cs.CHESTS_EMOJIS['legendary']} x{chest_dict['legendary_chest']} `legendary chest(s)`\n• {cs.CHESTS_EMOJIS['epic']} x{chest_dict['epic_chest']} `epic chest(s)`\n• {cs.CHESTS_EMOJIS['mythic']} x{chest_dict['mythic_chest']} `mythic chest(s)`\nuse `{ctx.clean_prefix}open [chest] [amount]` to open your chests to get random items!"
 		embed.description= text
@@ -337,7 +341,7 @@ class BattleField(commands.Cog):
 		# flag = await self.bfh.check_if_exists(player_id)
 		# if not flag:
 		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = await self.bfh.get_inventory_table(player_id)
+		inv_table = await self.bfh.get_player_data(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['common_chest'] < amount:
 			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `common chest(s)`, sorry.")
@@ -388,7 +392,7 @@ class BattleField(commands.Cog):
 		# flag = await self.bfh.check_if_exists(player_id)
 		# if not flag:
 		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = await self.bfh.get_inventory_table(player_id)
+		inv_table = await self.bfh.get_player_data(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['rare_chest'] < amount:
 			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `rare chest(s)`, sorry.")
@@ -441,7 +445,7 @@ class BattleField(commands.Cog):
 		# flag = await self.bfh.check_if_exists(player_id)
 		# if not flag:
 		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = await self.bfh.get_inventory_table(player_id)
+		inv_table = await self.bfh.get_player_data(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['legendary_chest'] < amount:
 			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `legendary chest(s)`, sorry.")
@@ -491,7 +495,7 @@ class BattleField(commands.Cog):
 		# flag = await self.bfh.check_if_exists(player_id)
 		# if not flag:
 		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = await self.bfh.get_inventory_table(player_id)
+		inv_table = await self.bfh.get_player_data(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['epic_chest'] < amount:
 			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `epic chest(s)`, sorry.")
@@ -541,7 +545,7 @@ class BattleField(commands.Cog):
 		# flag = await self.bfh.check_if_exists(player_id)
 		# if not flag:
 		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = await self.bfh.get_inventory_table(player_id)
+		inv_table = await self.bfh.get_player_data(player_id)
 		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
 		if chest_counts['mythic_chest'] < amount:
 			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `mythic chest(s)`, sorry.")
@@ -714,55 +718,57 @@ class BattleField(commands.Cog):
 			await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
 		await ctx.send(text)
 
-	@commands.command(name = 'loot', alias= ['l'], help= "soon")
+	@commands.command(name = 'loot', aliases= ['l'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _loot(self, ctx):
 		await ctx.send("SOON")
 
-	@commands.command(name = 'buy', alias= ['b'], help= "soon")
+	@commands.command(name = 'buy', aliases= ['b'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _buy(self, ctx):
 		await ctx.send("SOON")
 
-	@commands.command(name = 'sell', alias= ['s'], help= "soon")
+	@commands.command(name = 'sell', aliases= ['s'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _sell(self, ctx):
 		await ctx.send("SOON")
 
-	@commands.command(name = 'trade', alias= ['tr'], help= "soon")
+	@commands.command(name = 'trade', aliases= ['tr'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _trade(self, ctx):
 		await ctx.send("SOON")
 
-	@commands.command(name = 'attack', alias= ['a'], help= "soon")
+	@commands.command(name = 'attack', aliases= ['a'], help= "soon")
 	@has_started()
+	@is_opted()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _attack(self, ctx, target : discord.Member):
 		target_id = target.id
 		player_id = ctx.author.id
-		# flag = await self.bfh.check_if_exists(player_id)
-		# if not flag:
-		# 	return await ctx.send(f"Hey **{ctx.author}**, you haven't started playing Battlefield yet. To start, run the `{ctx.clean_prefix}start` command! Thanks ")
+		if target == ctx.author:
+			return await ctx.send("You can't attack yourself, L")
+
 		flag_2 = await self.bfh.check_if_exists(target_id)
 		if not flag_2:
-			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! Can't attack him before he starts playing and opt in!")
-		player_opt_status = await self.bfh.get_opt_status(player_id)
-		target_opt_status = await self.bfh.get_opt_status(target_id)
-		if not player_opt_status:
-			return await ctx.send(f"{ctx.author.mention}, You are **not** opted in currently! To attack other players , you need to be opted in. run **{ctx.clean_prefix}opt** to `opt in` and attack other players!")
-		if not target_opt_status:
-			return await ctx.send(f"**{target}** is not opted in to the Battlefield currently, you can't attack them rn!")
+			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! You an't attack him before he starts playing and opt in!")
+		# player_opt_status = await self.bfh.get_opt_status(player_id)
+		t1, t2 = await self.bfh.get_player_data(target_id)
+		
+		if not t1['opt_status']:
+			return await ctx.send(f"**{target}** is `not opted in` to the Battlefield currently, you can't attack them rn!")
+
+		
 		
 		
 
 		await ctx.send("SOON")
 
-	@commands.command(name = 'heal', alias= ['h'], help= "soon")
+	@commands.command(name = 'heal', aliases= ['h'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _heal(self, ctx):
 		await ctx.send("SOON")
 
-	@commands.command(name= 'players', alises = ['player', 'activeplayers'], help = "Shows currently opted in players count and information")
+	@commands.command(name= 'players', aliases = ['player', 'activeplayers'], help = "Shows currently opted in players count and information")
 	@commands.guild_only()
 	@commands.cooldown(1,3, BucketType.user)
 	async def players(self, ctx):

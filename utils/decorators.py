@@ -6,16 +6,35 @@ from utils.errors import NotStartedPlaying, NotOptedIn
 
 def has_started():
 	async def predicate(ctx):
-		flag = False
+		
 		player = await ctx.bot.db.fetchval(""" SELECT p_id FROM battlefield WHERE p_id = $1 """, ctx.author.id)
 		if player:
-			flag = True
-			return flag
+			return True
 		else:
-			flag = False
-			raise NotStartedPlaying(f"{ctx.author} you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+			raise NotStartedPlaying(f"**{ctx.author}**, you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 	return commands.check(predicate)
 
+def has_ref_started():
+	async def predicate(ctx):
+		if ctx.message.reference:
+			p_id = ctx.message.reference.resolved.author.id
+			player = await ctx.bot.db.fetchval(""" SELECT p_id FROM battlefield WHERE p_id = $1 """, p_id)
+			if player:
+			
+				return True
+			else:
+				
+				raise NotStartedPlaying(f"**{ctx.message.reference.resolved.author}** haven't started playing Battlefield yet,ask him to run `{ctx.clean_prefix}start` to start playing!")
+		else:
+			
+			player = await ctx.bot.db.fetchval(""" SELECT p_id FROM battlefield WHERE p_id = $1 """, ctx.author.id)
+			if player:
+				return True
+			else:
+				raise NotStartedPlaying(f"**{ctx.author}**, you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		
+		
+	return commands.check(predicate)
 
 def is_opted():
 	async def predicate(ctx):
@@ -23,7 +42,7 @@ def is_opted():
 		if status:
 			return True
 		else:
-			raise NotOptedIn(f"**You can't use this command if you are not opted in!**\nRun the `{ctx.clean_prefix}opt` to toggle your opt status.")
+			raise NotOptedIn(f"**{ctx.author}**, You can't use this command if you are not opted in!\nRun the `{ctx.clean_prefix}opt` to toggle your opt status.")
 
 	return commands.check(predicate)
 

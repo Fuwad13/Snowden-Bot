@@ -22,14 +22,14 @@ class BattleFieldHelper:
 
 	async def update_exp(self, *,player_id :int, amount : int, add :bool = True ):
 		if add == True:
-			c_exp : int = await self.bot.db.fetchval(""" SELECT exp FROM inventory WHERE p_id = $1 ;""", player_id)
+			c_exp : int = await self.bot.db.fetchval(""" SELECT exp FROM battlefield WHERE p_id = $1 ;""", player_id)
 			n_exp = c_exp + amount
-			await self.bot.db.execute(""" UPDATE inventory SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
+			await self.bot.db.execute(""" UPDATE battlefield SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
 
 		elif add == False:
-			c_exp :int= await self.bot.db.fetchval(""" SELECT exp FROM inventory WHERE p_id = $1 ;""", player_id)
+			c_exp :int= await self.bot.db.fetchval(""" SELECT exp FROM battlefield WHERE p_id = $1 ;""", player_id)
 			n_exp= c_exp - amount
-			await self.bot.db.execute(""" UPDATE inventory SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
+			await self.bot.db.execute(""" UPDATE battlefield SET exp = $1 WHERE p_id = $2; """, n_exp, player_id)
 		return c_exp, n_exp
 
 	def format_cooldown(self, seconds: int):
@@ -82,59 +82,59 @@ class BattleFieldHelper:
 
 	async def update_balance(self,*,player_id, amount : int, add : bool = True):
 		if add == True:
-			bal :int = await self.bot.db.fetchval(""" SELECT balance FROM inventory WHERE p_id = $1 ;""", player_id)
+			bal :int = await self.bot.db.fetchval(""" SELECT balance FROM battlefield WHERE p_id = $1 ;""", player_id)
 			bal = bal + amount
-			await self.bot.db.execute(""" UPDATE inventory SET balance = $1 WHERE p_id = $2; """, bal, player_id)
+			await self.bot.db.execute(""" UPDATE battlefield SET balance = $1 WHERE p_id = $2; """, bal, player_id)
 
 		elif add == False:
-			bal :int = await self.bot.db.fetchval(""" SELECT balance FROM inventory WHERE p_id = $1 ;""", player_id)
+			bal :int = await self.bot.db.fetchval(""" SELECT balance FROM battlefield WHERE p_id = $1 ;""", player_id)
 			bal = bal - amount
-			await self.bot.db.execute(""" UPDATE inventory SET balance = $1 WHERE p_id = $2; """, bal, player_id)
+			await self.bot.db.execute(""" UPDATE battlefield SET balance = $1 WHERE p_id = $2; """, bal, player_id)
 		return bal
 
 	def get_item_data(self, item :str):
 		data = itm.ALL_ITEMS[item]
 		return data
 
-	async def get_inventory_table(self, player_id :int):
-		inv_table = await self.bot.db.fetchrow(""" SELECT * FROM inventory where p_id = $1; """, player_id)
-		return inv_table
+	
 
-	def get_inventory_value(self, t2):
+	def get_inventory_value(self, rec):
+		"""Returns the inventory value for a player"""
 		value : int = 0
-		for column in t2:
-			if isinstance(column, int):
-				continue
+		inv_columns = ['common', 'rare', 'legendary', 'epic', 'mythic']
+		
+		for column_n in inv_columns:
+			column = rec[column_n] 
 			i_dict : dict = json.loads(column)
 			for item, count in i_dict.items():
 				unit_price = itm.ALL_ITEMS[str(item)]['sell_price']
 				value = value + unit_price*count
 		return value
 
-	def get_inventory_items_str(self, t2):
+	def get_inventory_items_str(self, rec):
 		fields = {}
+		inv_columns = ['common', 'rare', 'legendary', 'epic', 'mythic']
 		c = 1
-		for column in t2:
-			if isinstance(column, int):
-				continue
+		for column_n in inv_columns:
+			column = rec[column_n]
 			i_dict : dict = json.loads(column)
 			text = ""
 			for item, count in i_dict.items():
 				try:
 					if item and count != 0:
-						text+=f"{itm.ALL_ITEMS[str(item)]['emoji']} {str(item).replace('_',' ')} `x{count}`\n"
+						text+=f"{itm.ALL_ITEMS[str(item)]['emoji']} {itm.ALL_ITEMS[str(item)]['name']} `x{count}`\n"
 				except: #keyerror
 					pass
 			fields[str(c)] = text
 			c+=1
 		return fields
 
-	def get_chest_counts(self, t2):
+	def get_chest_counts(self, rec):
 		"""Returns a dictionary of the filtered items in the following format: {'item_name' : count}"""
 		filtered_items = {'common_chest' : 0, 'rare_chest' : 0,'legendary_chest' : 0, 'epic_chest' : 0,'mythic_chest' : 0}
-		for column in t2:
-			if isinstance(column, int):
-				continue
+		inv_columns = ['common', 'rare', 'legendary', 'epic', 'mythic']
+		for column_n in inv_columns:
+			column = rec[column_n]
 			i_dict : dict = json.loads(column)
 			text = ""
 			for item, count in i_dict.items():
@@ -148,9 +148,10 @@ class BattleFieldHelper:
 		return filtered_items
 
 	async def get_player_data(self, player_id : int):
-		t1 = await self.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;  """, player_id)
-		t2 = await self.bot.db.fetchrow(""" SELECT * FROM inventory where p_id = $1;  """, player_id)
-		return t1, t2
+		"""Returns the record for a player from the battlefield table"""
+		data = await self.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;  """, player_id)
+		
+		return data
 
 	async def get_opt_status(self, player_id: int):
 		status : bool= await self.bot.db.fetchval(""" SELECT opt_status FROM battlefield where p_id = $1; """, player_id)
@@ -165,7 +166,7 @@ class BattleFieldHelper:
 	
 	async def update_inventory(self,*,player_id : int, _item : str, amount : int):
 		"""Update a player's inventory for one item"""
-		inv_table = await self.get_inventory_table(player_id)
+		inv_table = await self.get_player_data(player_id)
 		rarity_tier :str = itm.ALL_ITEMS[_item]['rarity']
 		t_dict  = json.loads(inv_table[rarity_tier])
 		try:
@@ -173,7 +174,7 @@ class BattleFieldHelper:
 		except KeyError:
 			t_dict[_item] = amount
 		t_json = json.dumps(t_dict)
-		query = f"UPDATE inventory SET {rarity_tier} = $1 WHERE p_id = $2;"
+		query = f"UPDATE battlefield SET {rarity_tier} = $1 WHERE p_id = $2;"
 		await self.bot.db.execute(query, t_json, player_id)
 
 	async def bulk_update_inventory(self,*, player_id : int, items_dict : dict):
@@ -181,7 +182,7 @@ class BattleFieldHelper:
 		
 		try:
 			for item, count in items_dict.items():
-				inv_table = await self.get_inventory_table(player_id)
+				inv_table = await self.get_player_data(player_id)
 				rarity_tier : str =  itm.ALL_ITEMS[str(item)]['rarity']
 				t_dict = json.loads(inv_table[rarity_tier])
 				try:
@@ -190,7 +191,7 @@ class BattleFieldHelper:
 				except KeyError:
 					t_dict[str(item)] = int(count)
 				t_json = json.dumps(t_dict)
-				query = f"UPDATE inventory SET {rarity_tier} = $1 WHERE p_id = $2;"
+				query = f"UPDATE battlefield SET {rarity_tier} = $1 WHERE p_id = $2;"
 				con = await self.bot.db.execute(query, t_json, player_id)
 			return True
 		except Exception as e:
@@ -262,8 +263,14 @@ class BattleFieldHelper:
 		elif percentage > 0:
 			bar = f"{emoji_dict['left_half']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['right_empty']}"
 			return bar
-
 	
+	def get_equipments(self, rec):
+		"""Returns the str of equipments ( weapon , armour)"""
+		eq_column = rec['equipments']
+		eq_dict : dict = json.loads(eq_column)
+
+		return eq_dict['weapon'], eq_dict['armour']
+
 
 
 	
