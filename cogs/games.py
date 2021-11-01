@@ -756,6 +756,7 @@ class BattleField(commands.Cog):
 		view = bs.BuyItem(ctx)
 		msg = await ctx.send(f"{ctx.author.mention}, Do you want to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**?\n\nIf yes press the `Buy` button or press the `Cancel` button to cancel.`(timeout=20s)`", view = view)
 		await view.wait()
+		view.clear_items()
 		if not view.confirmation:
 			return await msg.edit(f"{ctx.author.mention}, ~~Do you want to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**?\n\nIf yes press the `Buy` button or press the `Cancel` button to cancel.`(timeout=20s)`~~\n**Cancelled**", view = view)
 		else:
@@ -763,7 +764,7 @@ class BattleField(commands.Cog):
 			await self.bot.db.execute("UPDATE battlefield SET balance = balance - $1 where p_id = $2;", total_price, ctx.author.id)
 
 			await msg.edit(f"{ctx.author.mention} ->\n{cs.EMOJIS['greentick']} You bought **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**.", view = view)
-			
+
 
 	@commands.command(name = 'sell', aliases= ['s'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)

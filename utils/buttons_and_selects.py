@@ -108,19 +108,20 @@ class BuyItem(ui.View):
 	#add emoji later
 	@ui.button(label = 'Buy', style= discord.ButtonStyle.green)
 	async def _buy(self, button, intr):
-		self.clear_items()
+		
 		self.confirmation = True
 		self.stop()
 
 	@ui.button(label='Cancel', style=discord.ButtonStyle.red)
 	async def _cancel(self, button, intr):
-		self.clear_items()
+		
 		self.confirmation = False
 		self.stop()
 
 	async def on_timeout(self):
 		
-		self.clear_items()
+		
+		self.confirmation = False
 		
 
 	
