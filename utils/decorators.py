@@ -59,6 +59,7 @@ def has_equipped_weapon():
 			ammo : str = ALL_ITEMS[str(weapon)]['ammo'] 
 			ammo_rarity : str= ALL_ITEMS[ammo]['rarity']
 			c_dict = json.loads(rec[ammo_rarity])
+			count = 0
 			try:
 				if c_dict[ammo]:
 					count : int = c_dict[ammo]
