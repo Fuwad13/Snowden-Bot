@@ -274,6 +274,7 @@ class BattleFieldHelper:
 	def get_item_count(self, rec, *, item_name : str ):
 		rarity_tier : str = itm.ALL_ITEMS[item_name]['rarity'] 
 		c_dict : dict = json.loads(rec[rarity_tier])
+		count = 0
 		try:
 			if c_dict[item_name]:
 				count : int = c_dict[item_name]

@@ -724,6 +724,7 @@ class BattleField(commands.Cog):
 		await ctx.send(text)
 
 	@commands.command(name = 'loot', aliases= ['l'], help= "soon")
+	@has_ref_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _loot(self, ctx):
 		await ctx.send("SOON")
@@ -746,30 +747,54 @@ class BattleField(commands.Cog):
 			return await ctx.send(f"No item named `{item_name}`found")
 		item_name_n= item_s_r[0]
 		if not ALL_ITEMS[item_name_n]['buy_price']:
-			return await ctx.send("**Sorry, this item is not buyable**")
+			return await ctx.send(f"**Sorry, {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` is not buyable**")
 		rec = await self.bfh.get_player_data(ctx.author.id)
-		unite_price : int= ALL_ITEMS[item_name_n]['buy_price']
-		total_price : int = unite_price*amount
+		unit_price : int= ALL_ITEMS[item_name_n]['buy_price']
+		total_price : int = unit_price*amount
 		if rec['balance'] < total_price:
-			return await ctx.send(f"{ctx.author.mention}, You don't enough money to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}`\n\nYou have **${rec['balance']}** but need **${total_price}** to buy them.")
+			return await ctx.send(f"{ctx.author.mention}, You don't enough money to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}`\n\nYou have **${rec['balance']}** but need **${total_price}** to buy them.")
 
 		view = bs.BuyItem(ctx)
-		msg = await ctx.send(f"{ctx.author.mention}, Do you want to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**?\n\nIf yes press the `Buy` button or press the `Cancel` button to cancel.`(timeout=20s)`", view = view)
+		msg = await ctx.send(f"{ctx.author.mention}, Do you want to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**?\n\nIf yes press the `Buy` button or press the `Cancel` button to cancel.`(timeout=20s)`", view = view)
 		await view.wait()
 		view.clear_items()
 		if not view.confirmation:
-			return await msg.edit(f"{ctx.author.mention}, ~~Do you want to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**?\n\nIf yes press the `Buy` button or press the `Cancel` button to cancel.`(timeout=20s)`~~\n**Cancelled**", view = view)
+			return await msg.edit(f"{ctx.author.mention}, ~~Do you want to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**?\n\nIf yes press the `Buy` button or press the `Cancel` button to cancel.`(timeout=20s)`~~\n**Cancelled**", view = view)
 		else:
 			await self.bfh.update_inventory(player_id=ctx.author.id, _item = item_name_n, amount = amount)
 			await self.bot.db.execute("UPDATE battlefield SET balance = balance - $1 where p_id = $2;", total_price, ctx.author.id)
 
-			await msg.edit(f"{ctx.author.mention} ->\n{cs.EMOJIS['greentick']} You bought **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**.", view = view)
+			await msg.edit(f"{ctx.author.mention} ->\n{cs.EMOJIS['greentick']} You bought **{amount}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**.", view = view)
 
 
 	@commands.command(name = 'sell', aliases= ['s'], help= "soon")
+	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
-	async def _sell(self, ctx):
-		await ctx.send("SOON")
+	async def _sell(self, ctx,amount : typing.Optional[int] = 1,*, item_name : str):
+		item_list = [str(item) for item in ALL_ITEMS.keys()]
+
+		item_s_r = difflib.get_close_matches(item_name.lower(),item_list, n=1, cutoff=0.3)
+		if len(item_s_r) == 0:
+			return await ctx.send(f"No item named `{item_name}`found")
+		item_name_n= item_s_r[0]
+		rec = await self.bfh.get_player_data(ctx.author.id)
+		count = self.bfh.get_item_count(rec, item_name_n)
+		if count < amount:
+			return await ctx.send(f"{ctx.author.mention}, You have **{count}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` only, you can't sell more than this amount of {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}`(s)")
+		unit_price : int= ALL_ITEMS[item_name_n]['sell_price']
+		total_price : int = unit_price*amount
+		view = bs.SellItem(ctx)
+		msg = await ctx.send(f"{ctx.author.mention}, Do you want to sell **{amount}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory for **${total_price}**?\n\nIf yes press the `Sell` button or press the `Cancel` button to cancel.`(timeout=20s)`", view = view)
+		await view.wait()
+		view.clear_items()
+		if not view.confirmation:
+			return await msg.edit(f"{ctx.author.mention}, ~~Do you want to sell **{amount}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory for **${total_price}**?\n\nIf yes press the `Sell` button or press the `Cancel` button to cancel.`(timeout=20s)`~~\n**Cancelled**", view = view)
+		else:
+			await self.bfh.update_inventory(player_id=ctx.author.id, _item = item_name_n, amount = -amount)
+			await self.bot.db.execute("UPDATE battlefield SET balance = balance + $1 where p_id = $2;", total_price, ctx.author.id)
+
+			await msg.edit(f"{ctx.author.mention} ->\n{cs.EMOJIS['greentick']} You sold **{amount}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory for **${total_price}**.", view = view)
+
 
 	@commands.command(name = 'trade', aliases= ['tr'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)

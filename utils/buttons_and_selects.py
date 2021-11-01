@@ -123,7 +123,34 @@ class BuyItem(ui.View):
 		
 		self.confirmation = False
 		
+class SellItem(ui.View):
+	def __init__(self, ctx):
+		self.ctx = ctx
+		self.confirmation = False
+		super().__init__(timeout=20)
 
+	async def interaction_check(self, intr):
+		if not intr.user == self.ctx.author:
+			await intr.response.send_message(f"Sorry, only **{self.ctx.author.name}** can use this button!", ephemeral = True)
+
+		return intr.user == self.ctx.author
+	#add emoji later
+	@ui.button(label = 'Sell', style= discord.ButtonStyle.green)
+	async def _buy(self, button, intr):
+		
+		self.confirmation = True
+		self.stop()
+
+	@ui.button(label='Cancel', style=discord.ButtonStyle.red)
+	async def _cancel(self, button, intr):
+		
+		self.confirmation = False
+		self.stop()
+
+	async def on_timeout(self):
+		
+		
+		self.confirmation = False
 	
 		
 
