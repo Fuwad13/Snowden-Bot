@@ -271,12 +271,15 @@ class BattleFieldHelper:
 
 		return eq_dict['weapon'], eq_dict['armour']
 
+	def get_item_count(self, rec, *, item_name : str ):
+		rarity_tier : str = itm.ALL_ITEMS[item_name]['rarity'] 
+		c_dict : dict = json.loads(rec[rarity_tier])
+		try:
+			if c_dict[item_name]:
+				count : int = c_dict[item_name]
 
-
-	
-
-
+		except KeyError:
+			count = 0
 		
+		return count
 
-
-	

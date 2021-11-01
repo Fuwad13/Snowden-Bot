@@ -82,6 +82,7 @@ class InventoryEmbeds(ui.View):
 	@ui.button(emoji = '<:stop:904438127530225724>', style = discord.ButtonStyle.gray)
 	async def _stop(self, button, intr):
 		self.stop()
+		await self.message.edit(view = self)
 		await intr.message.delete(silent = True)
 
 

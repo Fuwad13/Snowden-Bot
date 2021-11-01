@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
-from utils.errors import NotStartedPlaying, NotOptedIn
-
+from utils.errors import NotStartedPlaying, NotOptedIn, NoWeaponEquipped, NotEnoughAmmo
+import json
+from games_utils.items import ALL_ITEMS
 
 
 def has_started():
@@ -46,3 +47,28 @@ def is_opted():
 
 	return commands.check(predicate)
 
+def has_equipped_weapon():
+	async def predicate(ctx):
+		rec = await ctx.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;""", ctx.author.id)
+		eq_dict = json.loads(rec['equipments'])
+		weapon = eq_dict['weapon']
+		if not weapon:
+			raise NoWeaponEquipped(f"You haven't equipped any weapon yet to use for attacking. use `{ctx.clean_prefix}equip <weapon_name>` to equip a weapon.")
+
+		else:
+			ammo : str = ALL_ITEMS[str(weapon)]['ammo'] 
+			ammo_rarity : str= ALL_ITEMS[ammo]['rarity']
+			c_dict = json.loads(rec[ammo_rarity])
+			try:
+				if c_dict[ammo]:
+					count : int = c_dict[ammo]
+
+			except KeyError:
+				count = 0
+			if count <= 0:
+				raise NotEnoughAmmo(f"You don't have enough ammo (`{ammo}`) for your equipped weapon to use.You can get them by opening chests or trading with another players.")
+			else:
+				return True
+
+	return commands.check(predicate)
+		

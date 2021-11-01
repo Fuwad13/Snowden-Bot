@@ -6,3 +6,9 @@ class NotStartedPlaying(commands.CheckFailure):
 
 class NotOptedIn(commands.CheckFailure):
     pass
+
+class NoWeaponEquipped(commands.CheckFailure):
+    pass
+
+class NotEnoughAmmo(commands.CheckFailure):
+    pass

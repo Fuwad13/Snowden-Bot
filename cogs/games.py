@@ -15,7 +15,7 @@ import humanize
 from games_utils import helper
 from games_utils.items import ALL_ITEMS
 import games_utils.constants as cs
-from utils.decorators import has_started, is_opted, has_ref_started
+from utils.decorators import has_started, is_opted, has_ref_started, has_equipped_weapon
 class BattleField(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -375,7 +375,7 @@ class BattleField(commands.Cog):
 					items_dict['common_chest']+=-amount
 			except KeyError:
 				items_dict['common_chest'] = -amount
-			print(items_dict)
+			
 			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
 			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
 			r_str = '\n'.join(r_list)
@@ -739,8 +739,10 @@ class BattleField(commands.Cog):
 		await ctx.send("SOON")
 
 	@commands.command(name = 'attack', aliases= ['a'], help= "soon")
+	@commands.guild_only()
 	@has_started()
 	@is_opted()
+	@has_equipped_weapon()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _attack(self, ctx, target : discord.Member):
 		target_id = target.id
@@ -756,10 +758,6 @@ class BattleField(commands.Cog):
 		
 		if not t1['opt_status']:
 			return await ctx.send(f"**{target}** is `not opted in` to the Battlefield currently, you can't attack them rn!")
-
-		
-		
-		
 
 		await ctx.send("SOON")
 

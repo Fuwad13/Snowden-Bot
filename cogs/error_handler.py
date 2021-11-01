@@ -4,7 +4,7 @@ import sys
 import traceback
 
 from discord.ext.commands import errors
-from utils.errors import NotStartedPlaying, NotOptedIn
+from utils.errors import NotStartedPlaying, NotOptedIn, NoWeaponEquipped, NotEnoughAmmo
 
 class ErrorHandler(commands.Cog):
 	def __init__(self, bot):
@@ -41,6 +41,11 @@ class ErrorHandler(commands.Cog):
 		elif isinstance(error, NotOptedIn):
 			await ctx.send(error)
 
+		elif isinstance(error, NoWeaponEquipped):
+			await ctx.send(error)
+
+		elif isinstance(error, NotEnoughAmmo):
+			await ctx.send(error)
 			
 
 			
