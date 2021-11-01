@@ -778,7 +778,7 @@ class BattleField(commands.Cog):
 			return await ctx.send(f"No item named `{item_name}`found")
 		item_name_n= item_s_r[0]
 		rec = await self.bfh.get_player_data(ctx.author.id)
-		count = self.bfh.get_item_count(rec, item_name_n)
+		count = self.bfh.get_item_count(rec,item_name =  item_name_n)
 		if count < amount:
 			return await ctx.send(f"{ctx.author.mention}, You have **{count}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` only, you can't sell more than this amount of {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}`(s)")
 		unit_price : int= ALL_ITEMS[item_name_n]['sell_price']
