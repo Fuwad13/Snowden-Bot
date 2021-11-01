@@ -113,7 +113,7 @@ class BuyItem(ui.View):
 		self.stop()
 
 	@ui.button(label='Cancel', style=discord.ButtonStyle.red)
-	async def _buy(self, button, intr):
+	async def _cancel(self, button, intr):
 		self.clear_items()
 		self.confirmation = False
 		self.stop()
