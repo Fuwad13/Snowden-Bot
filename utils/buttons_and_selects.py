@@ -87,13 +87,44 @@ class InventoryEmbeds(ui.View):
 
 
 	async def on_timeout(self):
-		c = 0
+		
 		for item in self.children:
 			self.clear_items()
 			
 		await self.message.edit(view = self)
 			
+
+class BuyItem(ui.View):
+	def __init__(self, ctx):
+		self.ctx = ctx
+		self.confirmation = False
+		super().__init__(timeout=20)
+
+	async def interaction_check(self, intr):
+		if not intr.user == self.ctx.author:
+			await intr.response.send_message(f"Sorry, only **{self.ctx.author.name}** can use this button!", ephemeral = True)
+
+		return intr.user == self.ctx.author
+	#add emoji later
+	@ui.button(label = 'Buy', style= discord.ButtonStyle.green)
+	async def _buy(self, button, intr):
+		self.clear_items()
+		self.confirmation = True
+		self.stop()
+
+	@ui.button(label='Cancel', style=discord.ButtonStyle.red)
+	async def _buy(self, button, intr):
+		self.clear_items()
+		self.confirmation = False
+		self.stop()
+
+	async def on_timeout(self):
+		
+		self.clear_items()
+		
+
 	
+		
 
 
 

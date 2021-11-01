@@ -6,7 +6,7 @@ import asyncpg
 import typing
 import random
 import asyncio
-
+import difflib
 from discord.ext.commands.cooldowns import BucketType, Cooldown
 from utils import buttons_and_selects as bs 
 import json
@@ -54,7 +54,7 @@ class BattleField(commands.Cog):
 		current_sp : int = rec['sp']
 
 		embed = discord.Embed(title = f"**__{player}'s Inventory__**",color = 0x2F3136)
-		text = f"\U0001f3e6 **Balance**         : ${rec['balance']}\n\U0001f4bc **Inv. value** : ${inv_value}\n\U00002728 **Player value**    : ${rec['balance']+inv_value}\n\U0001f4c8 **Level**           : {self.bfh.get_level(rec['exp'])}\n\U00002694 **Opt in status**   : {cs.EMOJIS['toggle_on'] if rec['opt_status'] else cs.EMOJIS['toggle_off']}\n"
+		text = f"\U0001f3e6 **Balance** : ${rec['balance']}\n\U0001f4bc **Inv. value** : ${inv_value}\n\U00002728 **Player value** : ${rec['balance']+inv_value}\n\U0001f4c8 **Level**: {self.bfh.get_level(rec['exp'])}\n\U00002694 **Opt in status** : {cs.EMOJIS['toggle_on'] if rec['opt_status'] else cs.EMOJIS['toggle_off']}\n"
 		embed.add_field(name='\U0001f4cb __Status/profile__', value=text, inline = False)
 		embed.add_field(name="\U00002764 __Health__", value=f"{current_hp}/100\n{self.bfh.get_bar_emojis('hp', current_hp, 100)}")
 		weap, sh = self.bfh.get_equipments(rec)
@@ -117,7 +117,12 @@ class BattleField(commands.Cog):
 			embed.description = f"`{r_str}`"
 			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
 
-		item_name_n = item_name.replace(' ', '_')
+		item_list = [str(item) for item in ALL_ITEMS.keys()]
+
+		item_s_r = difflib.get_close_matches(item_name.lower(),item_list, n=1, cutoff=0.3)
+		if len(item_s_r) == 0:
+			return await ctx.send(f"No item named `{item_name}`found")
+		item_name_n = item_s_r[0]
 		try:
 			item_dict = ALL_ITEMS[item_name_n]
 		except KeyError:
@@ -723,10 +728,42 @@ class BattleField(commands.Cog):
 	async def _loot(self, ctx):
 		await ctx.send("SOON")
 
-	@commands.command(name = 'buy', aliases= ['b'], help= "soon")
+	@commands.command(name = 'shop', aliases= ['sh'], help= "soon")
+	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
-	async def _buy(self, ctx):
-		await ctx.send("SOON")
+	async def _shop(self, ctx, item_name : str, amount : int = 1):
+		pass
+
+	@commands.command(name = 'buy', aliases= ['b'], help= "soon")
+	@has_started()
+	@commands.cooldown(1,3, BucketType.user)
+	async def _buy(self, ctx,amount : typing.Optional[int] = 1,*, item_name : str):
+		
+		item_list = [str(item) for item in ALL_ITEMS.keys()]
+
+		item_s_r = difflib.get_close_matches(item_name.lower(),item_list, n=1, cutoff=0.3)
+		if len(item_s_r) == 0:
+			return await ctx.send(f"No item named `{item_name}`found")
+		item_name_n= item_s_r[0]
+		if not ALL_ITEMS[item_name_n]['buy_price']:
+			return await ctx.send("**Sorry, this item is not buyable**")
+		rec = await self.bfh.get_player_data(ctx.author.id)
+		unite_price : int= ALL_ITEMS[item_name_n]['buy_price']
+		total_price : int = unite_price*amount
+		if rec['balance'] < total_price:
+			return await ctx.send(f"{ctx.author.mention}, You don't enough money to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}`\n\nYou have **${rec['balance']}** but need **${total_price}** to buy them.")
+
+		view = bs.BuyItem(ctx)
+		msg = await ctx.send(f"{ctx.author.mention}, Do you want to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**?\n\nIf yes press the `Buy` button or press the `Cancel` button to cancel.`(timeout=20s)`", view = view)
+		await view.wait()
+		if not view.confirmation:
+			return await msg.edit(f"{ctx.author.mention}, ~~Do you want to buy **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**?\n\nIf yes press the `Buy` button or press the `Cancel` button to cancel.`(timeout=20s)`~~\n**Cancelled**", view = view)
+		else:
+			await self.bfh.update_inventory(player_id=ctx.author.id, _item = item_name_n, amount = amount)
+			await self.bot.db.execute("UPDATE battlefield SET balance = balance - $1 where p_id = $2;", total_price, ctx.author.id)
+
+			await msg.edit(f"{ctx.author.mention} ->\n{cs.EMOJIS['greentick']} You bought **{amount}x** {ALL_ITEMS[item_name_n]['emoji']} `{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**.", view = view)
+			
 
 	@commands.command(name = 'sell', aliases= ['s'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
@@ -754,9 +791,9 @@ class BattleField(commands.Cog):
 		if not flag_2:
 			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! You an't attack him before he starts playing and opt in!")
 		# player_opt_status = await self.bfh.get_opt_status(player_id)
-		t1, t2 = await self.bfh.get_player_data(target_id)
+		rec = await self.bfh.get_player_data(target_id)
 		
-		if not t1['opt_status']:
+		if not rec['opt_status']:
 			return await ctx.send(f"**{target}** is `not opted in` to the Battlefield currently, you can't attack them rn!")
 
 		await ctx.send("SOON")

@@ -1,7 +1,7 @@
 
 
 
-CD_UNIT = int(72)
+CD_UNIT = int(18)
 ALL_ITEMS = {
     'p92' : {
         'name' : 'p92',
@@ -427,7 +427,7 @@ ALL_ITEMS = {
         'rarity' : 'epic',
         'emoji' : '<:epic_chest:901799469006336080>',
         'description' : 'soon',
-        'buy_price' : 2000,
+        'buy_price' : None,
         'sell_price' : 1500
     },
     'mythic_chest' : {
@@ -440,4 +440,3 @@ ALL_ITEMS = {
         'sell_price' : 3000
     },
 } 
-

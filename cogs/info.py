@@ -24,23 +24,7 @@ class Information(commands.Cog):
 		embed.set_image(url=avatar)
 		await ctx.send(embed=embed)
 
-	@commands.command(name = 'test', hidden= True)
-	async def test(self, ctx):
-		em = discord.Embed(title = 'Test')
-		view = bs.ConfirmOrCancel(ctx,timeout=30)
-		view.msg = await ctx.send(embed = em , view = view)
-		await view.wait()
-		view.clear_items()
-		await view.msg.edit(view = view)
-		if view.value == True:
-			await ctx.send("confirmed")
-
-		elif view.value == False:
-			await ctx.send('cancelled')
-
-		elif view.value == None:
-			await ctx.send('Timed out')
-			
+	
 
 
 def setup(bot):

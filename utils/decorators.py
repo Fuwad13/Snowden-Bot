@@ -67,7 +67,7 @@ def has_equipped_weapon():
 			except KeyError:
 				count = 0
 			if count <= 0:
-				raise NotEnoughAmmo(f"You don't have enough ammo (`{ammo}`) for your equipped weapon to use.You can get them by opening chests or trading with another players.")
+				raise NotEnoughAmmo(f"You don't have enough ammo (`{ammo}`) for your equipped weapon to use.You can get them by opening chests or trading with other players.")
 			else:
 				return True
 

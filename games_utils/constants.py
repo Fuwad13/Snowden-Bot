@@ -41,7 +41,7 @@ CHESTS = {
         'name' : 'epic_chest',
         'emoji' : '<:epic_chest:901799469006336080>',
         'description' : '',
-        'buy_price' : 2000,
+        'buy_price' : None,
         'sell_price' : 1500
     },
     'mythic_chest' : {
@@ -61,7 +61,7 @@ EMOJIS = {
     'toggle_off' : '<:toggle_off:890712914330271764>'
 }
 
-CD_UNIT = int(72)
+CD_UNIT = int(18)
 # games items
 
 WEAPONS = {
