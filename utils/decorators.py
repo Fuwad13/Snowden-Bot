@@ -50,11 +50,8 @@ def is_opted():
 def has_equipped_weapon():
 	async def predicate(ctx):
 		rec = await ctx.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;""", ctx.author.id)
-		try:
-
-			eq_dict = json.loads(rec['equipments'])
-		except TypeError:
-			raise NotStartedPlaying(f"**{ctx.author}**, you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+		eq_dict = json.loads(rec['equipments'])
+			
 		weapon = eq_dict['weapon']
 		if not weapon:
 			raise NoWeaponEquipped(f"You haven't equipped any weapon yet to use for attacking. use `{ctx.clean_prefix}equip <weapon_name>` to equip a weapon.")
