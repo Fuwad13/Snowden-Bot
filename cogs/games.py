@@ -860,7 +860,7 @@ class BattleField(commands.Cog):
 
 		flag_2 = await self.bfh.check_if_exists(target_id)
 		if not flag_2:
-			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! You an't attack him before he starts playing and opt in!")
+			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! You can't attack him before he starts playing and opt in!")
 		
 		a_rec = await self.bfh.get_player_data(player_id)
 		t_rec = await self.bfh.get_player_data(target_id)
@@ -880,7 +880,7 @@ class BattleField(commands.Cog):
 
 			attack_engine = AttackEngine(bot = self.bot, bfh = self.bfh,attacker = ctx.author, a_rec = a_rec, target = target, t_rec = t_rec)
 
-			text = attack_engine.attack()
+			text = await attack_engine.attack()
 
 			await msg.edit(f"{text}", view = view)
 
