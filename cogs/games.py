@@ -17,6 +17,7 @@ from games_utils.helper import AttackEngine
 from games_utils.items import ALL_ITEMS
 import games_utils.constants as cs
 from utils.decorators import has_started, is_opted, has_ref_started, has_equipped_weapon
+from utils.errors import NotStartedPlaying
 class BattleField(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -49,7 +50,12 @@ class BattleField(commands.Cog):
 				player = ctx.message.reference.resolved.author
 			else:
 				player = ctx.author
+
 		player_id = player.id
+		flag = await self.bfh.check_if_exists(player_id)
+		if not flag:
+			raise NotStartedPlaying(f"**{player.mention}**, haven't started playing Battlefield yet,ask them to run `{ctx.clean_prefix}start` to start playing!")
+		
 		rec = await self.bfh.get_player_data(player_id)
 		inv_value = self.bfh.get_inventory_value(rec)
 		current_hp : int = rec['hp']
