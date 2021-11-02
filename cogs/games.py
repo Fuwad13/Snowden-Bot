@@ -799,9 +799,12 @@ class BattleField(commands.Cog):
 
 
 	@commands.command(name = 'trade', aliases= ['tr'], help= "soon")
-	@commands.cooldown(1,3, BucketType.user)
-	async def _trade(self, ctx):
-		await ctx.send("SOON")
+	@has_started()
+	@commands.cooldown(1,10, BucketType.user)
+	async def _trade(self, ctx, player : discord.Member):
+		player1 = ctx.author
+		player2 = player
+		await ctx.send("Ok we will trade soon, ......implementingggg........")
 
 	@commands.command(name= 'equip', aliases = ['eq', 'attach'], help = "Equip a weapon or armour from your inventory")
 	@has_started()
@@ -813,6 +816,16 @@ class BattleField(commands.Cog):
 			return await ctx.send(f"`{item_name}` is not a valid item or this item can't not be equipped")
 		item_name_n= item_s_r[0]
 		item_type : str= ALL_ITEMS[item_name_n]['type']
+		current_time = int(time.time())
+		if item_type == 'weapon':
+			cd = await self.bfh.get_cooldown_data(ctx.author.id, 'w_equip')
+			if current_time < int(cd):
+				return await ctx.send(f"{ctx.author.mention} ->**You're on cooldown!\nYou can equip any new weapon again in `{humanize.precisedelta(cd - current_time)}`")
+		elif item_type == 'armour':
+			cd = await self.bfh.get_cooldown_data(ctx.author.id, 'a_equip')
+			if current_time < int(cd):
+				return await ctx.send(f"{ctx.author.mention} ->**You're on cooldown!\nYou can equip any new armour again in `{humanize.precisedelta(cd - current_time)}`")
+
 		item_rarity : str = ALL_ITEMS[item_name_n]['rarity']
 		rec = await self.bfh.get_player_data(ctx.author.id)
 		count = self.bfh.get_item_count(rec, item_name = item_name_n)
@@ -836,11 +849,13 @@ class BattleField(commands.Cog):
 				arm_points : int = ALL_ITEMS[item_name_n]['shield_points']
 				query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 , sp = $3 WHERE p_id = $4;"
 				await self.bot.db.execute(query, inv_json, eq_json, arm_points, ctx.author.id)
+				await self.bfh.update_cooldowns(ctx.author.id, 'a_equip')
 				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from you inventory.\nNow you have {arm_points} {self.bfh.get_bar_emojis('armour', 100,100)} `armour points`", view = view)
 
 			else:
 				query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 WHERE p_id = $3;"
 				await self.bot.db.execute(query, inv_json, eq_json, ctx.author.id)
+				await self.bfh.update_cooldowns(ctx.author.id, 'w_equip')
 				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory.", view = view)
 
 
@@ -853,6 +868,10 @@ class BattleField(commands.Cog):
 	@has_equipped_weapon()
 	@commands.cooldown(1,5, BucketType.user)
 	async def _attack(self, ctx, target : discord.Member):
+		current_time = int(time.time())
+		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'attack')
+		if current_time < int(cd):
+			return await ctx.send(f"{ctx.author.mention} ->**You're on attack cooldown!\nYou can attack again in `{humanize.precisedelta(cd - current_time)}`")
 		target_id = target.id
 		player_id = ctx.author.id
 		if target == ctx.author:
@@ -881,7 +900,7 @@ class BattleField(commands.Cog):
 			attack_engine = AttackEngine(bot = self.bot, bfh = self.bfh,attacker = ctx.author, a_rec = a_rec, target = target, t_rec = t_rec)
 
 			text = await attack_engine.attack()
-
+			await self.bfh.update_attack_or_heal_cd(player_id= player_id, command_name= 'attack', item_used=a_weapon)
 			await msg.edit(f"{text}", view = view)
 
 	@commands.command(name = 'heal', aliases= ['healing'], help= "soon")

@@ -342,7 +342,6 @@ class AttackEngine:
 				# implement looting stuffs later
 				ammo_dict = {ammo_used : -1 }
 				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
-				await self.bfh.update_attack_or_heal_cd(player_id=self.attacker_id, command_name='attack', item_used= a_weapon)
 				r_str = f"{self.attacker.mention} -> You Killed **{self.target}** with your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}**(:boom:{damage} damage)\n\nLooting the killed player's inventory is being implemented, keep patience."
 				return r_str
 
@@ -351,7 +350,7 @@ class AttackEngine:
 				# implement looting stuffs later
 				ammo_dict = {ammo_used : -1 }
 				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
-				await self.bfh.update_attack_or_heal_cd(player_id=self.attacker_id, command_name='attack', item_used= a_weapon)
+				
 				r_str = f"{self.attacker.mention} -> You Killed **{self.target}** with your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}**(:boom:{damage} damage)\n\nLooting the killed player's inventory is being implemented, keep patience."
 				return r_str
 			# the case when target is killed
@@ -363,7 +362,7 @@ class AttackEngine:
 			await self.bot.db.execute(""" UPDATE battlefield SET hp = $1 WHERE p_id = $2;""", new_hp, self.target_id)
 			ammo_dict = {ammo_used : -1 }
 			await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
-			await self.bfh.update_attack_or_heal_cd(player_id=self.attacker_id, command_name='attack', item_used= a_weapon)
+			
 			r_str = f"{self.attacker.mention} -> Your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}** dealt :boom: {damage} damage to **{self.target}**.\nThey now have {new_hp}/100 {self.bfh.get_bar_emojis('hp', new_hp, 100)} `health` remaining."
 			return r_str
 			
@@ -372,7 +371,7 @@ class AttackEngine:
 			await self.bot.db.execute(""" UPDATE battlefield SET sp = $1 WHERE p_id = $2;""", new_sp, self.target_id)
 			ammo_dict = {ammo_used : -1 }
 			await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
-			await self.bfh.update_attack_or_heal_cd(player_id=self.attacker_id, command_name='attack', item_used= a_weapon)
+			
 			r_str = f"{self.attacker.mention} -> Your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}** dealt :boom: {damage} damage to **{self.target}'s** {itm.ALL_ITEMS[str(t_armour)]['emoji']}**{itm.ALL_ITEMS[str(t_armour)]['name']}**.\nThey now have {self.t_rec['hp']}/100 {self.bfh.get_bar_emojis('hp', self.t_rec['hp'], 100)} `health` and {new_sp}/{itm.ALL_ITEMS[str(t_armour)]['shield_points']} {self.bfh.get_bar_emojis('armour', new_sp, itm.ALL_ITEMS[str(t_armour)]['shield_points'])} `armour points` remaining."
 			return r_str
 			
@@ -385,7 +384,7 @@ class AttackEngine:
 			await self.bot.db.execute(""" UPDATE battlefield SET hp = $1, sp = 0, equipments = $2 WHERE p_id = $3; """, new_hp, t_eq_json, self.target_id)
 			ammo_dict = {ammo_used : -1 }
 			await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
-			await self.bfh.update_attack_or_heal_cd(player_id=self.attacker_id, command_name='attack', item_used= a_weapon)
+			
 			r_str = f"{self.attacker.mention} -> Your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}** dealt :boom: {t_sp} damage to **{self.target}'s** {itm.ALL_ITEMS[str(t_armour)]['emoji']}**{itm.ALL_ITEMS[str(t_armour)]['name']}**. Their armour was broken and the rest :boom: {damage_l} damage was dealt to their `health`.\nThey now have {new_hp}/100 {self.bfh.get_bar_emojis('hp', new_hp, 100)} `health` remaining."
 			return r_str
 
