@@ -1,6 +1,6 @@
 from discord.ext import commands 
 import discord
-import sys 
+import sys
 import traceback
 
 from discord.ext.commands import errors

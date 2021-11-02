@@ -13,6 +13,7 @@ import json
 import time
 import humanize
 from games_utils import helper
+from games_utils.helper import AttackEngine
 from games_utils.items import ALL_ITEMS
 import games_utils.constants as cs
 from utils.decorators import has_started, is_opted, has_ref_started, has_equipped_weapon
@@ -20,6 +21,7 @@ class BattleField(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.bfh = helper.BattleFieldHelper(bot)
+		
 
 	
 
@@ -801,12 +803,55 @@ class BattleField(commands.Cog):
 	async def _trade(self, ctx):
 		await ctx.send("SOON")
 
+	@commands.command(name= 'equip', aliases = ['eq', 'attach'], help = "Equip a weapon or armour from your inventory")
+	@has_started()
+	@commands.cooldown(1,5, BucketType.user)
+	async def _equip(self, ctx,*, item_name : str):
+		item_list = [str(item) for item in ALL_ITEMS.keys() if ALL_ITEMS[str(item)]['type'] == 'weapon' or ALL_ITEMS[str(item)]['type'] == 'armour']
+		item_s_r = difflib.get_close_matches(item_name.lower(),item_list, n=1, cutoff=0.3)
+		if len(item_s_r) == 0:
+			return await ctx.send(f"`{item_name}` is not a valid item or this item can't not be equipped")
+		item_name_n= item_s_r[0]
+		item_type : str= ALL_ITEMS[item_name_n]['type']
+		item_rarity : str = ALL_ITEMS[item_name_n]['rarity']
+		rec = await self.bfh.get_player_data(ctx.author.id)
+		count = self.bfh.get_item_count(rec, item_name = item_name_n)
+		if count <=0 :
+			return await ctx.send(f"{ctx.author.mention} -> You don't have any {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` in your inventory to equip!")
+		view = bs.EquipItem(ctx)
+		msg = await ctx.send(f"{ctx.author.mention} -> Do you want to equip {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory?\n\nIf yes then press the *Equip* button or press the *Cancel* button to cancel. (`timeout = 20s`)", view = view)
+		await view.wait()
+		view.clear_items()
+		if not view.confirmation:
+			return await msg.edit(f"{ctx.author.mention} -> ~~Do you want to equip {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory?\n\nIf yes then press the *Equip* button or press the *Cancel* button to cancel. (`timeout = 20s`)~~\n**Cancelled**", view = view)
+		elif view.confirmation:
+		
+			eq_dict = json.loads(rec['equipments'])
+			eq_dict[item_type] = item_name_n
+			eq_json = json.dumps(eq_dict)
+			inv_dict = json.loads(rec[item_rarity])
+			inv_dict[item_name_n]-=1
+			inv_json = json.dumps(inv_dict)
+			if item_type == 'armour':
+				arm_points : int = ALL_ITEMS[item_name_n]['shield_points']
+				query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 , sp = $3 WHERE p_id = $4;"
+				await self.bot.db.execute(query, inv_json, eq_json, arm_points, ctx.author.id)
+				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from you inventory.\nNow you have {arm_points} {self.bfh.get_bar_emojis('armour', 100,100)} `armour points`", view = view)
+
+			else:
+				query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 WHERE p_id = $3;"
+				await self.bot.db.execute(query, inv_json, eq_json, ctx.author.id)
+				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory.", view = view)
+
+
+
+
 	@commands.command(name = 'attack', aliases= ['a'], help= "soon")
 	@commands.guild_only()
 	@has_started()
 	@is_opted()
 	@has_equipped_weapon()
-	@commands.cooldown(1,3, BucketType.user)
+	@commands.cooldown(1,5, BucketType.user)
 	async def _attack(self, ctx, target : discord.Member):
 		target_id = target.id
 		player_id = ctx.author.id
@@ -816,13 +861,28 @@ class BattleField(commands.Cog):
 		flag_2 = await self.bfh.check_if_exists(target_id)
 		if not flag_2:
 			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! You an't attack him before he starts playing and opt in!")
-		# player_opt_status = await self.bfh.get_opt_status(player_id)
-		rec = await self.bfh.get_player_data(target_id)
 		
-		if not rec['opt_status']:
+		a_rec = await self.bfh.get_player_data(player_id)
+		t_rec = await self.bfh.get_player_data(target_id)
+		a_weapon , a_armour = self.bfh.get_equipments(a_rec)
+		
+		if not t_rec['opt_status']:
 			return await ctx.send(f"**{target}** is `not opted in` to the Battlefield currently, you can't attack them rn!")
 
-		await ctx.send("SOON")
+		view = bs.AttackView(ctx)
+		msg = await ctx.send(f"{ctx.author.mention} -> Do you want to attack **{target}** using your {ALL_ITEMS[str(a_weapon)]['emoji']}**{ALL_ITEMS[str(a_weapon)]['name']}**?\nIf yes then press the *Attack* button or press the *Cancel* button to cancel.(`timeout = 20s`)", view = view)
+		await view.wait()
+		view.clear_items()
+		if not view.confirmation:
+			return await msg.edit(f"{ctx.author.mention} -> ~~Do you want to attack **{target}** using your {ALL_ITEMS[str(a_weapon)]['emoji']}**{ALL_ITEMS[str(a_weapon)]['name']}**?\nIf yes then press the *Attack* button or press the *Cancel* button to cancel.(`timeout = 20s`)~~\n**Cancelled**", view = view)
+		elif view.confirmation:
+
+
+			attack_engine = AttackEngine(bot = self.bot, bfh = self.bfh,attacker = ctx.author, a_rec = a_rec, target = target, t_rec = t_rec)
+
+			text = attack_engine.attack()
+
+			await msg.edit(f"{text}", view = view)
 
 	@commands.command(name = 'heal', aliases= ['healing'], help= "soon")
 	@commands.cooldown(1,3, BucketType.user)
