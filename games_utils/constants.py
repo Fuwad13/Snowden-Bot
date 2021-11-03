@@ -435,7 +435,8 @@ COOLDOWNS = {
     'work' : 3600,
     'loot' : 30,
     'opt_in_toggle' : 43200,
-    'equip' : 300
+    'w_equip' : 300,
+    'a_equip' : 300
 }
 
 EXP_LEVELS = {
