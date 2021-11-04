@@ -156,7 +156,7 @@ class BattleField(commands.Cog):
 			embed.set_thumbnail(url = self.bot.get_emoji(int(item_dict['emoji'].split(':')[-1][:-1:])).url)
 			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
 		if item_dict['type'] == 'armour':
-			embed.add_field(name= ":shield: Shield Points", value=f"**{item_dict['shield_points']}**")
+			embed.add_field(name= ":shield: Armour Points", value=f"**{item_dict['shield_points']}**")
 			if item_dict['buy_price']:
 				embed.add_field(name=":dollar: Buy price", value= f"**${item_dict['buy_price']}**")
 			embed.add_field(name=":dollar: Sell price", value=f"**${item_dict['sell_price']}**")
@@ -191,10 +191,8 @@ class BattleField(commands.Cog):
 		embed = discord.Embed(title = f"__{player}'s cooldowns:__",color =0x2F3136)
 		now = int(time.time())
 		for n_c, t in cd_dict.items():
-			if 'equip' in str(n_c):
-				 embed.add_field(name=f"__{str(n_c).split('_')[-1]}__", value= f"**{'Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
-				 continue
 			embed.add_field(name=f"__{str(n_c).split('n_', 1)[1]}__", value= f"**{'Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
+		embed.description = "`w_equip` - cooldown for equipping weapons\n`a_equip` - cooldown for equipping armours"
 		await ctx.send(f"{ctx.author.mention} ->", embed = embed)
 
 
@@ -883,7 +881,7 @@ class BattleField(commands.Cog):
 		current_time = int(time.time())
 		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'attack')
 		if current_time < int(cd):
-			return await ctx.send(f"{ctx.author.mention} ->**You're on attack cooldown!\nYou can attack again in `{humanize.precisedelta(cd - current_time)}`")
+			return await ctx.send(f"{ctx.author.mention} ->**You're on attack cooldown!**\nYou can attack again in `{humanize.precisedelta(cd - current_time)}`")
 		target_id = target.id
 		player_id = ctx.author.id
 		if target == ctx.author:
