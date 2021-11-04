@@ -54,7 +54,7 @@ class BattleField(commands.Cog):
 		player_id = player.id
 		flag = await self.bfh.check_if_exists(player_id)
 		if not flag:
-			raise NotStartedPlaying(f"**{player.mention}**, haven't started playing Battlefield yet,ask them to run `{ctx.clean_prefix}start` to start playing!")
+			raise NotStartedPlaying(f"**{player}** haven't started playing Battlefield yet,ask them to run `{ctx.clean_prefix}start` to start playing!")
 		
 		rec = await self.bfh.get_player_data(player_id)
 		inv_value = self.bfh.get_inventory_value(rec)
@@ -191,6 +191,9 @@ class BattleField(commands.Cog):
 		embed = discord.Embed(title = f"__{player}'s cooldowns:__",color =0x2F3136)
 		now = int(time.time())
 		for n_c, t in cd_dict.items():
+			if 'equip' in str(n_c):
+				 embed.add_field(name=f"__{str(n_c).split('_')[-1]}__", value= f"**{'Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
+				 continue
 			embed.add_field(name=f"__{str(n_c).split('n_', 1)[1]}__", value= f"**{'Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
 		await ctx.send(f"{ctx.author.mention} ->", embed = embed)
 
@@ -810,6 +813,9 @@ class BattleField(commands.Cog):
 	async def _trade(self, ctx, player : discord.Member):
 		player1 = ctx.author
 		player2 = player
+		flag = await self.bfh.check_if_exists(player2.id)
+		if not flag:
+			return await ctx.send(f"**{player2}** hasn't started playing battlefield yet! You can't trade with him before he starts playing")
 		await ctx.send("Ok we will trade soon, ......implementingggg........")
 
 	@commands.command(name= 'equip', aliases = ['eq', 'attach'], help = "Equip a weapon or armour from your inventory")
@@ -826,11 +832,11 @@ class BattleField(commands.Cog):
 		if item_type == 'weapon':
 			cd = await self.bfh.get_cooldown_data(ctx.author.id, 'w_equip')
 			if current_time < int(cd):
-				return await ctx.send(f"{ctx.author.mention} ->**You're on cooldown!\nYou can equip any new weapon again in `{humanize.precisedelta(cd - current_time)}`")
+				return await ctx.send(f"{ctx.author.mention} ->**You're on cooldown!**\nYou can equip any new weapon again in `{humanize.precisedelta(cd - current_time)}`")
 		elif item_type == 'armour':
 			cd = await self.bfh.get_cooldown_data(ctx.author.id, 'a_equip')
 			if current_time < int(cd):
-				return await ctx.send(f"{ctx.author.mention} ->**You're on cooldown!\nYou can equip any new armour again in `{humanize.precisedelta(cd - current_time)}`")
+				return await ctx.send(f"{ctx.author.mention} ->**You're on cooldown!**\nYou can equip any new armour again in `{humanize.precisedelta(cd - current_time)}`")
 
 		item_rarity : str = ALL_ITEMS[item_name_n]['rarity']
 		rec = await self.bfh.get_player_data(ctx.author.id)

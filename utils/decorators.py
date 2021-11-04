@@ -40,17 +40,23 @@ def has_ref_started():
 def is_opted():
 	async def predicate(ctx):
 		status : bool= await ctx.bot.db.fetchval(""" SELECT opt_status FROM battlefield where p_id = $1; """,ctx.author.id)
-		if status:
+		if status == True:
 			return True
-		else:
+		elif status == False:
 			raise NotOptedIn(f"**{ctx.author}**, You can't use this command if you are not opted in!\nRun the `{ctx.clean_prefix}opt` to toggle your opt status.")
+		else:
+			raise NotStartedPlaying(f"**{ctx.author}**, you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 
 	return commands.check(predicate)
 
 def has_equipped_weapon():
 	async def predicate(ctx):
 		rec = await ctx.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;""", ctx.author.id)
-		eq_dict = json.loads(rec['equipments'])
+		try:
+
+			eq_dict = json.loads(rec['equipments'])
+		except TypeError:
+			raise NotStartedPlaying(f"**{ctx.author}**, you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 			
 		weapon = eq_dict['weapon']
 		if not weapon:
