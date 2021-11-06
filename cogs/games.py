@@ -870,14 +870,24 @@ class BattleField(commands.Cog):
 				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from you inventory.\nNow you have {arm_points} {self.bfh.get_bar_emojis('armour', 100,100)} `armour points`", view = view)
 
 			else:
-				if current_weapon:
-					w_count = inv_dict.get(current_weapon, 0)
-					inv_dict[current_weapon] = w_count + 1
 				inv_json = json.dumps(inv_dict)
-				query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 WHERE p_id = $3;"
-				await self.bot.db.execute(query, inv_json, eq_json, ctx.author.id)
+				if current_weapon:
+					current_rarity : str = ALL_ITEMS[current_weapon]['rarity'] 
+					current_inv_dict : dict = json.loads(rec[current_rarity])
+
+					w_count = current_inv_dict.get(current_weapon, 0)
+					current_inv_dict[current_weapon] = w_count + 1
+					current_inv_json = json.dumps(current_inv_dict)
+					query = f"UPDATE battlefield SET {item_rarity} = $1,{current_rarity} = $2, equipments = $3 WHERE p_id = $4;"
+					await self.bot.db.execute(query, inv_json,current_inv_json, eq_json, ctx.author.id)
+					_extra_str = f"{ALL_ITEMS[current_weapon]['emoji']}`{ALL_ITEMS[current_weapon]['name']}` x1 was returned to your inventory."
+				else:
+					query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 WHERE p_id = $3;"
+					await self.bot.db.execute(query, inv_json, eq_json, ctx.author.id)
+					_extra_str = f""
+
 				await self.bfh.update_cooldowns(ctx.author.id, 'w_equip')
-				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory.\n{ALL_ITEMS[current_weapon]['emoji']}`{ALL_ITEMS[current_weapon]['name']}` x1 was returned to your inventory.", view = view)
+				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory.\n{_extra_str}", view = view)
 
 
 
