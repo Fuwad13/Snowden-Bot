@@ -1,3 +1,4 @@
+from discord import emoji
 from discord.ext import commands 
 import discord
 import sys
@@ -5,7 +6,7 @@ import traceback
 
 from discord.ext.commands import errors
 from utils.errors import NotStartedPlaying, NotOptedIn, NoWeaponEquipped, NotEnoughAmmo
-
+from utils.emojis import EMOJIS
 class ErrorHandler(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -46,6 +47,16 @@ class ErrorHandler(commands.Cog):
 
 		elif isinstance(error, NotEnoughAmmo):
 			await ctx.send(error)
+		elif isinstance(error, commands.MissingPermissions):
+			needed_perms = '\n'.join(error.missing_permissions)
+			await ctx.send(f"{EMOJIS['redtick']} **You need the following permission(s) to execute this command**\n{needed_perms}")
+
+		elif isinstance(error, commands.BotMissingPermissions):
+			needed_perms = '\n'.join(error.missing_permissions)
+			await ctx.send(f"**I need the following permission(s) to execute this command**\n{needed_perms}")
+		else:
+			await ctx.send(error)
+			
 			
 
 			

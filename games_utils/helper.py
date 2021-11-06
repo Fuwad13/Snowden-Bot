@@ -122,6 +122,7 @@ class BattleFieldHelper:
 		return value
 
 	def get_inventory_items_str(self, rec):
+		"""This is just for showing the inv items"""
 		fields = {}
 		inv_columns = ['common', 'rare', 'legendary', 'epic', 'mythic']
 		c = 1
@@ -138,6 +139,17 @@ class BattleFieldHelper:
 			fields[str(c)] = text
 			c+=1
 		return fields
+
+	def get_inventory_items(self, rec):
+		"""This method is for getting the items of a  player's inventory.
+		Returns a dict of the rarity based items."""
+		inv_dict = {}
+		inv_columns = ['common', 'rare', 'legendary', 'epic', 'mythic']
+		for column_n in inv_columns:
+			column = rec[column_n]
+			i_dict : dict = json.loads(column)
+			inv_dict[column_n] = i_dict
+		return inv_dict
 
 	def get_chest_counts(self, rec):
 		"""Returns a dictionary of the filtered items in the following format: {'item_name' : count}"""
@@ -323,6 +335,11 @@ class AttackEngine:
 		"""returns the sum of hp and sp"""
 		hp_plus_sp : int = rec['hp'] + rec['sp']
 		return hp_plus_sp
+
+	async def loot(self,ctx):
+		"""Algorithm for looting a killed player"""
+		target_items_dict = self.bfh.get_inventory_items(self.t_rec)
+		
 	
 	async def attack(self):
 		"""Returns a string to be send corresponding to the damage done"""
@@ -342,7 +359,7 @@ class AttackEngine:
 				# implement looting stuffs later
 				ammo_dict = {ammo_used : -1 }
 				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
-				r_str = f"{self.attacker.mention} -> You Killed **{self.target}** with your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}**(:boom:{damage} damage)\n\nLooting the killed player's inventory is being implemented, keep patience."
+				r_str = f"{self.attacker.mention} -> You Killed **{self.target}** with your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}**(:boom:{damage} damage)\n\nPlease wait a few seconds before you can start looting the player's loot-crate."
 				return r_str
 
 			else:

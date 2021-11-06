@@ -831,31 +831,38 @@ class BattleField(commands.Cog):
 			cd = await self.bfh.get_cooldown_data(ctx.author.id, 'w_equip')
 			if current_time < int(cd):
 				return await ctx.send(f"{ctx.author.mention} ->**You're on cooldown!**\nYou can equip any new weapon again in `{humanize.precisedelta(cd - current_time)}`")
+			rec = await self.bfh.get_player_data(ctx.author.id)
+			current_weapon, _ = self.bfh.get_equipments(rec)
+			extras = f"- Your current equipped weapon ({ALL_ITEMS[current_weapon]['emoji']}`{ALL_ITEMS[current_weapon]['name']}`) will be returned to your inventory." if current_weapon else ''
 		elif item_type == 'armour':
 			cd = await self.bfh.get_cooldown_data(ctx.author.id, 'a_equip')
 			if current_time < int(cd):
 				return await ctx.send(f"{ctx.author.mention} ->**You're on cooldown!**\nYou can equip any new armour again in `{humanize.precisedelta(cd - current_time)}`")
-
+			rec = await self.bfh.get_player_data(ctx.author.id)
+			_ , current_armour = self.bfh.get_equipments(rec)
+			extras = f"- Your current equipped armour ({ALL_ITEMS[current_armour]['emoji']}`{ALL_ITEMS[current_armour]['name']}`) will **NOT** be returned to your inventory." if current_armour else ''
 		item_rarity : str = ALL_ITEMS[item_name_n]['rarity']
-		rec = await self.bfh.get_player_data(ctx.author.id)
+		
 		count = self.bfh.get_item_count(rec, item_name = item_name_n)
 		if count <=0 :
 			return await ctx.send(f"{ctx.author.mention} -> You don't have any {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` in your inventory to equip!")
 		view = bs.EquipItem(ctx)
-		msg = await ctx.send(f"{ctx.author.mention} -> Do you want to equip {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory?\n\nIf yes then press the *Equip* button or press the *Cancel* button to cancel. (`timeout = 20s`)", view = view)
+
+		msg = await ctx.send(f"{ctx.author.mention} -> Do you want to equip {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory?\n{extras}\nIf yes then press the *Equip* button or press the *Cancel* button to cancel. (`timeout = 20s`)", view = view)
 		await view.wait()
 		view.clear_items()
 		if not view.confirmation:
-			return await msg.edit(f"{ctx.author.mention} -> ~~Do you want to equip {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory?\n\nIf yes then press the *Equip* button or press the *Cancel* button to cancel. (`timeout = 20s`)~~\n**Cancelled**", view = view)
+			return await msg.edit(f"{ctx.author.mention} -> ~~Do you want to equip {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory?\n{extras}\nIf yes then press the *Equip* button or press the *Cancel* button to cancel. (`timeout = 20s`)~~\n**Cancelled**", view = view)
 		elif view.confirmation:
 		
-			eq_dict = json.loads(rec['equipments'])
+			eq_dict : dict= json.loads(rec['equipments'])
 			eq_dict[item_type] = item_name_n
 			eq_json = json.dumps(eq_dict)
-			inv_dict = json.loads(rec[item_rarity])
+			inv_dict : dict = json.loads(rec[item_rarity])
 			inv_dict[item_name_n]-=1
-			inv_json = json.dumps(inv_dict)
+			
 			if item_type == 'armour':
+				inv_json = json.dumps(inv_dict)
 				arm_points : int = ALL_ITEMS[item_name_n]['shield_points']
 				query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 , sp = $3 WHERE p_id = $4;"
 				await self.bot.db.execute(query, inv_json, eq_json, arm_points, ctx.author.id)
@@ -863,10 +870,14 @@ class BattleField(commands.Cog):
 				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from you inventory.\nNow you have {arm_points} {self.bfh.get_bar_emojis('armour', 100,100)} `armour points`", view = view)
 
 			else:
+				if current_weapon:
+					w_count = inv_dict.get(current_weapon, 0)
+					inv_dict[current_weapon] = w_count + 1
+				inv_json = json.dumps(inv_dict)
 				query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 WHERE p_id = $3;"
 				await self.bot.db.execute(query, inv_json, eq_json, ctx.author.id)
 				await self.bfh.update_cooldowns(ctx.author.id, 'w_equip')
-				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory.", view = view)
+				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory.\n{ALL_ITEMS[current_weapon]['emoji']}`{ALL_ITEMS[current_weapon]['name']}` x1 was returned to your inventory.", view = view)
 
 
 
@@ -910,6 +921,10 @@ class BattleField(commands.Cog):
 			attack_engine = AttackEngine(bot = self.bot, bfh = self.bfh,attacker = ctx.author, a_rec = a_rec, target = target, t_rec = t_rec)
 
 			text = await attack_engine.attack()
+			if 'killed' in text:
+				await self.bfh.update_attack_or_heal_cd(player_id= player_id, command_name= 'attack', item_used=a_weapon)
+				await msg.edit(f"{text}", view = view)
+				
 			await self.bfh.update_attack_or_heal_cd(player_id= player_id, command_name= 'attack', item_used=a_weapon)
 			await msg.edit(f"{text}", view = view)
 
