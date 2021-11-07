@@ -125,9 +125,9 @@ async def create_db_pool():
 #events =========
 @bot.check
 async def black_list(ctx):
-    print("check")
+    
     mf = ctx.bot.blacklist.get(str(ctx.author.id))
-    print(mf)
+    
     if mf:
         raise Blacklisted(f"You have been blacklisted from using any commands.\nreason: {mf}")
 
