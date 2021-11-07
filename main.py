@@ -131,6 +131,9 @@ async def black_list(ctx):
     if mf:
         raise Blacklisted(f"You have been blacklisted from using any commands.\nreason: {mf}")
 
+    else:
+        return True
+
 @bot.event
 async def on_ready():
     bot.uptime = int(time.time())
