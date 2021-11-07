@@ -86,6 +86,12 @@ class Owner(commands.Cog):
 
 		await ctx.send(f"**Deleted {len(deleted)} message(s)**", delete_after = 5)
 
+	@commands.command(name= "blacklist", aliases = ['bl','shutlist'],hidden=True,help="Shut some mfs so they can't invoke commands")
+	@commands.is_owner()
+	async def _blacklist(self, ctx, user : discord.User, *, reason : str):
+		self.bot.blacklist[str(user.id)] = reason
+		await ctx.send(f"{cs.EMOJIS['greentick']} blacklisted {user} for {reason}")
+
 
 	
 

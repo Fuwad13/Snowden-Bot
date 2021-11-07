@@ -12,3 +12,6 @@ class NoWeaponEquipped(commands.CheckFailure):
 
 class NotEnoughAmmo(commands.CheckFailure):
     pass
+
+class Blacklisted(commands.CheckFailure):
+    pass

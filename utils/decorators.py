@@ -63,7 +63,9 @@ def has_equipped_weapon():
 			raise NoWeaponEquipped(f"You haven't equipped any weapon yet to use for attacking. use `{ctx.clean_prefix}equip <weapon_name>` to equip a weapon.")
 
 		else:
-			ammo : str = ALL_ITEMS[str(weapon)]['ammo'] 
+			ammo : str = ALL_ITEMS[str(weapon)]['ammo']
+			if not ammo:
+				return True
 			ammo_rarity : str= ALL_ITEMS[ammo]['rarity']
 			c_dict = json.loads(rec[ammo_rarity])
 			count = 0

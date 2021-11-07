@@ -17,6 +17,8 @@ import ast
 import re
 import inspect
 
+from utils.errors import Blacklisted
+
 def source(o):
     s = inspect.getsource(o).split("\n")
     indent = len(s[0]) - len(s[0].lstrip())
@@ -83,6 +85,7 @@ class SnowdenContext(commands.Context):
 class SnowdenBot(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.blacklist = {}
 
     async def get_context(self, message, *, cls=SnowdenContext):
         return await super().get_context(message, cls=cls)
@@ -120,6 +123,12 @@ async def create_db_pool():
     
 
 #events =========
+@bot.check
+async def black_list(ctx):
+    mf = ctx.bot.blacklist.get(str(ctx.author.id))
+    if mf:
+        raise Blacklisted(f"You have been blacklisted from using any commands.\nreason: {mf}")
+
 @bot.event
 async def on_ready():
     bot.uptime = int(time.time())
