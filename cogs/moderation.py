@@ -1,4 +1,5 @@
 import typing
+from discord.ext.commands.errors import NoPrivateMessage
 import humanize
 import discord
 from discord.ext import commands
@@ -9,21 +10,32 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def cog_check(self, ctx):
+        if ctx.guild is None:
+            raise NoPrivateMessage("This command can run only in a guild channel.")
+        else:
+            return True
+
+
     @commands.command(name='slowmode', aliases =['sm'], help="Set the slowmode for a TextChannel.")
-    @commands.guild_only()
     @commands.has_permissions(manage_channels=True)
-    @commands.bot_has_permissions(admin = True)
-    async def slowmode(self, ctx, seconds : int = 0, channel : typing.Optional[discord.TextChannel]=None):
-        if not channel:
-            channel = ctx.channel
-            if seconds > 21600:
-                return await ctx.send("Maximum amount of slowmode delay is `6 hours or 21600 seconds`", delete_after=5)
-            await channel.edit(slowmode_delay=seconds, reason=f"responsible user - {ctx.author}")
-            return await ctx.send(f"{EMOJIS['greentick']} Set the slowmode to **{humanize.precisedelta(seconds)}** for {channel.mention}")
+    @commands.bot_has_permissions(manage_channels = True)
+    async def slowmode(self, ctx, seconds : int = 0):
+        channel = ctx.channel
         if seconds > 21600:
-            return await ctx.send("Maximum amount of slowmode delay is `6 hours` or `21600 seconds`", delete_after=5)
+            return await ctx.send("Maximum amount of slowmode delay is `6 hours` or `21600 seconds`", delete_after=10)
         await channel.edit(slowmode_delay=seconds, reason=f"responsible user - {ctx.author}")
-        return await ctx.send(f"{EMOJIS['greentick']} Set the slowmode to **{humanize.precisedelta(seconds)}** for {channel.mention}")
+        return await ctx.send(f"{EMOJIS['greentick']} Set the slowmode to **{humanize.precisedelta(seconds)}**")
+
+    @commands.group(name= "purge", aliases = ['cleanup'], help= "Bulk delete messages of a textchannel, specify the amount of messages to be deleted `(default 5)`. Use the subcommands for more specific types of bulk deletion.", invoke_without_command = True)
+    @commands.has_permissions(manage_messages= True)
+    @commands.bot_has_permissions(manage_messages= True)
+    async def _purge(self, ctx, amount : int = 5):
+        if amount > 1000:
+            return await ctx.send("**Can't delete more than 1000 messages at once!**")
+        deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at)
+        await ctx.send(f"**Deleted {len(deleted)} message(s)**" , delete_after = 5)
+    
 
 
 def setup(bot):

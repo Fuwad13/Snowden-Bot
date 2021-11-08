@@ -81,4 +81,4 @@ def has_equipped_weapon():
 				return True
 
 	return commands.check(predicate)
-		
+
