@@ -1,4 +1,6 @@
+import time
 import typing
+from discord.ext.commands.core import check
 from discord.ext.commands.errors import NoPrivateMessage
 import humanize
 import discord
@@ -27,13 +29,15 @@ class Moderation(commands.Cog):
         await channel.edit(slowmode_delay=seconds, reason=f"responsible user - {ctx.author}")
         return await ctx.send(f"{EMOJIS['greentick']} Set the slowmode to **{humanize.precisedelta(seconds)}**")
 
-    @commands.group(name= "purge", aliases = ['cleanup'], help= "Bulk delete messages of a textchannel, specify the amount of messages to be deleted `(default 5)`. Use the subcommands for more specific types of bulk deletion.", invoke_without_command = True)
+    @commands.group(name= "purge", aliases = ['cleanup'], help= "Bulk delete messages of a textchannel, specify the amount of messages to be deleted `(default 5)`. Use the subcommands for more specific types of bulk deletion. The bot can't delete messages that are older than 2 weeks due to discord limitations.", invoke_without_command = True)
     @commands.has_permissions(manage_messages= True)
     @commands.bot_has_permissions(manage_messages= True)
     async def _purge(self, ctx, amount : int = 5):
         if amount > 1000:
             return await ctx.send("**Can't delete more than 1000 messages at once!**")
-        deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at)
+        def is_deleteable(message):
+            return (time.time() - message.created_at.timestamp()) < 1209600
+        deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at, check = is_deleteable)
         await ctx.send(f"**Deleted {len(deleted)} message(s)**" , delete_after = 5)
     
 
