@@ -220,8 +220,10 @@ class Guide(ui.View):
 	@ui.button(label="Guide", emoji= "\U00002139", style = discord.ButtonStyle.gray)
 	async def guide_button(self, button, interaction):
 		ctx = self.ctx
-		embed = discord.Embed(title = "\U00002139 Battlefield Guide", color = 0x2F3136)
+		embed = discord.Embed(title = "", color = 0x2F3136)
 		embed.description = f"""
+\U00002139 Battlefield Guide
+
 - If you haven't started playing yet, run the `{ctx.clean_prefix}start` command to get started.
 
 - Use the following commands to get time based check-in rewards:
