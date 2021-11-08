@@ -258,7 +258,7 @@ class ChestDropdown(ui.Select):
 		for k, v in chest_dict.items():
 			if v > 0:
 				options.append(discord.SelectOption(
-					label=f"{str(k).replace('_', ' ').capitalize} x{v}", value=f"{str(k)}-{v}",
+					label=f"{str(k).replace('_', ' ').capitalize()} x{v}", value=f"{str(k)}-{v}",
 					emoji=f"{ALL_ITEMS[str(k)]['emoji']}"))
 		super().__init__(placeholder="Select chests to open.....", min_values=1, max_values=1, options=options)
 
