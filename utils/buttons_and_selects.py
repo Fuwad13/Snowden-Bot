@@ -1,6 +1,5 @@
 import discord
 from discord import ui
-from discord.ui import view
 from games_utils.items import ALL_ITEMS
 class ConfirmOrCancel(ui.View):
 
@@ -291,11 +290,12 @@ class ChestDropdown(ui.Select):
 class OpenChestView(ui.View):
 
 	def __init__(self, ctx, chest_dict : dict):
+		super().__init__(timeout=60)
 		self.ctx = ctx
 		self.chest_dict = chest_dict
 		bot = ctx.bot
 		self.add_item(ChestDropdown(ctx,chest_dict, bot ))
-		super().__init__(timeout=60)
+		
 
 	async def interaction_check(self, intr):
 		if not intr.user == self.ctx.author:
