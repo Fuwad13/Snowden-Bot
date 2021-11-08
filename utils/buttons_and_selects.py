@@ -220,8 +220,8 @@ class Guide(ui.View):
 	@ui.button(label="Guide", emoji= "\U00002139", style = discord.ButtonStyle.gray)
 	async def guide_button(self, button, interaction):
 		ctx = self.ctx
-		embed = discord.Embed(title = "", color = 0x2F3136)
-		embed.description = f"""
+		
+		text = f"""
 \U00002139 Battlefield Guide
 
 - If you haven't started playing yet, run the `{ctx.clean_prefix}start` command to get started.
@@ -245,5 +245,5 @@ class Guide(ui.View):
 **If you still get confused feel free to join our support server and ask in the support channel.**
 
 		"""
-		await interaction.response.send_message(embed= embed, ephemeral=True)
+		await interaction.response.send_message(text, ephemeral=True)
 	
