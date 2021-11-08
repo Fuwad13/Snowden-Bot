@@ -263,7 +263,9 @@ class ChestDropdown(ui.Select):
 		super().__init__(placeholder="Select chests to open.....", min_values=1, max_values=1, options=options)
 
 	async def callback(self, interaction: discord.Interaction):
+		print('cc')
 		val = self.values[0].split('-')
+		print(val)
 		chest , count = val[0], val[1]
 		print(chest, count)
 
