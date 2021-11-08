@@ -5,8 +5,10 @@ import sys
 import traceback
 
 from discord.ext.commands import errors
+from discord.ui import view
 from utils.errors import NotStartedPlaying, NotOptedIn, NoWeaponEquipped, NotEnoughAmmo
 from utils.emojis import EMOJIS
+from utils.buttons_and_selects import Guide
 class ErrorHandler(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -37,13 +39,13 @@ class ErrorHandler(commands.Cog):
 			await ctx.send('L')
 
 		elif isinstance(error, NotStartedPlaying):
-			await ctx.send(error)
+			await ctx.send(error, view= Guide(ctx))
 
 		elif isinstance(error, NotOptedIn):
-			await ctx.send(error)
+			await ctx.send(error, view= Guide(ctx))
 
 		elif isinstance(error, NoWeaponEquipped):
-			await ctx.send(error)
+			await ctx.send(error, view= Guide(ctx))
 
 		elif isinstance(error, NotEnoughAmmo):
 			await ctx.send(error)

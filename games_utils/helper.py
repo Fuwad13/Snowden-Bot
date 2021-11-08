@@ -307,7 +307,7 @@ class BattleFieldHelper:
 		return count
 
 	async def update_equipments(self,*, player_id : int, eq_dict : dict):
-		"""update a players equiments"""
+		"""update a players equipments"""
 		rec = await self.get_player_data(player_id)
 		eq_p_dict = json.loads(rec['equipments'])
 		#later
@@ -349,7 +349,7 @@ class AttackEngine:
 		attackable_t_hp = self.get_hp_plus_sp(self.t_rec)
 		w_d_min, w_d_max = map(int,itm.ALL_ITEMS[str(a_weapon)]['damage'].split('-'))
 		damage = random.randint(w_d_min, w_d_max)
-		ammo_used : str= itm.ALL_ITEMS[str(a_weapon)]['ammo']
+		ammo_used = itm.ALL_ITEMS[str(a_weapon)]['ammo']
 		if damage >= attackable_t_hp:
 			if t_armour:
 				t_eq_dict = json.loads(self.t_rec['equipments'])
@@ -357,16 +357,20 @@ class AttackEngine:
 				t_eq_json = json.dumps(t_eq_dict)
 				await self.bot.db.execute(""" UPDATE battlefield SET hp = 100, sp = 0, equipments = $1 WHERE p_id = $2;""",t_eq_json, self.target_id)
 				# implement looting stuffs later
-				ammo_dict = {ammo_used : -1 }
-				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+				if ammo_used:
+					ammo_dict = {ammo_used : -1 }
+					await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+				
 				r_str = f"{self.attacker.mention} -> You Killed **{self.target}** with your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}**(:boom:{damage} damage)\n\nPlease wait a few seconds before you can start looting the player's loot-crate."
 				return r_str
 
 			else:
 				await self.bot.db.execute(""" UPDATE battlefield SET hp = 100 WHERE p_id = $1;""",self.target_id)
 				# implement looting stuffs later
-				ammo_dict = {ammo_used : -1 }
-				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+				if ammo_used:
+					ammo_dict = {ammo_used : -1 }
+					await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+				
 				
 				r_str = f"{self.attacker.mention} -> You Killed **{self.target}** with your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}**(:boom:{damage} damage)\n\nLooting the killed player's inventory is being implemented, keep patience."
 				return r_str
@@ -377,8 +381,10 @@ class AttackEngine:
 			# when target has no armour
 			new_hp = attackable_t_hp - damage
 			await self.bot.db.execute(""" UPDATE battlefield SET hp = $1 WHERE p_id = $2;""", new_hp, self.target_id)
-			ammo_dict = {ammo_used : -1 }
-			await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+			if ammo_used:
+				ammo_dict = {ammo_used : -1 }
+				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+			
 			
 			r_str = f"{self.attacker.mention} -> Your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}** dealt :boom: {damage} damage to **{self.target}**.\nThey now have {new_hp}/100 {self.bfh.get_bar_emojis('hp', new_hp, 100)} `health` remaining."
 			return r_str
@@ -386,8 +392,10 @@ class AttackEngine:
 		elif damage < attackable_t_hp and t_armour and damage < t_sp:
 			new_sp = t_sp - damage
 			await self.bot.db.execute(""" UPDATE battlefield SET sp = $1 WHERE p_id = $2;""", new_sp, self.target_id)
-			ammo_dict = {ammo_used : -1 }
-			await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+			if ammo_used:
+				ammo_dict = {ammo_used : -1 }
+				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+			
 			
 			r_str = f"{self.attacker.mention} -> Your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}** dealt :boom: {damage} damage to **{self.target}'s** {itm.ALL_ITEMS[str(t_armour)]['emoji']}**{itm.ALL_ITEMS[str(t_armour)]['name']}**.\nThey now have {self.t_rec['hp']}/100 {self.bfh.get_bar_emojis('hp', self.t_rec['hp'], 100)} `health` and {new_sp}/{itm.ALL_ITEMS[str(t_armour)]['shield_points']} {self.bfh.get_bar_emojis('armour', new_sp, itm.ALL_ITEMS[str(t_armour)]['shield_points'])} `armour points` remaining."
 			return r_str
@@ -399,8 +407,10 @@ class AttackEngine:
 			t_eq_dict['armour'] = None
 			t_eq_json = json.dumps(t_eq_dict)
 			await self.bot.db.execute(""" UPDATE battlefield SET hp = $1, sp = 0, equipments = $2 WHERE p_id = $3; """, new_hp, t_eq_json, self.target_id)
-			ammo_dict = {ammo_used : -1 }
-			await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+			if ammo_used:
+				ammo_dict = {ammo_used : -1 }
+				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+			
 			
 			r_str = f"{self.attacker.mention} -> Your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}** dealt :boom: {t_sp} damage to **{self.target}'s** {itm.ALL_ITEMS[str(t_armour)]['emoji']}**{itm.ALL_ITEMS[str(t_armour)]['name']}**. Their armour was broken and the rest :boom: {damage_l} damage was dealt to their `health`.\nThey now have {new_hp}/100 {self.bfh.get_bar_emojis('hp', new_hp, 100)} `health` remaining."
 			return r_str

@@ -211,4 +211,37 @@ class AttackView(ui.View):
 		self.confirmation = False
 
 
+class Guide(ui.View):
 
+	def __init__(self, ctx):
+		self.ctx = ctx
+		super().__init__(timeout=300)
+
+	@ui.button(label="Guide", emoji= "\U00002139", style = discord.ButtonStyle.gray)
+	async def guide_button(self, button, interaction):
+		ctx = self.ctx
+		embed = discord.Embed(title = "\U00002139 Battlefield Guide", color = 0x2F3136)
+		embed.description = f"""
+- If you haven't started playing yet, run the `{ctx.clean_prefix}start` command to get started.
+
+- Use the following commands to get time based check-in rewards:
+    `{ctx.clean_prefix}hourly`, `{ctx.clean_prefix}daily`, `{ctx.clean_prefix}weekly`, `{ctx.clean_prefix}monthly`,
+	`{ctx.clean_prefix}work`, `{ctx.clean_prefix}loot` ....
+
+- Use `{ctx.clean_prefix}inventory` to see you inventory, `{ctx.clean_prefix}equip <weapon/armour name>` to equip weapons/armours. 
+
+- Use `{ctx.clean_prefix}opt` to toggle your *opt in* status. *Opted in* means you are able to attack other players and vice versa. *Opted out* means you can't attack others and vice versa.
+
+- Use `{ctx.clean_prefix}attack <player>` to attack a player (you must be opted in and have a equipped weapon with necessary ammunition.)
+
+- Use `{ctx.clean_prefix}heal <healing_item_name>` to heal and increase your healthpoints.
+
+- Use `{ctx.clean_prefix}buy [amount] <item_name>` or `{ctx.clean_prefix}sell [amount] <item_name>` to buy/sell items. `{ctx.clean_prefix}trade <player>` to trade items with a player.
+
+- Use `{ctx.clean_prefix}help Battlefield` for more fun and useful commands.
+
+**If you still get confused feel free to join our support server and ask in the support channel.**
+
+		"""
+		await interaction.response.send_message(embed= embed, ephemeral=True)
+	

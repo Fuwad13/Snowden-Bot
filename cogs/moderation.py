@@ -33,12 +33,22 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_messages= True)
     @commands.bot_has_permissions(manage_messages= True)
     async def _purge(self, ctx, amount : int = 5):
-        if amount > 1000:
-            return await ctx.send("**Can't delete more than 1000 messages at once!**")
+        if amount > 2000:
+            return await ctx.send("**Can't delete more than 2000 messages at once!**")
         def is_deleteable(message):
             return (time.time() - message.created_at.timestamp()) < 1209600
         deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at, check = is_deleteable)
         await ctx.send(f"**Deleted {len(deleted)} message(s)**" , delete_after = 5)
+
+    @_purge.command(name= "links", aliases = ['link', 'url'], help = "Bulk delete messages that contains links/url.")
+    @commands.has_permissions(manage_messages= True)
+    @commands.bot_has_permissions(manage_messages = True)
+    async def links(self, ctx, amount : int = 5):
+        if amount > 2000:
+            return await ctx.send("**Can't delete more than 2000 messages at once!**")
+        def is_link(message):
+            ...
+        k = "kdk"
     
 
 

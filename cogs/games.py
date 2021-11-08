@@ -18,7 +18,7 @@ from games_utils.items import ALL_ITEMS
 import games_utils.constants as cs
 from utils.decorators import has_started, is_opted, has_ref_started, has_equipped_weapon
 from utils.errors import NotStartedPlaying
-class BattleField(commands.Cog):
+class Battlefield(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.bfh = helper.BattleFieldHelper(bot)
@@ -39,7 +39,7 @@ class BattleField(commands.Cog):
 		
 
 		embed = discord.Embed(title = f"Hey {ctx.author.name}, \U0001f44b Welcome to Snowden's BattleField!!", description = f"You got **$500** and <:exp:896086434946097162>**100 EXP** as a reward for entering the battlefield!\nYou also got:\n• {ALL_ITEMS['common_chest']['emoji']}`common chest x2`\n• {cs.CHESTS_EMOJIS['rare']}`rare chest x1`\n• {ALL_ITEMS['p92']['emoji']}`p92 x1`\n• {ALL_ITEMS['pain_killer']['emoji']}`pain killer x1`\nHope you enjoy!", color = 0x2F3136)
-		await ctx.reply(embed = embed)
+		await ctx.reply(embed = embed, view = bs.Guide(ctx))
 
 	@commands.command(name= 'inventory', aliases = ['inv'], brief= "Shows player inventory", help = "Shows player inventory, only if the user has an account.")
 	@has_ref_started()
@@ -733,10 +733,10 @@ class BattleField(commands.Cog):
 		await ctx.send(text)
 
 	@commands.command(name = 'loot', aliases= ['l'], help= "soon")
-	@has_ref_started()
-	@commands.cooldown(1,3, BucketType.user)
+	@is_opted()
+	@commands.cooldown(1,10, BucketType.user)
 	async def _loot(self, ctx):
-		await ctx.send("SOON")
+		await ctx.send("This command is under maintenance.")
 
 	@commands.command(name = 'shop', aliases= ['sh'], help= "soon")
 	@has_started()
@@ -955,5 +955,5 @@ class BattleField(commands.Cog):
 	
 
 def setup(bot):
-	bot.add_cog(BattleField(bot))
+	bot.add_cog(Battlefield(bot))
 
