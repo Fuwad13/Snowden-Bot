@@ -1,6 +1,7 @@
 import discord
 from discord import ui
-
+from discord.ui import view
+from games_utils.items import ALL_ITEMS
 class ConfirmOrCancel(ui.View):
 
 
@@ -246,4 +247,64 @@ class Guide(ui.View):
 
 		"""
 		await interaction.response.send_message(text, ephemeral=True)
+
+
+class ChestDropdown(ui.Select):
+
+	def __init__(self, ctx, chest_dict : dict, bot):
+		self.ctx = ctx
+		self.chest_dict = chest_dict
+		self.bot = bot
+		options = []
+		for k, v in chest_dict.items():
+			if v > 0:
+				options.append(discord.SelectOption(
+					label=f"{str(k).replace('_', ' ').capitalize} x{v}", value=f"{str(k)}-{v}",
+					emoji=f"{ALL_ITEMS[str(k)]['emoji']}"))
+		super().__init__(placeholder="Select chests to open.....", min_values=1, max_values=1, options=options)
+
+	async def callback(self, interaction: discord.Interaction):
+		val = self.values[0].split('-')
+		chest , count = val[0], val[1]
+
+		if chest == 'common_chest':
+			cmd = self.bot.get_command('open common')
+			await cmd(self.ctx, count)
+		elif chest == 'rare_chest':
+			cmd = self.bot.get_command('open rare')
+			await cmd(self.ctx, count)
+		elif chest == 'legendary_chest':
+			cmd = self.bot.get_command('open legendary')
+			await cmd(self.ctx, count)
+		elif chest == 'epic_chest':
+			cmd = self.bot.get_command('open epic')
+			await cmd(self.ctx, count)
+		elif chest == 'mythic_chest':
+			cmd = self.bot.get_command('open mythic')
+			await cmd(self.ctx, count)
+
+		self.view.clear_items()
+		self.view.stop()
+
+		await interaction.message.edit(view= self.view)
+
+class OpenChestView(ui.View):
+
+	def __init__(self, ctx, chest_dict : dict):
+		self.ctx = ctx
+		self.chest_dict = chest_dict
+		bot = ctx.bot
+		self.add_item(ChestDropdown(ctx,chest_dict, bot ))
+		super().__init__(timeout=60)
+
+	async def interaction_check(self, intr):
+		if not intr.user == self.ctx.author:
+			await intr.response.send_message(f"Sorry, only **{self.ctx.author.name}** can use this dropdown!", ephemeral = True)
+
+	async def on_timeout(self) -> None:
+		self.clear_items()
+		self.message.edit(view= self)
+
 	
+	
+		

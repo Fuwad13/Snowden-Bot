@@ -120,7 +120,7 @@ class Battlefield(commands.Cog):
 		if not item_name:
 			item_list = []
 			for item in ALL_ITEMS.keys():
-				item_list.append(str(item))
+				item_list.append(ALL_ITEMS[str(item)]['name'])
 			r_str = ', '.join(item_list)
 			embed = discord.Embed(title = "Snowden's Battlefield : All items ->", color =0x2F3136 )
 			embed.description = f"`{r_str}`"
@@ -346,7 +346,8 @@ class Battlefield(commands.Cog):
 		chest_dict = self.bfh.get_chest_counts(inv_table)
 		text= f"• {cs.CHESTS_EMOJIS['common']} x{chest_dict['common_chest']} `common chest(s)`\n• {cs.CHESTS_EMOJIS['rare']} x{chest_dict['rare_chest']} `rare chest(s)`\n• {cs.CHESTS_EMOJIS['legendary']} x{chest_dict['legendary_chest']} `legendary chest(s)`\n• {cs.CHESTS_EMOJIS['epic']} x{chest_dict['epic_chest']} `epic chest(s)`\n• {cs.CHESTS_EMOJIS['mythic']} x{chest_dict['mythic_chest']} `mythic chest(s)`\nuse `{ctx.clean_prefix}open [chest] [amount]` to open your chests to get random items!"
 		embed.description= text
-		await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		view = bs.OpenChestView(ctx, chest_dict)
+		view.message = await ctx.send(f"{ctx.author.mention} ->", embed = embed, view = view)
 
 	@_open.command(name= 'common', aliases = ['c', 'cmn', 'com'], help= "Open common chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
 	@has_started()
