@@ -265,6 +265,7 @@ class ChestDropdown(ui.Select):
 	async def callback(self, interaction: discord.Interaction):
 		val = self.values[0].split('-')
 		chest , count = val[0], val[1]
+		print(chest, count)
 
 		if chest == 'common_chest':
 			cmd = self.bot.get_command('open common')
@@ -281,7 +282,7 @@ class ChestDropdown(ui.Select):
 		elif chest == 'mythic_chest':
 			cmd = self.bot.get_command('open mythic')
 			await cmd(self.ctx, count)
-
+		print(chest, count, cmd)
 		self.view.clear_items()
 		self.view.stop()
 
@@ -303,7 +304,7 @@ class OpenChestView(ui.View):
 
 	async def on_timeout(self) -> None:
 		self.clear_items()
-		self.message.edit(view= self)
+		await self.message.edit(view= self)
 
 	
 	
