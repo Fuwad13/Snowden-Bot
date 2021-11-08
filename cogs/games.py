@@ -34,11 +34,12 @@ class Battlefield(commands.Cog):
 		player_id = ctx.author.id
 		flag = await self.bfh.check_if_exists(player_id)
 		if flag:
-			return await ctx.send("**You already have an account, you can keep playing!**")
-		await self.bot.db.execute(""" INSERT INTO battlefield (p_id, created_at, common, rare) VALUES ($1, $2, $3, $4); """, player_id, int(ctx.message.created_at.timestamp()),'{"p92" : 1, "common_chest" : 2}','{"rare_chest" : 1, "pain_killer" : 1 }' )
+			return await ctx.send("**You already have an account, you can keep playing!**", view = bs.Guide(ctx))
+		await self.bot.db.execute(""" INSERT INTO battlefield (p_id, created_at, common, rare) VALUES ($1, $2, $3, $4); """, player_id, int(ctx.message.created_at.timestamp()),'{"p92" : 1, "common_chest" : 2, "9mm" : 2}','{"rare_chest" : 1, "pain_killer" : 1 }' )
 		
 
-		embed = discord.Embed(title = f"Hey {ctx.author.name}, \U0001f44b Welcome to Snowden's BattleField!!", description = f"You got **$500** and <:exp:896086434946097162>**100 EXP** as a reward for entering the battlefield!\nYou also got:\n• {ALL_ITEMS['common_chest']['emoji']}`common chest x2`\n• {cs.CHESTS_EMOJIS['rare']}`rare chest x1`\n• {ALL_ITEMS['p92']['emoji']}`p92 x1`\n• {ALL_ITEMS['pain_killer']['emoji']}`pain killer x1`\nHope you enjoy!", color = 0x2F3136)
+		embed = discord.Embed(title = f"Hey {ctx.author.name}, \U0001f44b Welcome to Snowden's BattleField!!", description = f"You got **$500** and <:exp:896086434946097162>**100 EXP** as a reward for entering the battlefield!\nYou also got:\n• {ALL_ITEMS['common_chest']['emoji']}`common chest x2`\n• {cs.CHESTS_EMOJIS['rare']}`rare chest x1`\n• {ALL_ITEMS['p92']['emoji']}`p92 x1`\n• {ALL_ITEMS['9mm']['emoji']}`9mm x2`\n• {ALL_ITEMS['pain_killer']['emoji']}`pain killer x1`\nHope you enjoy!", color = 0x2F3136)
+		embed.set_footer(text = f"you can use {ctx.clean_prefix}start command later for getting guide how to play the game!")
 		await ctx.reply(embed = embed, view = bs.Guide(ctx))
 
 	@commands.command(name= 'inventory', aliases = ['inv'], brief= "Shows player inventory", help = "Shows player inventory, only if the user has an account.")
