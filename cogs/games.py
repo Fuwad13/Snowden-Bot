@@ -205,7 +205,7 @@ class Battlefield(commands.Cog):
 
 		
 	
-	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt', 'opt_in_toggle'], help= "Toggle your `opt` status if it's available. You can't toggle your `opt` status if you are on cooldown!")
+	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt', 'opt_in_toggle'], help= "Toggle your `opt` status if it's available.There is a 12h cooldown.")
 	@commands.guild_only()
 	@has_started()
 	@commands.max_concurrency(1, BucketType.user)
