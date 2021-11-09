@@ -277,6 +277,34 @@ class Guide(ui.View):
 		await interaction.response.send_message(text, ephemeral=True)
 
 
+class TradeConfirmView(ui.View):
+	def __init__(self, player2):
+		self.player2 = player2
+		self.confirmation = False
+		super().__init__(timeout=60)
+
+	async def interaction_check(self, intr):
+		if not intr.user == self.player2:
+			await intr.response.send_message(f"Sorry, only **{self.player2}** can use this button!", ephemeral = True)
+
+		return intr.user == self.player2
+	#add emoji later
+	@ui.button(label = 'Trade', style= discord.ButtonStyle.blurple)
+	async def _tradebutton(self, button, intr):
+		
+		self.confirmation = True
+		self.stop()
+
+	@ui.button(label='Cancel', style=discord.ButtonStyle.red)
+	async def _cancel(self, button, intr):
+		
+		self.confirmation = False
+		self.stop()
+
+	async def on_timeout(self):
+		
+		
+		self.confirmation = False
 	
 	
 		

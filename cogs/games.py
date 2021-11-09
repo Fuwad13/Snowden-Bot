@@ -16,7 +16,7 @@ from games_utils import helper
 from games_utils.helper import AttackEngine
 from games_utils.items import ALL_ITEMS
 import games_utils.constants as cs
-from utils.decorators import has_started, is_opted, has_ref_started, has_equipped_weapon
+from utils.decorators import has_started, is_opted, has_ref_started, can_attack
 from utils.errors import NotStartedPlaying
 class Battlefield(commands.Cog):
 	def __init__(self, bot):
@@ -852,6 +852,7 @@ class Battlefield(commands.Cog):
 
 	@commands.command(name = 'trade', aliases= ['tr'], help= "soon")
 	@has_started()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,10, BucketType.user)
 	async def _trade(self, ctx, player : discord.Member):
 		player1 = ctx.author
@@ -859,7 +860,21 @@ class Battlefield(commands.Cog):
 		flag = await self.bfh.check_if_exists(player2.id)
 		if not flag:
 			return await ctx.send(f"**{player2}** hasn't started playing battlefield yet! You can't trade with him before he starts playing")
-		await ctx.send("Ok we will trade soon, ......implementingggg........")
+		rec1 = await self.bfh.get_player_data(player1.id)
+		rec2 = await self.bfh.get_player_data(player2.id)
+		p1_level = self.bfh.get_level(rec1['exp'])
+		p2_level = self.bfh.get_level(rec2['exp'])
+		if p1_level < 5 or p2_level < 5:
+			return await ctx.send(f"{player1} and {player2}, sorry , one/both of you two haven't reached **Level 5** yet. You can't trade with one another before both of you reach level 5!")
+		view = bs.TradeConfirmView(player2)
+		msg = await ctx.send(f"{player2.mention} -> {player1.mention} wants to trade with you?\nIf you want to trade with him then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`", view = view)
+		await view.wait()
+		view.clear_items()
+		if not view.confirmation:
+			return await msg.edit(f"{player2.mention} -> {player1.mention} ~~wants to trade with you!\nIf you want to trade with him then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`~~\n**Trade Cancelled**", view = view)
+		elif view.confirmation:
+			return await msg.edit(f"Trading system will be implemented soon...")
+
 
 	@commands.command(name= 'equip', aliases = ['eq', 'attach'], help = "Equip a weapon or armour from your inventory")
 	@has_started()
@@ -936,9 +951,7 @@ class Battlefield(commands.Cog):
 
 	@commands.command(name = 'attack', aliases= ['a'], help= "soon")
 	@commands.guild_only()
-	@has_started()
-	@is_opted()
-	@has_equipped_weapon()
+	@can_attack()
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5, BucketType.user)
 	async def _attack(self, ctx, target : discord.Member):

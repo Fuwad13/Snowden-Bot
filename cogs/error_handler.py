@@ -58,6 +58,8 @@ class ErrorHandler(commands.Cog):
 		elif isinstance(error, commands.BotMissingPermissions):
 			needed_perms = '\n'.join(error.missing_permissions)
 			await ctx.send(f"**I need the following permission(s) to execute this command**\n**{needed_perms}**")
+		elif isinstance(error, commands.MemberNotFound):
+			await ctx.send(f"Member not found....", delete_after = 10)
 		else:
 			await ctx.send(error)
 			

@@ -49,15 +49,15 @@ def is_opted():
 
 	return commands.check(predicate)
 
-def has_equipped_weapon():
+def can_attack():
 	async def predicate(ctx):
 		rec = await ctx.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;""", ctx.author.id)
-		try:
-
-			eq_dict = json.loads(rec['equipments'])
-		except TypeError:
+		if not rec:
 			raise NotStartedPlaying(f"**{ctx.author}**, you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-			
+
+		if rec['opt_status'] == False:
+			raise NotOptedIn(f"**{ctx.author}**, You can't use this command if you are not opted in!\nRun the `{ctx.clean_prefix}opt` to toggle your opt status.")
+		eq_dict = json.loads(rec['equipments'])	
 		weapon = eq_dict['weapon']
 		if not weapon:
 			raise NoWeaponEquipped(f"You haven't equipped any weapon yet to use for attacking. use `{ctx.clean_prefix}equip <weapon_name>` to equip a weapon.")
