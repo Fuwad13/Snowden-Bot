@@ -93,7 +93,7 @@ class SnowdenBot(commands.AutoShardedBot):
 
 
 bot = SnowdenBot(
-    command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True, slash_command_guilds=[874735250842984458] )
+    command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True,slash_commands = True, slash_command_guilds=[874735250842984458] )
 
 
 
