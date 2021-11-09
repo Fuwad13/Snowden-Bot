@@ -86,21 +86,25 @@ class Owner(commands.Cog):
 
 		await ctx.send(f"**Deleted {len(deleted)} message(s)**", delete_after = 5)
 
-	@commands.command(name= "blacklist", aliases = ['bl','shutlist'],hidden=True,help="Shut some mfs so they can't invoke commands")
+	@commands.command(name= "/blacklist", aliases = ['/bl','/shutlist'],hidden=True,help="Shut some mfs so they can't invoke commands")
 	@commands.is_owner()
-	async def _blacklist(self, ctx, user : discord.User, *, reason : str):
+	async def _blacklist(self, ctx, user : discord.User, *, reason : str = None):
+		if reason is None:
+			reason = "being a mf"
 		self.bot.blacklist[str(user.id)] = reason
 		await ctx.send(f"{cs.EMOJIS['greentick']} blacklisted {user} for {reason}")
 
+	@commands.command(name='/forgive', aliases = ['/unblacklist', '/unbl'], hidden = True, help  = "forgive a good person who was once a mf")
+	@commands.is_owner()
+	async def _unbl(self, ctx, user : discord.User, *, reason : str = None):
+		if reason is None:
+			reason = "forgave"
+		mf = self.bot.blacklist.get(str(user.id))
+		if not mf:
+			return await ctx.send(f"{user} is not blacklisted.")
 
-	
-
-
-
-
-	
-
-	
+		del self.bot.blacklist[str(user.id)]
+		await ctx.send(f"{cs.EMOJIS['greentick']} forgave / unblacklisted {user} for {reason}")
 
 
 def setup(bot):

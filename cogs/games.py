@@ -192,8 +192,12 @@ class Battlefield(commands.Cog):
 		embed = discord.Embed(title = f"__{player}'s cooldowns:__",color =0x2F3136)
 		now = int(time.time())
 		for n_c, t in cd_dict.items():
+			if 'equip' in str(n_c):
+				embed.add_field(name=f"__equip__", value= f"**{'Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
+				break
 			embed.add_field(name=f"__{str(n_c).split('n_', 1)[1]}__", value= f"**{'Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
-		embed.description = "`w_equip` - cooldown for equipping weapons\n`a_equip` - cooldown for equipping armours"
+			
+		embed.description = "Note: `equip` cooldown is applicable for weapon equipments only.\nArmour equipments have no cooldowns."
 		await ctx.send(f"{ctx.author.mention} ->", embed = embed)
 
 
@@ -869,9 +873,6 @@ class Battlefield(commands.Cog):
 			current_weapon, _ = self.bfh.get_equipments(rec)
 			extras = f"- Your current equipped weapon ({ALL_ITEMS[current_weapon]['emoji']}`{ALL_ITEMS[current_weapon]['name']}`) will be returned to your inventory." if current_weapon else ''
 		elif item_type == 'armour':
-			cd = await self.bfh.get_cooldown_data(ctx.author.id, 'a_equip')
-			if current_time < int(cd):
-				return await ctx.send(f"{ctx.author.mention} ->**You're on cooldown!**\nYou can equip any new armour again in `{humanize.precisedelta(cd - current_time)}`")
 			rec = await self.bfh.get_player_data(ctx.author.id)
 			_ , current_armour = self.bfh.get_equipments(rec)
 			extras = f"- Your current equipped armour ({ALL_ITEMS[current_armour]['emoji']}`{ALL_ITEMS[current_armour]['name']}`) will **NOT** be returned to your inventory." if current_armour else ''
@@ -900,7 +901,6 @@ class Battlefield(commands.Cog):
 				arm_points : int = ALL_ITEMS[item_name_n]['shield_points']
 				query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 , sp = $3 WHERE p_id = $4;"
 				await self.bot.db.execute(query, inv_json, eq_json, arm_points, ctx.author.id)
-				await self.bfh.update_cooldowns(ctx.author.id, 'a_equip')
 				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from you inventory.\nNow you have {arm_points} {self.bfh.get_bar_emojis('armour', 100,100)} `armour points`", view = view)
 
 			else:
@@ -972,10 +972,63 @@ class Battlefield(commands.Cog):
 			await self.bfh.update_attack_or_heal_cd(player_id= player_id, command_name= 'attack', item_used=a_weapon)
 			await msg.edit(f"{text}", view = view)
 
-	@commands.command(name = 'heal', aliases= ['healing'], help= "soon")
+	@commands.command(name = 'heal', aliases= ['healing'], help= "heal/ increase your healthpoints using a healing item from your inventory.")
+	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
-	async def _heal(self, ctx):
-		await ctx.send("SOON")
+	async def _heal(self, ctx,*, healing_item : str = None):
+		player_id = ctx.author.id
+		rec = self.bfh.get_player_data(player_id)
+		all_items_dict = self.bfh.get_inv_all_items_dict(rec)
+		if healing_item is None:
+			ava_heal_items = [str(i) for i , c in all_items_dict.items() if c > 0 and ALL_ITEMS[str(i)]['type'] == 'healing']
+			if len(ava_heal_items) == 0:
+				return await ctx.send(f"{ctx.author.mention} -> You don't have any healing items in your inventory! \nBuy any healing items and use `{ctx.clean_prefix}heal [healing_item]` to heal/increase your healthpoints.")
+			h_str = ""
+			for _item in ava_heal_items:
+				h_str+=f"• {ALL_ITEMS[_item]['emoji']} **{all_items_dict[_item]}x** `{ALL_ITEMS[_item]['name']}`\n"
+			return await ctx.send(f"{ctx.author.mention} -> You have the following healing item(s) in your inventory:\n{h_str}\nTo use a healing item, use `{ctx.clean_prefix}heal <healing_item>` to **heal/increase** your healthpoints.")
+		
+
+		healing_items_list = [str(hi) for hi in ALL_ITEMS.keys() if ALL_ITEMS[str(hi)]['type']=='healing']
+		heal_s_r = difflib.get_close_matches(healing_item.lower(),healing_items_list, n=1, cutoff=0.3)
+		if len(heal_s_r) == 0:
+			return await ctx.send(f"No healing item named `{healing_item}`found")
+
+		current_hp : int = rec['hp']
+		cd_dict = self.bfh.get_cd_dict_from_rec(rec)
+		if cd_dict['n_heal'] > int(time.time()):
+			return await ctx.send(f"{ctx.author.mention}, You're on healing cooldown!\nYou can use any healing item again in `{humanize.precisedelta(cd_dict['n_heal']-int(time.time()))}`")
+		heal_name_n= heal_s_r[0]
+		count  : int = all_items_dict.get(heal_name_n, 0)
+		if count <= 0:
+			return await ctx.send(f"{ctx.author.mention} -> You don't have any {ALL_ITEMS[heal_name_n]['emoji']} `{ALL_ITEMS[heal_name_n]['name']}` in your inventory to use.")
+		
+		if current_hp == 100:
+			return await ctx.send(f"{ctx.author} , You already have full healthpoints (100/100) {self.bfh.get_bar_emojis('hp', 100, 100)}\nNo need to use any healing item rn.")
+		view = bs.HealView(ctx)
+		msg = await ctx.send(f"{ctx.author.mention} -> You currently have {current_hp}/100 {self.bfh.get_bar_emojis('hp', current_hp, 100)} `hp`. \nDo you want to use {ALL_ITEMS[heal_name_n]['emoji']}**x1** `{ALL_ITEMS[heal_name_n]['name']}` to heal/increase your `hp`?\nIf yes , press the **Heal** button or press the **Cancel** button to cancel.`(timeout = 20s)`", view = view)
+		await view.wait()
+		view.clear_items()
+		if not view.confirmation:
+			return await msg.edit(f"{ctx.author.mention} -> ~~You currently have {current_hp}/100 {self.bfh.get_bar_emojis('hp', current_hp, 100)} `hp`. \nDo you want to use {ALL_ITEMS[heal_name_n]['emoji']}**x1** `{ALL_ITEMS[heal_name_n]['name']}` to heal/increase your `hp`?\nIf yes , press the **Heal** button or press the **Cancel** button to cancel.`(timeout = 20s)`~~\n**Cancelled**", view = view)
+
+		elif view.confirmation:
+			healing_range = ALL_ITEMS[heal_name_n]['hp_recover'].split('-')
+			min_hp, max_hp = int(healing_range[0]),int(healing_range[1])
+			healed = random.randint(min_hp, max_hp)
+			if current_hp + healed >= 100:
+				updated_hp = 100
+			else:
+				updated_hp = current_hp+healed
+
+			updated_dict = {heal_name_n : -1}
+			await self.bot.db.execute("UPDATE battlefield SET hp = $1 WHERE p_id = $2;", updated_hp, player_id)
+			await self.bfh.bulk_update_inventory(player_id=player_id, items_dict= updated_dict)
+			await self.bfh.update_attack_or_heal_cd(player_id=player_id, command_name='heal',item_used=heal_name_n)
+			return await msg.edit(f"{ctx.author.mention} -> You used {ALL_ITEMS[heal_name_n]['emoji']}**x1** `{ALL_ITEMS[heal_name_n]['name']}` and healed yourself.\nNow you have {updated_hp}/100 {self.bfh.get_bar_emojis('hp', updated_hp, 100)} `hp`", view = view)
+
+
+		
 
 	@commands.command(name= 'players', aliases = ['player', 'activeplayers'], help = "Shows currently opted in players count and information")
 	@commands.guild_only()

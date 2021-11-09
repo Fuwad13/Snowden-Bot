@@ -70,7 +70,12 @@ class BattleFieldHelper:
 		cd_data = await self.bot.db.fetchval(""" SELECT cooldowns FROM battlefield WHERE p_id = $1; """, player_id)
 		cd_dict = json.loads(cd_data)
 		return cd_dict[f'n_{command_name}']
-		
+
+	def get_cd_dict_from_rec(self, rec):
+		column = rec['cooldowns']
+		cd_dict : dict = json.loads(column)
+		return cd_dict
+
 
 	async def update_cooldowns(self, player_id : int, command_name : str ):
 		cd_data = await self.bot.db.fetchval(""" SELECT cooldowns FROM battlefield WHERE p_id = $1; """, player_id)
@@ -140,7 +145,7 @@ class BattleFieldHelper:
 			c+=1
 		return fields
 
-	def get_inventory_items(self, rec):
+	def get_inv_items_dict_by_rarity(self, rec):
 		"""This method is for getting the items of a  player's inventory.
 		Returns a dict of the rarity based items."""
 		inv_dict = {}
@@ -150,6 +155,16 @@ class BattleFieldHelper:
 			i_dict : dict = json.loads(column)
 			inv_dict[column_n] = i_dict
 		return inv_dict
+
+	def get_inv_all_items_dict(self, rec):
+		"""this method returns a dict of all items and counts. eg : {'ak_47' : 4, '7_62mm' : 3}"""
+		all_items_dict = {}
+		inv_columns = ['common', 'rare', 'legendary', 'epic', 'mythic']
+		for column_n in inv_columns:
+			column = rec[column_n]
+			i_dict : dict = json.loads(column)
+			all_items_dict.update(i_dict)
+		return all_items_dict
 
 	def get_chest_counts(self, rec):
 		"""Returns a dictionary of the filtered items in the following format: {'item_name' : count}"""
@@ -338,7 +353,7 @@ class AttackEngine:
 
 	async def loot(self,ctx):
 		"""Algorithm for looting a killed player"""
-		target_items_dict = self.bfh.get_inventory_items(self.t_rec)
+		target_items_dict = self.bfh.get_inv_items_dict_by_rarity(self.t_rec)
 		
 	
 	async def attack(self):

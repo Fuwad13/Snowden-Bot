@@ -1,7 +1,7 @@
 
 
 
-CD_UNIT = int(18)
+CD_UNIT = int(36)
 ALL_ITEMS = {
     'p92' : {
         'name' : 'p92',
