@@ -293,11 +293,12 @@ class ChestDropdown(ui.Select):
 class OpenChestView(ui.View):
 
 	def __init__(self, ctx, chest_dict : dict):
-		super().__init__(timeout=60)
+		
 		self.ctx = ctx
 		self.chest_dict = chest_dict
-		bot = ctx.bot
-		self.add_item(ChestDropdown(ctx,chest_dict, bot ))
+		super().__init__(timeout=60)
+		
+		self.add_item(ChestDropdown(ctx,chest_dict, ctx.bot ))
 		
 
 	async def interaction_check(self, intr):
