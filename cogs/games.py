@@ -333,276 +333,307 @@ class Battlefield(commands.Cog):
 			view.clear_items()
 			await msg.edit(embed = embed, view = view)
 
-	@commands.group(name= 'open', aliases = ['unbox', 'o', 'un'], brief= "Open chest(s) from your inventory", help= "Open chests to get random game items!Chances of getting items are based on their rarity.You might get items with higher tier rarity from a lower tier chest.", invoke_without_command= True)
+	@commands.command(name= 'open', aliases = ['unbox', 'o', 'un'], brief= "Open chest(s) from your inventory", help= "Open chests to get random game items!Chances of getting items are based on their rarity.You might get items with higher tier rarity from a lower tier chest.")
 	@has_started()
 	@commands.cooldown(1,5, BucketType.user)
-	async def _open(self, ctx):
+	async def _open(self, ctx, amount : typing.Optional[int] = 1,*, chest : str = None):
 		player_id = ctx.author.id
-		# flag = await self.bfh.check_if_exists(player_id)
-		# if not flag:
-		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		embed = discord.Embed(title = f"{ctx.author.name}, You currently have...", color = 0x2F3136)
-		inv_table = await self.bot.db.fetchrow(""" SELECT * FROM battlefield where p_id = $1;  """, player_id)
-		chest_dict = self.bfh.get_chest_counts(inv_table)
-		text= f"• {cs.CHESTS_EMOJIS['common']} x{chest_dict['common_chest']} `common chest(s)`\n• {cs.CHESTS_EMOJIS['rare']} x{chest_dict['rare_chest']} `rare chest(s)`\n• {cs.CHESTS_EMOJIS['legendary']} x{chest_dict['legendary_chest']} `legendary chest(s)`\n• {cs.CHESTS_EMOJIS['epic']} x{chest_dict['epic_chest']} `epic chest(s)`\n• {cs.CHESTS_EMOJIS['mythic']} x{chest_dict['mythic_chest']} `mythic chest(s)`\nuse `{ctx.clean_prefix}open [chest] [amount]` to open your chests to get random items!"
-		embed.description= text
-		view = bs.OpenChestView(ctx, chest_dict)
-		view.message = await ctx.send(f"{ctx.author.mention} ->", embed = embed, view = view)
-		await view.wait()
-
-	@_open.command(name= 'common', aliases = ['c', 'cmn', 'com'], help= "Open common chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
-	@has_started()
-	@commands.cooldown(1,5, BucketType.user)
-	async def _common(self, ctx, amount : int = 1):
-		player_id = ctx.author.id
-		# flag = await self.bfh.check_if_exists(player_id)
-		# if not flag:
-		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
 		inv_table = await self.bfh.get_player_data(player_id)
-		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
-		if chest_counts['common_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `common chest(s)`, sorry.")
+		chest_dict : dict = self.bfh.get_chest_counts(inv_table)
+		if chest is None:
+			
+			embed = discord.Embed(title = f"{ctx.author.name}, You currently have...", color = 0x2F3136)
+			
+			text= f"• {cs.CHESTS_EMOJIS['common']} x{chest_dict['common_chest']} `common chest(s)`\n• {cs.CHESTS_EMOJIS['rare']} x{chest_dict['rare_chest']} `rare chest(s)`\n• {cs.CHESTS_EMOJIS['legendary']} x{chest_dict['legendary_chest']} `legendary chest(s)`\n• {cs.CHESTS_EMOJIS['epic']} x{chest_dict['epic_chest']} `epic chest(s)`\n• {cs.CHESTS_EMOJIS['mythic']} x{chest_dict['mythic_chest']} `mythic chest(s)`\nuse `{ctx.clean_prefix}open [amount] [chest_name]` to open your chests to get random items!"
+			embed.description= text
+			return await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+		chest_list = ['common_chest', 'rare_chest', 'legendary_chest', 'epic_chest', 'mythic_chest']
+		chest_s_r = difflib.get_close_matches(chest.lower(),chest_list, n=1, cutoff=0.3)
+		if len(chest_s_r) == 0:
+			return await ctx.send(f"No chest named `{chest}`found")
+		chest_name_n= chest_s_r[0]
+		if chest_dict[chest_name_n] < amount:
+			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `{ALL_ITEMS[chest_name_n]['name']}(s)` in your inventory, sorry.")
 		elif amount <= 0:
-			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
-		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `common chest(s)` from your inventory.....",color = 0x2F3136)
-		msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
-		if amount == 1:
-			
-			o_item = self.bfh.open_chest('common_chest')
-			await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
-			await self.bfh.update_inventory(player_id = player_id, _item = 'common_chest',amount= -1)
-			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `common chest` from your inventory. You got:"
-			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
-			# add embed image later
-			await asyncio.sleep(2)
-			await msg.edit(embed= embed)
-		elif amount > 1:
-			items_dict = {}
-			items_list = []
-			for i in range(0, amount):
-				o_item = self.bfh.open_chest('common_chest')
-				items_list.append(o_item)
-				try:
-					if items_dict[o_item]:
-						items_dict[o_item]+=1
-				except KeyError:
-					items_dict[o_item] = 1
-			try:
-				if items_dict['common_chest']:
-					items_dict['common_chest']+=-amount
-			except KeyError:
-				items_dict['common_chest'] = -amount
-			
-			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
-			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
-			r_str = '\n'.join(r_list)
-			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `common chest(s)` from your inventory. You got:"
-			embed.description = r_str
-			await asyncio.sleep(2)
-			await msg.edit(embed= embed)
+			return await ctx.send(f"{ctx.author.mention} please specify a valid amount for opening chests.")
+		msg = await ctx.send(f"<a:windows_loading:894852723726499852> {ctx.author.mention} ->  Opening **{amount}x** `{ALL_ITEMS[chest_name_n]['name']}(s)` from your inventory.....")
 
-	@_open.command(name= 'rare', aliases = ['r', 'rar'], help= "Open rare chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
-	@has_started()
-	@commands.cooldown(1,5, BucketType.user)
-	async def _rare(self, ctx, amount : int = 1):
-		player_id = ctx.author.id
-		# flag = await self.bfh.check_if_exists(player_id)
-		# if not flag:
-		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = await self.bfh.get_player_data(player_id)
-		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
-		if chest_counts['rare_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `rare chest(s)`, sorry.")
-		elif amount <= 0:
-			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
-		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `rare chest(s)` from your inventory.....",color = 0x2F3136)
-		msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
-		if amount == 1:
-			
-			o_item = self.bfh.open_chest('rare_chest')
-			await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
-			await self.bfh.update_inventory(player_id = player_id, _item = 'rare_chest',amount= -1)
-			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `rare chest` from your inventory. You got:"
-			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
-			# add embed image later
-			await asyncio.sleep(2)
-			await msg.edit(embed= embed)
-		elif amount > 1:
-			items_dict = {}
-			items_list = []
-			for i in range(0, amount):
-				o_item = self.bfh.open_chest('rare_chest')
-				items_list.append(o_item)
-				try:
-					if items_dict[o_item]:
-						items_dict[o_item]+=1
-				except KeyError:
-					items_dict[o_item] = 1
+		items_dict = {}
+		items_list = []
+		# randomize/ set chances of getting item later
+		for i in range(0, amount):
+			o_item = self.bfh.open_chest(chest_name_n)
+			items_list.append(o_item)
 			try:
-				if items_dict['rare_chest']:
-					items_dict['rare_chest']+=-amount
+				if items_dict[o_item]:
+					items_dict[o_item]+=1
 			except KeyError:
-				items_dict['rare_chest'] = -amount
+				items_dict[o_item] = 1
+		try:
+			if items_dict[chest_name_n]:
+				items_dict[chest_name_n]+=-amount
+		except KeyError:
+			items_dict[chest_name_n] = -amount
+		
+		await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+		r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+		r_str = '\n'.join(r_list)
+		await asyncio.sleep(2)
+		await msg.edit(f"{cs.EMOJIS['greentick']} {ctx.author.mention} ->  Opened **{amount}x** `{ALL_ITEMS[chest_name_n]['name']}(s)` from your inventory. You got : \n{r_str}")
+
+	# @_open.command(name= 'common', aliases = ['c', 'cmn', 'com'], help= "Open common chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	# @has_started()
+	# @commands.cooldown(1,5, BucketType.user)
+	# async def _common(self, ctx, amount : int = 1):
+	# 	player_id = ctx.author.id
+	# 	# flag = await self.bfh.check_if_exists(player_id)
+	# 	# if not flag:
+	# 	# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+	# 	inv_table = await self.bfh.get_player_data(player_id)
+	# 	chest_counts : dict = self.bfh.get_chest_counts(inv_table)
+	# 	if chest_counts['common_chest'] < amount:
+	# 		return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `common chest(s)`, sorry.")
+	# 	elif amount <= 0:
+	# 		return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
+	# 	embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `common chest(s)` from your inventory.....",color = 0x2F3136)
+	# 	msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+	# 	if amount == 1:
+			
+	# 		o_item = self.bfh.open_chest('common_chest')
+	# 		await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
+	# 		await self.bfh.update_inventory(player_id = player_id, _item = 'common_chest',amount= -1)
+	# 		embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `common chest` from your inventory. You got:"
+	# 		embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
+	# 		# add embed image later
+	# 		await asyncio.sleep(2)
+	# 		await msg.edit(embed= embed)
+	# 	elif amount > 1:
+	# 		items_dict = {}
+	# 		items_list = []
+	# 		for i in range(0, amount):
+	# 			o_item = self.bfh.open_chest('common_chest')
+	# 			items_list.append(o_item)
+	# 			try:
+	# 				if items_dict[o_item]:
+	# 					items_dict[o_item]+=1
+	# 			except KeyError:
+	# 				items_dict[o_item] = 1
+	# 		try:
+	# 			if items_dict['common_chest']:
+	# 				items_dict['common_chest']+=-amount
+	# 		except KeyError:
+	# 			items_dict['common_chest'] = -amount
+			
+	# 		await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+	# 		r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+	# 		r_str = '\n'.join(r_list)
+	# 		embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `common chest(s)` from your inventory. You got:"
+	# 		embed.description = r_str
+	# 		await asyncio.sleep(2)
+	# 		await msg.edit(embed= embed)
+
+	# @_open.command(name= 'rare', aliases = ['r', 'rar'], help= "Open rare chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	# @has_started()
+	# @commands.cooldown(1,5, BucketType.user)
+	# async def _rare(self, ctx, amount : int = 1):
+	# 	player_id = ctx.author.id
+	# 	# flag = await self.bfh.check_if_exists(player_id)
+	# 	# if not flag:
+	# 	# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+	# 	inv_table = await self.bfh.get_player_data(player_id)
+	# 	chest_counts : dict = self.bfh.get_chest_counts(inv_table)
+	# 	if chest_counts['rare_chest'] < amount:
+	# 		return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `rare chest(s)`, sorry.")
+	# 	elif amount <= 0:
+	# 		return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
+	# 	embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `rare chest(s)` from your inventory.....",color = 0x2F3136)
+	# 	msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+	# 	if amount == 1:
+			
+	# 		o_item = self.bfh.open_chest('rare_chest')
+	# 		await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
+	# 		await self.bfh.update_inventory(player_id = player_id, _item = 'rare_chest',amount= -1)
+	# 		embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `rare chest` from your inventory. You got:"
+	# 		embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
+	# 		# add embed image later
+	# 		await asyncio.sleep(2)
+	# 		await msg.edit(embed= embed)
+	# 	elif amount > 1:
+	# 		items_dict = {}
+	# 		items_list = []
+	# 		for i in range(0, amount):
+	# 			o_item = self.bfh.open_chest('rare_chest')
+	# 			items_list.append(o_item)
+	# 			try:
+	# 				if items_dict[o_item]:
+	# 					items_dict[o_item]+=1
+	# 			except KeyError:
+	# 				items_dict[o_item] = 1
+	# 		try:
+	# 			if items_dict['rare_chest']:
+	# 				items_dict['rare_chest']+=-amount
+	# 		except KeyError:
+	# 			items_dict['rare_chest'] = -amount
 
 			
-			test = await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+	# 		test = await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
 			
-			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
-			r_str = '\n'.join(r_list)
-			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `rare chest(s)` from your inventory. You got:"
-			embed.description = r_str
-			await asyncio.sleep(2)
-			await msg.edit(embed= embed)
+	# 		r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+	# 		r_str = '\n'.join(r_list)
+	# 		embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `rare chest(s)` from your inventory. You got:"
+	# 		embed.description = r_str
+	# 		await asyncio.sleep(2)
+	# 		await msg.edit(embed= embed)
 
-	@_open.command(name= 'legendary', aliases = ['l', 'leg', 'le', 'legen'], help= "Open legendary chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
-	@has_started()
-	@commands.cooldown(1,5, BucketType.user)
-	async def _legendary(self, ctx, amount : int = 1):
-		player_id = ctx.author.id
-		# flag = await self.bfh.check_if_exists(player_id)
-		# if not flag:
-		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = await self.bfh.get_player_data(player_id)
-		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
-		if chest_counts['legendary_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `legendary chest(s)`, sorry.")
-		elif amount <= 0:
-			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
-		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `legendary chest(s)` from your inventory.....",color = 0x2F3136)
-		msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
-		if amount == 1:
+	# @_open.command(name= 'legendary', aliases = ['l', 'leg', 'le', 'legen'], help= "Open legendary chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	# @has_started()
+	# @commands.cooldown(1,5, BucketType.user)
+	# async def _legendary(self, ctx, amount : int = 1):
+	# 	player_id = ctx.author.id
+	# 	# flag = await self.bfh.check_if_exists(player_id)
+	# 	# if not flag:
+	# 	# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+	# 	inv_table = await self.bfh.get_player_data(player_id)
+	# 	chest_counts : dict = self.bfh.get_chest_counts(inv_table)
+	# 	if chest_counts['legendary_chest'] < amount:
+	# 		return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `legendary chest(s)`, sorry.")
+	# 	elif amount <= 0:
+	# 		return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
+	# 	embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `legendary chest(s)` from your inventory.....",color = 0x2F3136)
+	# 	msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+	# 	if amount == 1:
 			
-			o_item = self.bfh.open_chest('legendary_chest')
-			await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
-			await self.bfh.update_inventory(player_id = player_id, _item = 'legendary_chest',amount= -1)
-			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `legendary chest` from your inventory. You got:"
-			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
-			# add embed image later
-			await asyncio.sleep(2)
-			await msg.edit(embed= embed)
-		elif amount > 1:
-			items_dict = {}
-			items_list = []
-			for i in range(0, amount):
-				o_item = self.bfh.open_chest('legendary_chest')
-				items_list.append(o_item)
-				try:
-					if items_dict[o_item]:
-						items_dict[o_item]+=1
-				except KeyError:
-					items_dict[o_item] = 1
-			try:
-				if items_dict['legendary_chest']:
-					items_dict['legendary_chest']+=-amount
-			except KeyError:
-				items_dict['legendary_chest'] = -amount
-			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
-			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
-			r_str = '\n'.join(r_list)
-			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `legendary chest(s)` from your inventory. You got:"
-			embed.description = r_str
-			await asyncio.sleep(2)
-			await msg.edit(embed= embed)
+	# 		o_item = self.bfh.open_chest('legendary_chest')
+	# 		await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
+	# 		await self.bfh.update_inventory(player_id = player_id, _item = 'legendary_chest',amount= -1)
+	# 		embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `legendary chest` from your inventory. You got:"
+	# 		embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
+	# 		# add embed image later
+	# 		await asyncio.sleep(2)
+	# 		await msg.edit(embed= embed)
+	# 	elif amount > 1:
+	# 		items_dict = {}
+	# 		items_list = []
+	# 		for i in range(0, amount):
+	# 			o_item = self.bfh.open_chest('legendary_chest')
+	# 			items_list.append(o_item)
+	# 			try:
+	# 				if items_dict[o_item]:
+	# 					items_dict[o_item]+=1
+	# 			except KeyError:
+	# 				items_dict[o_item] = 1
+	# 		try:
+	# 			if items_dict['legendary_chest']:
+	# 				items_dict['legendary_chest']+=-amount
+	# 		except KeyError:
+	# 			items_dict['legendary_chest'] = -amount
+	# 		await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+	# 		r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+	# 		r_str = '\n'.join(r_list)
+	# 		embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `legendary chest(s)` from your inventory. You got:"
+	# 		embed.description = r_str
+	# 		await asyncio.sleep(2)
+	# 		await msg.edit(embed= embed)
 
-	@_open.command(name= 'epic', aliases = ['e', 'ep', 'epc'], help= "Open epic chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
-	@has_started()
-	@commands.cooldown(1,5, BucketType.user)
-	async def _epic(self, ctx, amount : int = 1):
-		player_id = ctx.author.id
-		# flag = await self.bfh.check_if_exists(player_id)
-		# if not flag:
-		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = await self.bfh.get_player_data(player_id)
-		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
-		if chest_counts['epic_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `epic chest(s)`, sorry.")
-		elif amount <= 0:
-			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
-		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `epic chest(s)` from your inventory.....",color = 0x2F3136)
-		msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
-		if amount == 1:
+	# @_open.command(name= 'epic', aliases = ['e', 'ep', 'epc'], help= "Open epic chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	# @has_started()
+	# @commands.cooldown(1,5, BucketType.user)
+	# async def _epic(self, ctx, amount : int = 1):
+	# 	player_id = ctx.author.id
+	# 	# flag = await self.bfh.check_if_exists(player_id)
+	# 	# if not flag:
+	# 	# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+	# 	inv_table = await self.bfh.get_player_data(player_id)
+	# 	chest_counts : dict = self.bfh.get_chest_counts(inv_table)
+	# 	if chest_counts['epic_chest'] < amount:
+	# 		return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `epic chest(s)`, sorry.")
+	# 	elif amount <= 0:
+	# 		return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
+	# 	embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `epic chest(s)` from your inventory.....",color = 0x2F3136)
+	# 	msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+	# 	if amount == 1:
 			
-			o_item = self.bfh.open_chest('epic_chest')
-			await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
-			await self.bfh.update_inventory(player_id = player_id, _item = 'epic_chest',amount= -1)
-			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `epic chest` from your inventory. You got:"
-			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
-			# add embed image later
-			await asyncio.sleep(2)
-			await msg.edit(embed= embed)
-		elif amount > 1:
-			items_dict = {}
-			items_list = []
-			for i in range(0, amount):
-				o_item = self.bfh.open_chest('epic_chest')
-				items_list.append(o_item)
-				try:
-					if items_dict[o_item]:
-						items_dict[o_item]+=1
-				except KeyError:
-					items_dict[o_item] = 1
-			try:
-				if items_dict['epic_chest']:
-					items_dict['epic_chest']+=-amount
-			except KeyError:
-				items_dict['epic_chest'] = -amount
-			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
-			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
-			r_str = '\n'.join(r_list)
-			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `epic chest(s)` from your inventory. You got:"
-			embed.description = r_str
-			await asyncio.sleep(2)
-			await msg.edit(embed= embed)
+	# 		o_item = self.bfh.open_chest('epic_chest')
+	# 		await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
+	# 		await self.bfh.update_inventory(player_id = player_id, _item = 'epic_chest',amount= -1)
+	# 		embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `epic chest` from your inventory. You got:"
+	# 		embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
+	# 		# add embed image later
+	# 		await asyncio.sleep(2)
+	# 		await msg.edit(embed= embed)
+	# 	elif amount > 1:
+	# 		items_dict = {}
+	# 		items_list = []
+	# 		for i in range(0, amount):
+	# 			o_item = self.bfh.open_chest('epic_chest')
+	# 			items_list.append(o_item)
+	# 			try:
+	# 				if items_dict[o_item]:
+	# 					items_dict[o_item]+=1
+	# 			except KeyError:
+	# 				items_dict[o_item] = 1
+	# 		try:
+	# 			if items_dict['epic_chest']:
+	# 				items_dict['epic_chest']+=-amount
+	# 		except KeyError:
+	# 			items_dict['epic_chest'] = -amount
+	# 		await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+	# 		r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+	# 		r_str = '\n'.join(r_list)
+	# 		embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `epic chest(s)` from your inventory. You got:"
+	# 		embed.description = r_str
+	# 		await asyncio.sleep(2)
+	# 		await msg.edit(embed= embed)
 
-	@_open.command(name= 'mythic', aliases = ['m', 'myth', 'mtc', 'mth', 'mc'], help= "Open mythic chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
-	@has_started()
-	@commands.cooldown(1,5, BucketType.user)
-	async def _mythic(self, ctx, amount : int = 1):
-		player_id = ctx.author.id
-		# flag = await self.bfh.check_if_exists(player_id)
-		# if not flag:
-		# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
-		inv_table = await self.bfh.get_player_data(player_id)
-		chest_counts : dict = self.bfh.get_chest_counts(inv_table)
-		if chest_counts['mythic_chest'] < amount:
-			return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `mythic chest(s)`, sorry.")
-		elif amount <= 0:
-			return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
-		embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `mythic chest(s)` from your inventory.....",color = 0x2F3136)
-		msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
-		if amount == 1:
+	# @_open.command(name= 'mythic', aliases = ['m', 'myth', 'mtc', 'mth', 'mc'], help= "Open mythic chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
+	# @has_started()
+	# @commands.cooldown(1,5, BucketType.user)
+	# async def _mythic(self, ctx, amount : int = 1):
+	# 	player_id = ctx.author.id
+	# 	# flag = await self.bfh.check_if_exists(player_id)
+	# 	# if not flag:
+	# 	# 	return await ctx.send(f"{ctx.author}, you haven't  started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
+	# 	inv_table = await self.bfh.get_player_data(player_id)
+	# 	chest_counts : dict = self.bfh.get_chest_counts(inv_table)
+	# 	if chest_counts['mythic_chest'] < amount:
+	# 		return await ctx.send(f"{ctx.author.mention}, You don't have **{amount}x** `mythic chest(s)`, sorry.")
+	# 	elif amount <= 0:
+	# 		return await ctx.send(f"{ctx.author.mention} dumbass.... specify a valid amount for opening chests.")
+	# 	embed = discord.Embed(title=f"<a:windows_loading:894852723726499852> Opening **{amount}** `mythic chest(s)` from your inventory.....",color = 0x2F3136)
+	# 	msg = await ctx.send(f"{ctx.author.mention} ->", embed = embed)
+	# 	if amount == 1:
 			
-			o_item = self.bfh.open_chest('mythic_chest')
-			await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
-			await self.bfh.update_inventory(player_id = player_id, _item = 'mythic_chest',amount= -1)
-			embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `mythic chest` from your inventory. You got:"
-			embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
-			# add embed image later
-			await asyncio.sleep(2)
-			await msg.edit(embed= embed)
-		elif amount > 1:
-			items_dict = {}
-			items_list = []
-			for i in range(0, amount):
-				o_item = self.bfh.open_chest('mythic_chest')
-				items_list.append(o_item)
-				try:
-					if items_dict[o_item]:
-						items_dict[o_item]+=1
-				except KeyError:
-					items_dict[o_item] = 1
-			try:
-				if items_dict['mythic_chest']:
-					items_dict['mythic_chest']+=-amount
-			except KeyError:
-				items_dict['mythic_chest'] = -amount
-			await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
-			r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
-			r_str = '\n'.join(r_list)
-			embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `mythic chest(s)` from your inventory. You got:"
-			embed.description = r_str
-			await asyncio.sleep(2)
-			await msg.edit(embed= embed)
+	# 		o_item = self.bfh.open_chest('mythic_chest')
+	# 		await self.bfh.update_inventory(player_id = player_id, _item = o_item,amount= 1)
+	# 		await self.bfh.update_inventory(player_id = player_id, _item = 'mythic_chest',amount= -1)
+	# 		embed.title= f"{cs.EMOJIS['greentick']} Opened **{amount}** `mythic chest` from your inventory. You got:"
+	# 		embed.description=f"• {ALL_ITEMS[o_item]['emoji']} x1 `{ALL_ITEMS[o_item]['name']}`"
+	# 		# add embed image later
+	# 		await asyncio.sleep(2)
+	# 		await msg.edit(embed= embed)
+	# 	elif amount > 1:
+	# 		items_dict = {}
+	# 		items_list = []
+	# 		for i in range(0, amount):
+	# 			o_item = self.bfh.open_chest('mythic_chest')
+	# 			items_list.append(o_item)
+	# 			try:
+	# 				if items_dict[o_item]:
+	# 					items_dict[o_item]+=1
+	# 			except KeyError:
+	# 				items_dict[o_item] = 1
+	# 		try:
+	# 			if items_dict['mythic_chest']:
+	# 				items_dict['mythic_chest']+=-amount
+	# 		except KeyError:
+	# 			items_dict['mythic_chest'] = -amount
+	# 		await self.bfh.bulk_update_inventory(player_id= player_id, items_dict= items_dict)
+	# 		r_list = [f"• {ALL_ITEMS[j]['emoji']} x1 `{ALL_ITEMS[j]['name']}`" for j in items_list]
+	# 		r_str = '\n'.join(r_list)
+	# 		embed.title = f"{cs.EMOJIS['greentick']} Opened **{amount}** `mythic chest(s)` from your inventory. You got:"
+	# 		embed.description = r_str
+	# 		await asyncio.sleep(2)
+	# 		await msg.edit(embed= embed)
 
 	@commands.command(name = 'daily', aliases = ['d'])
 	@has_started()
