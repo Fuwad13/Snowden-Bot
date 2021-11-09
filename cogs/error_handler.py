@@ -34,6 +34,8 @@ class ErrorHandler(commands.Cog):
 
 		elif isinstance(error, commands.CommandOnCooldown):
 			await ctx.send(f"You're on cooldown! Please retry after `{error.retry_after:.2}` seconds")
+		elif isinstance(error, commands.MaxConcurrencyReached):
+			await ctx.send(f"{error}")
 
 		elif isinstance(error, commands.NotOwner):
 			await ctx.send('L')

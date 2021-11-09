@@ -29,6 +29,7 @@ class Battlefield(commands.Cog):
 
 	@commands.command(name = 'start', aliases = ['enter', 'init'], brief = "Creates an account for playing in Battlefield!", help = "Enter the `Snowden's BattleField` by creating an account!")
 	@commands.guild_only()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,10, type= BucketType.user)
 	async def _start(self, ctx):
 		player_id = ctx.author.id
@@ -44,6 +45,7 @@ class Battlefield(commands.Cog):
 
 	@commands.command(name= 'inventory', aliases = ['inv'], brief= "Shows player inventory", help = "Shows player inventory, only if the user has an account.")
 	@has_ref_started()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5, type= BucketType.user)
 	async def _inventory(self, ctx, player : typing.Union[discord.Member, discord.User] = None):
 		if player is None:
@@ -206,6 +208,7 @@ class Battlefield(commands.Cog):
 	@commands.command(name= 'opt', aliases = ['optin', 'optout', 'toggleopt', 'opt_in_toggle'], help= "Toggle your `opt` status if it's available. You can't toggle your `opt` status if you are on cooldown!")
 	@commands.guild_only()
 	@has_started()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5,BucketType.user)
 	async def opt(self, ctx):
 		player_id = ctx.author.id
@@ -242,6 +245,7 @@ class Battlefield(commands.Cog):
 
 	@commands.command(name = 'coinflip', aliases =[ 'cf', 'coinf'], help = "Gamble on coinflip! Choose your option and see if your lucky!")
 	@has_started()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(2,6, commands.BucketType.user)
 	async def _cf(self, ctx, amount : int = 50):
 		# flag = await self.bfh.check_if_exists(ctx.author.id)
@@ -339,6 +343,7 @@ class Battlefield(commands.Cog):
 
 	@commands.command(name= 'open', aliases = ['unbox', 'o', 'un'], brief= "Open chest(s) from your inventory", help= "Open chests to get random game items!Chances of getting items are based on their rarity.You might get items with higher tier rarity from a lower tier chest.")
 	@has_started()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5, BucketType.user)
 	async def _open(self, ctx, amount : typing.Optional[int] = 1,*, chest : str = None):
 		player_id = ctx.author.id
@@ -784,6 +789,7 @@ class Battlefield(commands.Cog):
 
 	@commands.command(name = 'buy', aliases= ['b'], help= "soon")
 	@has_started()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,3, BucketType.user)
 	async def _buy(self, ctx,amount : typing.Optional[int] = 1,*, item_name : str):
 		
@@ -816,6 +822,7 @@ class Battlefield(commands.Cog):
 
 	@commands.command(name = 'sell', aliases= ['s'], help= "soon")
 	@has_started()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,3, BucketType.user)
 	async def _sell(self, ctx,amount : typing.Optional[int] = 1,*, item_name : str):
 		item_list = [str(item) for item in ALL_ITEMS.keys()]
@@ -856,6 +863,7 @@ class Battlefield(commands.Cog):
 
 	@commands.command(name= 'equip', aliases = ['eq', 'attach'], help = "Equip a weapon or armour from your inventory")
 	@has_started()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5, BucketType.user)
 	async def _equip(self, ctx,*, item_name : str):
 		item_list = [str(item) for item in ALL_ITEMS.keys() if ALL_ITEMS[str(item)]['type'] == 'weapon' or ALL_ITEMS[str(item)]['type'] == 'armour']
@@ -931,6 +939,7 @@ class Battlefield(commands.Cog):
 	@has_started()
 	@is_opted()
 	@has_equipped_weapon()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5, BucketType.user)
 	async def _attack(self, ctx, target : discord.Member):
 		current_time = int(time.time())
@@ -974,6 +983,7 @@ class Battlefield(commands.Cog):
 
 	@commands.command(name = 'heal', aliases= ['healing'], help= "heal/ increase your healthpoints using a healing item from your inventory.")
 	@has_started()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,3, BucketType.user)
 	async def _heal(self, ctx,*, healing_item : str = None):
 		player_id = ctx.author.id
