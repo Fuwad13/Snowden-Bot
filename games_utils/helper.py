@@ -365,12 +365,14 @@ class AttackEngine:
 		w_d_min, w_d_max = map(int,itm.ALL_ITEMS[str(a_weapon)]['damage'].split('-'))
 		damage = random.randint(w_d_min, w_d_max)
 		ammo_used = itm.ALL_ITEMS[str(a_weapon)]['ammo']
+		invisibility = int(time.time()) + 600
 		if damage >= attackable_t_hp:
 			if t_armour:
 				t_eq_dict = json.loads(self.t_rec['equipments'])
 				t_eq_dict['armour'] = None
 				t_eq_json = json.dumps(t_eq_dict)
-				await self.bot.db.execute(""" UPDATE battlefield SET hp = 100, sp = 0, equipments = $1 WHERE p_id = $2;""",t_eq_json, self.target_id)
+				
+				await self.bot.db.execute(""" UPDATE battlefield SET hp = 100, sp = 0, equipments = $1, invisibility = $2 WHERE p_id = $3;""",t_eq_json,invisibility, self.target_id)
 				# implement looting stuffs later
 				if ammo_used:
 					ammo_dict = {ammo_used : -1 }
@@ -380,7 +382,7 @@ class AttackEngine:
 				return r_str
 
 			else:
-				await self.bot.db.execute(""" UPDATE battlefield SET hp = 100 WHERE p_id = $1;""",self.target_id)
+				await self.bot.db.execute(""" UPDATE battlefield SET hp = 100, invisibility = $1 WHERE p_id = $2;""",invisibility, self.target_id)
 				# implement looting stuffs later
 				if ammo_used:
 					ammo_dict = {ammo_used : -1 }
@@ -395,7 +397,7 @@ class AttackEngine:
 		elif damage < attackable_t_hp and not t_armour:
 			# when target has no armour
 			new_hp = attackable_t_hp - damage
-			await self.bot.db.execute(""" UPDATE battlefield SET hp = $1 WHERE p_id = $2;""", new_hp, self.target_id)
+			await self.bot.db.execute(""" UPDATE battlefield SET hp = $1, invisibility = $2  WHERE p_id = $3;""", new_hp,invisibility, self.target_id)
 			if ammo_used:
 				ammo_dict = {ammo_used : -1 }
 				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
@@ -406,7 +408,7 @@ class AttackEngine:
 			
 		elif damage < attackable_t_hp and t_armour and damage < t_sp:
 			new_sp = t_sp - damage
-			await self.bot.db.execute(""" UPDATE battlefield SET sp = $1 WHERE p_id = $2;""", new_sp, self.target_id)
+			await self.bot.db.execute(""" UPDATE battlefield SET sp = $1, invisibility = $2 WHERE p_id = $3;""", new_sp,invisibility, self.target_id)
 			if ammo_used:
 				ammo_dict = {ammo_used : -1 }
 				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
@@ -421,7 +423,7 @@ class AttackEngine:
 			t_eq_dict = json.loads(self.t_rec['equipments'])
 			t_eq_dict['armour'] = None
 			t_eq_json = json.dumps(t_eq_dict)
-			await self.bot.db.execute(""" UPDATE battlefield SET hp = $1, sp = 0, equipments = $2 WHERE p_id = $3; """, new_hp, t_eq_json, self.target_id)
+			await self.bot.db.execute(""" UPDATE battlefield SET hp = $1, sp = 0, equipments = $2, invisibility = $3 WHERE p_id = $4; """, new_hp, t_eq_json,invisibility, self.target_id)
 			if ammo_used:
 				ammo_dict = {ammo_used : -1 }
 				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)

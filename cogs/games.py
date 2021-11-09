@@ -971,12 +971,15 @@ class Battlefield(commands.Cog):
 		if not flag_2:
 			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! You can't attack him before he starts playing and opt in!")
 		
-		a_rec = await self.bfh.get_player_data(player_id)
 		t_rec = await self.bfh.get_player_data(target_id)
-		a_weapon , a_armour = self.bfh.get_equipments(a_rec)
-		
 		if not t_rec['opt_status']:
 			return await ctx.send(f"**{target}** is `not opted in` to the Battlefield currently, you can't attack them rn!")
+		if t_rec['invisibility'] > int(time.time()):
+			return await ctx.send(f"{ctx.author.mention} -> This player was attacked within the last 10 minutes. You can't attack them rn!")
+		a_rec = await self.bfh.get_player_data(player_id)
+		a_weapon , a_armour = self.bfh.get_equipments(a_rec)
+		
+		
 
 		view = bs.AttackView(ctx)
 		msg = await ctx.send(f"{ctx.author.mention} -> Do you want to attack **{target}** using your {ALL_ITEMS[str(a_weapon)]['emoji']}**{ALL_ITEMS[str(a_weapon)]['name']}**?\nIf yes then press the *Attack* button or press the *Cancel* button to cancel.(`timeout = 20s`)", view = view)
