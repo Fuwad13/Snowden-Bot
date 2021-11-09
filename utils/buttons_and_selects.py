@@ -304,6 +304,10 @@ class OpenChestView(ui.View):
 		if not intr.user == self.ctx.author:
 			await intr.response.send_message(f"Sorry, only **{self.ctx.author.name}** can use this dropdown!", ephemeral = True)
 
+	@ui.button(label='test', style= discord.ButtonStyle.gray)
+	async def test_button(self, button, intr):
+		await intr.response.send_message('test', ephemeral = True)
+
 	async def on_timeout(self) -> None:
 		self.clear_items()
 		await self.message.edit(view= self)
