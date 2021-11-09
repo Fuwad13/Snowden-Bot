@@ -792,7 +792,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,3, BucketType.user)
 	async def _buy(self, ctx,amount : typing.Optional[int] = 1,*, item_name : str):
-		
+		if amount <= 0:
+			return await ctx.send(f"{ctx.author} -> please specify a valid amount of items.")
 		item_list = [str(item) for item in ALL_ITEMS.keys()]
 
 		item_s_r = difflib.get_close_matches(item_name.lower(),item_list, n=1, cutoff=0.3)
@@ -825,6 +826,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,3, BucketType.user)
 	async def _sell(self, ctx,amount : typing.Optional[int] = 1,*, item_name : str):
+		if amount <= 0:
+			return await ctx.send(f"{ctx.author} -> please specify a valid amount of items.")
 		item_list = [str(item) for item in ALL_ITEMS.keys()]
 
 		item_s_r = difflib.get_close_matches(item_name.lower(),item_list, n=1, cutoff=0.3)
