@@ -348,6 +348,7 @@ class Battlefield(commands.Cog):
 		embed.description= text
 		view = bs.OpenChestView(ctx, chest_dict)
 		view.message = await ctx.send(f"{ctx.author.mention} ->", embed = embed, view = view)
+		await view.wait()
 
 	@_open.command(name= 'common', aliases = ['c', 'cmn', 'com'], help= "Open common chest(s) from your inventory(if available).Specify the amount of chests if you want to open multiple chests at once")
 	@has_started()
