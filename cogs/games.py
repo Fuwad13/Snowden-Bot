@@ -977,7 +977,7 @@ class Battlefield(commands.Cog):
 	@commands.cooldown(1,3, BucketType.user)
 	async def _heal(self, ctx,*, healing_item : str = None):
 		player_id = ctx.author.id
-		rec = self.bfh.get_player_data(player_id)
+		rec = await self.bfh.get_player_data(player_id)
 		all_items_dict = self.bfh.get_inv_all_items_dict(rec)
 		if healing_item is None:
 			ava_heal_items = [str(i) for i , c in all_items_dict.items() if c > 0 and ALL_ITEMS[str(i)]['type'] == 'healing']
