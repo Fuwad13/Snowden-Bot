@@ -22,7 +22,9 @@ class Information(commands.Cog):
 
 	@commands.command(name='avatar', aliases=['av', 'pfp'], brief='Shows the avatar of an user(if possible)', help='Shows the avatar of an user(if possible)')
 	@commands.cooldown(1, 10, commands.BucketType.user)
-	async def avatar(self, ctx, *, user: Union[discord.Member, discord.User] = None):
+	async def avatar(self, ctx : commands.Context, *, user: Union[discord.Member, discord.User] = None):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=True)
 		await asyncio.sleep(3)
 		
 		embed = discord.Embed()
