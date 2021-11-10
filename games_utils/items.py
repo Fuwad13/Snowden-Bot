@@ -440,3 +440,15 @@ ALL_ITEMS = {
         'sell_price' : 3000
     },
 } 
+
+COMMON_ITEMS_LIST = ['p92', 'crowbar', 'sickle', 'bandage', 'police_vest_level_1', '9mm', 'common_chest']
+
+RARE_ITEMS_LIST = ['p18c', 'ump45', 'thompson', 'pan', 's1897', 'pain_killer', 'police_vest_level_2', '45acp', '12gauge', 'rare_chest']
+
+LEGENDARY_ITEMS_LIST = ['grenade', 'ak_47', 'm416', 'scar_l', 'vector', 'beryl', 's686', 'first_aid_kit', 'military_armour_level_1', '5_56mm', '7_62mm', 'legendary_chest']
+
+EPIC_ITEMS_LIST = ['win94', 'kar98k', 'm24', 'groza', 'mini14', 'med_kit', 'military_armour_level_2', '300magnum', 'epic_chest']
+
+MYTHIC_ITEMS_LIST = ['awm', 'samurai_armour_set', 'mythic_chest']
+
+RARITY_BASED_LIST =  [COMMON_ITEMS_LIST, RARE_ITEMS_LIST, LEGENDARY_ITEMS_LIST, EPIC_ITEMS_LIST, MYTHIC_ITEMS_LIST]

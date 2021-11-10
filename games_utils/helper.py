@@ -250,9 +250,20 @@ class BattleFieldHelper:
 		item_list = [str(k) for k, v in itm.ALL_ITEMS.items() if v[by] == query]
 		
 		return item_list
+	#idk it may be helpful for later 
+	def get_key_from_dict(self, d : dict , value ):
+		for key, val in d.items():
+			if val == value:
+				return key
 
 	def open_chest(self, chest : str):
 		rarity_tier = chest.split('_')[0]
+		# rarity_index = cs.RARITY_INDEX[rarity_tier]
+		# random_number = random.randint(1,500)
+		# if random_number == 420:
+		# 	...
+		# elif random_number in range(1,69) or random_number in range(70,420) or random_number in range(421,501):
+		# 	...
 		item_list = self.get_items(by = 'rarity', query= rarity_tier)
 		o_item = random.choice(item_list)
 		return o_item

@@ -1,4 +1,4 @@
-
+# not zero indexed
 RARITY ={
     '1' : 'common',
     '2' : 'rare',
@@ -6,6 +6,9 @@ RARITY ={
     '4' : 'epic',
     '5' : 'mythic'
 }
+
+
+
 
 CHESTS_EMOJIS = {
     'common' : '<:common_chest:901798708864253992>',
@@ -488,3 +491,10 @@ EXP_EMOJIS = {
     'right_empty' : '<:r_empty:902307804860284968>'
 }
 
+RARITY_INDEX ={
+    'common' : 0,
+    'rare' : 1,
+    'legendary' : 2,
+    'epic' : 3,
+    'mythic' : 4
+}
