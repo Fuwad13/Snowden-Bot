@@ -10,6 +10,7 @@ from utils.errors import NotStartedPlaying, NotOptedIn, NoWeaponEquipped, NotEno
 from utils.emojis import EMOJIS
 from utils.buttons_and_selects import Guide
 class ErrorHandler(commands.Cog):
+	"""Cog for error handling"""
 	def __init__(self, bot):
 		self.bot = bot
 		

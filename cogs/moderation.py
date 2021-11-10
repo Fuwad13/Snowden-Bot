@@ -8,6 +8,7 @@ from discord.ext import commands
 from utils.emojis import EMOJIS
 
 class Moderation(commands.Cog):
+    """Cog for moderation"""
 
     def __init__(self, bot):
         self.bot = bot

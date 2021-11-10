@@ -8,6 +8,7 @@ import json
 
 
 class Owner(commands.Cog):
+	"""Owner only cog"""
 	def __init__(self, bot):
 		self.bot = bot
 		self.bfh = helper.BattleFieldHelper(bot)

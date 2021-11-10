@@ -19,6 +19,7 @@ import games_utils.constants as cs
 from utils.decorators import has_started, is_opted, has_ref_started, can_attack
 from utils.errors import NotStartedPlaying
 class Battlefield(commands.Cog):
+	"""Snowden's Battlefield cog"""
 	def __init__(self, bot):
 		self.bot = bot
 		self.bfh = helper.BattleFieldHelper(bot)
@@ -32,6 +33,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,10, type= BucketType.user)
 	async def _start(self, ctx):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=True)
 		player_id = ctx.author.id
 		flag = await self.bfh.check_if_exists(player_id)
 		if flag:
@@ -48,6 +51,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5, type= BucketType.user)
 	async def _inventory(self, ctx, player : typing.Union[discord.Member, discord.User] = None):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		if player is None:
 			if ctx.message.reference:
 				player = ctx.message.reference.resolved.author
@@ -119,6 +124,8 @@ class Battlefield(commands.Cog):
 	@commands.command(name = 'items', aliases = ['item'], brief = "Gives you information about any game item(s)", help = "Gives you information about any game item(s). run `items [item_name]` to get information about a specific item.")
 	@commands.cooldown(1,3, BucketType.user)
 	async def _items(self, ctx, *,item_name : str = None):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		if not item_name:
 			item_list = []
 			for item in ALL_ITEMS.keys():
@@ -183,6 +190,8 @@ class Battlefield(commands.Cog):
 	@has_ref_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _cooldowns(self, ctx, player : typing.Union[discord.Member, discord.User] = None):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		if player is None:
 			if ctx.message.reference:
 				player = ctx.message.reference.resolved.author
@@ -211,6 +220,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5,BucketType.user)
 	async def opt(self, ctx):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		player_id = ctx.author.id
 		opted_in = await self.bfh.get_opt_status(player_id)
 		n_opt : int= await self.bfh.get_cooldown_data(player_id,'opt_in_toggle')
@@ -248,6 +259,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(2,6, commands.BucketType.user)
 	async def _cf(self, ctx, amount : int = 50):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		# flag = await self.bfh.check_if_exists(ctx.author.id)
 		# if not flag:
 		# 	return await ctx.send(f"{ctx.author.mention},you haven't started playing Battlefield yet, run `{ctx.clean_prefix}start` to start playing!")
@@ -346,6 +359,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5, BucketType.user)
 	async def _open(self, ctx, amount : typing.Optional[int] = 1,*, chest : str = None):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		player_id = ctx.author.id
 		inv_table = await self.bfh.get_player_data(player_id)
 		chest_dict : dict = self.bfh.get_chest_counts(inv_table)
@@ -675,6 +690,8 @@ class Battlefield(commands.Cog):
 	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _hourly(self, ctx):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		# flag = await self.bfh.check_if_exists(ctx.author.id)
 		# if not flag:
 		# 	return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
@@ -701,6 +718,8 @@ class Battlefield(commands.Cog):
 	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _weekly(self, ctx):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		# flag = await self.bfh.check_if_exists(ctx.author.id)
 		# if not flag:
 		# 	return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
@@ -727,6 +746,8 @@ class Battlefield(commands.Cog):
 	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def _monthly(self, ctx):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		# flag = await self.bfh.check_if_exists(ctx.author.id)
 		# if not flag:
 		# 	return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
@@ -753,6 +774,8 @@ class Battlefield(commands.Cog):
 	@has_started()
 	@commands.cooldown(1,3, BucketType.user)
 	async def work(self, ctx):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		# flag = await self.bfh.check_if_exists(ctx.author.id)
 		# if not flag:
 		# 	return await ctx.send(f"Hey **{ctx.author}**, you don't have an account yet. To create one, run the `{ctx.clean_prefix}start` command! Thanks ")
@@ -760,7 +783,7 @@ class Battlefield(commands.Cog):
 		current_time = int(time.time())
 		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'work')
 		if current_time < int(cd):
-			return await ctx.send(f"{ctx.author.mention} **You can get the monthly rewards again in** `{humanize.precisedelta(cd - current_time)}`")
+			return await ctx.send(f"{ctx.author.mention} **You can work again in** `{humanize.precisedelta(cd - current_time)}`")
 		reward = random.randint(100, 150)
 		n_bal = await self.bfh.update_balance(player_id = ctx.author.id, amount = reward, add = True)
 		await self.bfh.update_cooldowns(ctx.author.id, 'work')
@@ -779,6 +802,8 @@ class Battlefield(commands.Cog):
 	@is_opted()
 	@commands.cooldown(1,10, BucketType.user)
 	async def _loot(self, ctx):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		await ctx.send("This command is under maintenance.")
 
 	@commands.command(name = 'shop', aliases= ['sh'], help= "soon")
@@ -792,6 +817,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,3, BucketType.user)
 	async def _buy(self, ctx,amount : typing.Optional[int] = 1,*, item_name : str):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		if amount <= 0:
 			return await ctx.send(f"{ctx.author} -> please specify a valid amount of items.")
 		item_list = [str(item) for item in ALL_ITEMS.keys()]
@@ -826,6 +853,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,3, BucketType.user)
 	async def _sell(self, ctx,amount : typing.Optional[int] = 1,*, item_name : str):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		if amount <= 0:
 			return await ctx.send(f"{ctx.author} -> please specify a valid amount of items.")
 		item_list = [str(item) for item in ALL_ITEMS.keys()]
@@ -858,6 +887,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,10, BucketType.user)
 	async def _trade(self, ctx, player : discord.Member):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		player1 = ctx.author
 		player2 = player
 		flag = await self.bfh.check_if_exists(player2.id)
@@ -885,6 +916,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5, BucketType.user)
 	async def _equip(self, ctx,*, item_name : str):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		item_list = [str(item) for item in ALL_ITEMS.keys() if ALL_ITEMS[str(item)]['type'] == 'weapon' or ALL_ITEMS[str(item)]['type'] == 'armour']
 		item_s_r = difflib.get_close_matches(item_name.lower(),item_list, n=1, cutoff=0.3)
 		if len(item_s_r) == 0:
@@ -959,6 +992,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,5, BucketType.user)
 	async def _attack(self, ctx, target : discord.Member):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		current_time = int(time.time())
 		cd = await self.bfh.get_cooldown_data(ctx.author.id, 'attack')
 		if current_time < int(cd):
@@ -1006,6 +1041,8 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,3, BucketType.user)
 	async def _heal(self, ctx,*, healing_item : str = None):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		player_id = ctx.author.id
 		rec = await self.bfh.get_player_data(player_id)
 		all_items_dict = self.bfh.get_inv_all_items_dict(rec)
@@ -1060,7 +1097,7 @@ class Battlefield(commands.Cog):
 
 		
 
-	@commands.command(name= 'players', aliases = ['player', 'activeplayers'], help = "Shows currently opted in players count and information")
+	@commands.command(name= 'players', aliases = ['player', 'activeplayers'], help = "Shows currently opted in players count and information", slash_command = False)
 	@commands.guild_only()
 	@commands.cooldown(1,3, BucketType.user)
 	async def players(self, ctx):
