@@ -876,7 +876,8 @@ class Battlefield(commands.Cog):
 		if not view.confirmation:
 			return await msg.edit(f"{player2.mention} -> {player1.mention} ~~wants to trade with you!\nIf you want to trade with him then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`~~\n**Trade Cancelled**", view = view)
 		elif view.confirmation:
-			return await msg.edit(f"Trading system will be implemented soon...")
+			return await msg.edit(f"Trading system will be implemented soon...", view = view)
+			
 
 
 	@commands.command(name= 'equip', aliases = ['eq', 'attach'], help = "Equip a weapon or armour from your inventory")

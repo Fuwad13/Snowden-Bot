@@ -21,8 +21,8 @@ class Owner(commands.Cog):
 
 
 			
-		except:
-			await ctx.send(f"{cs.EMOJIS['redtick']} There was an unexpected error!")
+		except Exception as e:
+			await ctx.send(f"{cs.EMOJIS['redtick']} There was an unexpected error!\n{e}")
 		
 
 
