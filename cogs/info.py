@@ -24,7 +24,7 @@ class Information(commands.Cog):
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def avatar(self, ctx : commands.Context, *, user: Union[discord.Member, discord.User] = None):
 		if ctx.interaction is not None:
-			await ctx.interaction.response.defer(ephemeral=True)
+			await ctx.interaction.response.defer(ephemeral=False)
 		await asyncio.sleep(3)
 		
 		embed = discord.Embed()
