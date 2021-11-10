@@ -14,4 +14,5 @@ class Events(commands.Cog):
 
         if message.content.lower() == "<@862771284014530561>" or message.content.lower() == "<@!862771284014530561>":
             return await message.reply(f"My prefixes are : `s/` , `sd` , {self.bot.user.mention} ", mention_author = False)
-        
+def setup(bot):
+    bot.add_cog(Events(bot))
