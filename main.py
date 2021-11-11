@@ -1,4 +1,5 @@
 import time
+import difflib
 import aiohttp
 import discord
 import random
@@ -157,14 +158,15 @@ async def on_command(ctx):
 
 @bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=True, brief="Loads a cog")
 @commands.is_owner()
-async def _loadcog(ctx, cogname: str):
+async def _loadcog(ctx, *, cogname: str):
     try:
         tick = bot.get_emoji(880695423516430336)
-        cname = f"{cogname}"
+        cname = difflib.get_close_matches(cogname.lower(), ALL_EXTENSIONS, n=1, cutoff= 0.5)
+        cname = cname[0]
 
         bot.load_extension(cname)
         em = discord.Embed(
-            title=f"{tick} Successfully Loaded  `{cogname}`",  color=0x2F3136)
+            title=f"{tick} Successfully Loaded  `{cname}`",  color=0x2F3136)
         await ctx.channel.send(embed=em)
     except Exception as e:
         await ctx.channel.send(e)
@@ -175,17 +177,17 @@ async def _loadcogerror(ctx, error):
     await ctx.channel.send(f"`Error`: `{error}`")
 
 
-@bot.command(name="unloadcog", aliases=["uc"], hidden=True, brief="Unloads a cog")
+@bot.command(name="unloadcog", aliases=["unload"], hidden=True, brief="Unloads a cog")
 @commands.is_owner()
-async def _unloadcog(ctx, cogname: str):
+async def _unloadcog(ctx, *,cogname: str):
 
     try:
         tick = bot.get_emoji(880695423516430336)
-        cname = f"{cogname}"
-
+        cname = difflib.get_close_matches(cogname.lower(), ALL_EXTENSIONS, n=1, cutoff= 0.5)
+        cname = cname[0]
         bot.unload_extension(cname)
         em = discord.Embed(
-            title=f"{tick} Successfully unloaded  `{cogname}`",  color=0x2F3136)
+            title=f"{tick} Successfully unloaded  `{cname}`",  color=0x2F3136)
         await ctx.channel.send(embed=em)
     except Exception as e:
         await ctx.channel.send(e)
@@ -222,13 +224,14 @@ async def reloadallerror(ctx, error):
 
 @bot.command(name="reloadcog", aliases=["rc", "r"], hidden=True, brief="Reloads a cog")
 @commands.is_owner()
-async def _reloadcog(ctx, cogname: str):
+async def _reloadcog(ctx, *, cogname: str):
     try:
         tick = bot.get_emoji(880695423516430336)
-        cname = f"{cogname}"
+        cname = difflib.get_close_matches(cogname.lower(), ALL_EXTENSIONS, n=1, cutoff= 0.5)
+        cname = cname[0]
         bot.reload_extension(cname)
         em = discord.Embed(
-            title=f"Cogs Reloader", description=f"{tick} Successfully reloaded the cog `{cogname}`", timestamp=ctx.message.created_at)
+            title=f"Cogs Reloader", description=f"{tick} Successfully reloaded the cog `{cname}`", timestamp=ctx.message.created_at)
         await ctx.channel.send(embed=em)
     except commands.ExtensionNotLoaded:
         await ctx.channel.send("This cog was not loaded")
