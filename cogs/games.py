@@ -761,7 +761,7 @@ class Battlefield(commands.Cog):
 
 		flag_2 = await self.bfh.check_if_exists(target_id)
 		if not flag_2:
-			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! You can't attack him before he starts playing and opt in!")
+			return await ctx.send(f"**{target}** hasn't started playing battlefield yet! You can't attack them before they starts playing and opt in!")
 		
 		t_rec = await self.bfh.get_player_data(target_id)
 		if not t_rec['opt_status']:
@@ -851,7 +851,27 @@ class Battlefield(commands.Cog):
 			return await msg.edit(f"{ctx.author.mention} -> You used {ALL_ITEMS[heal_name_n]['emoji']}**x1** `{ALL_ITEMS[heal_name_n]['name']}` and healed yourself.\nNow you have {updated_hp}/100 {self.bfh.get_bar_emojis('hp', updated_hp, 100)} `hp`", view = view)
 
 
-		
+	@commands.command(name = 'quickfight', aliases = ['qf', 'quickf'], brief = "A quick fight mode without any attack or heal cooldowns", help = "A quick fight mode that has no cooldowns for attack or heal and no need to opt in. costs nothing from the inventory!")
+	@commands.guild_only()
+	@has_started()
+	@commands.cooldown(1, 10, BucketType.user)
+	async def quickfight(self, ctx, player : discord.Member):
+		player1 = ctx.author
+		player2 = player
+		flag = await self.bfh.check_if_exists(player2.id)
+		if not flag:
+			return await ctx.send(f"**{player2}** hasn't started playing battlefield yet! You can't attack them before they starts playing!")
+
+		view = bs.QuickFightView(ctx, player2)
+		msg = await ctx.send(f"**{player2}**, {ctx.author.mention} has invited you to a quickfight match! \nYou have `90s` to **Accept** or **Reject** their invitation!", view = view)
+
+		await view.wait()
+		view.clear_items()
+		if not view.accepted:
+			return await msg.edit(f"~~**{player2}**, {ctx.author.mention} has invited you to a quickfight match! \nYou have `90s` to **Accept** or **Reject** their invitation!~~\n**Quickfight cancelled**", view = view)
+		elif view.accepted:
+			await msg.edit(f"This feature is being implemented, thank for using the command tho", view = view)
+			
 
 	@commands.command(name= 'players', aliases = ['player', 'activeplayers'], help = "Shows currently opted in players count and information", slash_command = False)
 	@commands.guild_only()

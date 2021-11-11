@@ -303,8 +303,31 @@ class TradeConfirmView(ui.View):
 
 	async def on_timeout(self):
 		
-		
 		self.confirmation = False
 	
+class QuickFightView(ui.View):
+
+	def __init__(self, ctx, player2):
+		super().__init__(timeout=90)
+		self.ctx = ctx
+		self.player2 = player2
+		self.accepted = False
+
+	async def interaction_check(self, interaction: discord.Interaction):
+		if not interaction.user == self.player2:
+			await interaction.response.send_message(f"Sorry, only {self.player2.mention} can `accept` or `reject`!", ephemeral= True)
+		return interaction.user == self.player2
+
+	@ui.button(label = 'Accept', style= discord.ButtonStyle.blurple)
+	async def accept_button(self, button, intr):
+		self.accepted = True
+		self.stop()
+
+	@ui.button(label = 'Reject', style=discord.ButtonStyle.red)
+	async def reject_button(self, button, intr):
+		self.accepted = False
+		self.stop()
+
+	async def on_timeout(self):
+		self.accepted = False
 	
-		
