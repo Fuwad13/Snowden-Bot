@@ -102,7 +102,7 @@ bot = SnowdenBot(
 
 # extensions
 INITIAL_EXTENSIONS = ['cogs.games',
-                      'cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner']
+                      'cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner']
 
 ALL_EXTENSIONS = ['cogs.games',
                   'cogs.image', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner']
@@ -255,7 +255,7 @@ async def reloaderror(ctx, error):
 
 
 bot.loop.run_until_complete(create_db_pool())
-bot.loop.create_task(run_once_when_ready())
+#bot.loop.create_task(run_once_when_ready())
 ready()
 bot.run(TOKEN)
 
