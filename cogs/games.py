@@ -726,7 +726,7 @@ class Battlefield(commands.Cog):
 					
 					if current_rarity == item_rarity:
 						w_count_n = inv_dict.get(current_weapon, 0)
-						inv_dict[current_weapon] = w_count + 1
+						inv_dict[current_weapon] = w_count_n + 1
 						query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 WHERE p_id = $3;"
 						inv_json = json.dumps(inv_dict)
 						await self.bot.db.execute(query, inv_json, eq_json, ctx.author.id)
