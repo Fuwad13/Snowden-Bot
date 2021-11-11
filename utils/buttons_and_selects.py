@@ -305,7 +305,7 @@ class TradeConfirmView(ui.View):
 		
 		self.confirmation = False
 	
-class QuickFightView(ui.View):
+class QuickFightConfirmation(ui.View):
 
 	def __init__(self, ctx, player2):
 		super().__init__(timeout=90)
@@ -331,3 +331,15 @@ class QuickFightView(ui.View):
 	async def on_timeout(self):
 		self.accepted = False
 	
+class QuickFightView(ui.View):
+
+	def __init__(self, ctx, player1, player2):
+		super().__init__(timeout=90)
+		self.ctx = ctx
+		self.player1 = player1
+		self.player2 = player2
+		self.turn = player1
+
+	async def interaction_check(self, interaction: Interaction) -> bool:
+		if not interaction.user == self.turn:
+			...

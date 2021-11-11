@@ -720,19 +720,31 @@ class Battlefield(commands.Cog):
 				return await msg.edit(f"{ctx.author.mention} -> {cs.EMOJIS['greentick']} You've equipped {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from you inventory.\nNow you have {arm_points} {self.bfh.get_bar_emojis('armour', 100,100)} `armour points`", view = view)
 
 			else:
-				inv_json = json.dumps(inv_dict)
+				
 				if current_weapon:
 					current_rarity : str = ALL_ITEMS[current_weapon]['rarity'] 
-					current_inv_dict : dict = json.loads(rec[current_rarity])
+					
+					if current_rarity == item_rarity:
+						w_count_n = inv_dict.get(current_weapon, 0)
+						inv_dict[current_weapon] = w_count + 1
+						query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 WHERE p_id = $3;"
+						inv_json = json.dumps(inv_dict)
+						await self.bot.db.execute(query, inv_json, eq_json, ctx.author.id)
+					else:
+						current_inv_dict : dict = json.loads(rec[current_rarity])
 
-					w_count = current_inv_dict.get(current_weapon, 0)
-					current_inv_dict[current_weapon] = w_count + 1
-					current_inv_json = json.dumps(current_inv_dict)
-					query = f"UPDATE battlefield SET {item_rarity} = $1,{current_rarity} = $2, equipments = $3 WHERE p_id = $4;"
-					await self.bot.db.execute(query, inv_json,current_inv_json, eq_json, ctx.author.id)
+						w_count = current_inv_dict.get(current_weapon, 0)
+						current_inv_dict[current_weapon] = w_count + 1
+						current_inv_json = json.dumps(current_inv_dict)
+						query = f"UPDATE battlefield SET {item_rarity} = $1,{current_rarity} = $2, equipments = $3 WHERE p_id = $4;"
+						inv_json = json.dumps(inv_dict)
+						await self.bot.db.execute(query, inv_json,current_inv_json, eq_json, ctx.author.id)
+					
+					
 					_extra_str = f"{ALL_ITEMS[current_weapon]['emoji']}`{ALL_ITEMS[current_weapon]['name']}` x1 was returned to your inventory."
 				else:
 					query = f"UPDATE battlefield SET {item_rarity} = $1, equipments = $2 WHERE p_id = $3;"
+					inv_json = json.dumps(inv_dict)
 					await self.bot.db.execute(query, inv_json, eq_json, ctx.author.id)
 					_extra_str = f""
 
@@ -862,7 +874,7 @@ class Battlefield(commands.Cog):
 		if not flag:
 			return await ctx.send(f"**{player2}** hasn't started playing battlefield yet! You can't attack them before they starts playing!")
 
-		view = bs.QuickFightView(ctx, player2)
+		view = bs.QuickFightConfirmation(ctx, player2)
 		msg = await ctx.send(f"**{player2}**, {ctx.author.mention} has invited you to a quickfight match! \nYou have `90s` to **Accept** or **Reject** their invitation!", view = view)
 
 		await view.wait()
@@ -871,7 +883,7 @@ class Battlefield(commands.Cog):
 			return await msg.edit(f"~~**{player2}**, {ctx.author.mention} has invited you to a quickfight match! \nYou have `90s` to **Accept** or **Reject** their invitation!~~\n**Quickfight cancelled**", view = view)
 		elif view.accepted:
 			await msg.edit(f"This feature is being implemented, thank for using the command tho", view = view)
-			
+
 
 	@commands.command(name= 'players', aliases = ['player', 'activeplayers'], help = "Shows currently opted in players count and information", slash_command = False)
 	@commands.guild_only()
