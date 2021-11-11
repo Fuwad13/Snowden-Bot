@@ -12,11 +12,23 @@ class AutoModeration(commands.Cog):
         if (message.guild is None) or (message.author.bot ):
             return
 
+        bl_words = self.bot.automod_guilds.get(str(message.guild.id))
+        if not bl_words:
+            return
+
+        content = message.content.split(' ')
+
+        for word in bl_words:
+            if word in content:
+                await message.delete()
+                await message.channel.send(f"{message.author.mention} - Watch your language!", delete_after = 5)
+
     @commands.group(name = 'blacklist', aliases = ['bl'], slash_command = False, help = "The group command for blacklisting words for chat automoderation.", invoke_without_command = True)
     @commands.guild_only()
     @commands.has_permissions(manage_guild = True)
     async def _blacklist(self, ctx):
         await ctx.send("Use the subcommands to add/remove blacklisted words")
+
 
     @_blacklist.command(name= 'add', aliases = ['append'], help = "add new word(s) to the blacklisted words, seperate words by spaces", slash_command = False)
     @commands.guild_only()
@@ -29,6 +41,7 @@ class AutoModeration(commands.Cog):
         bl_words = await self.bot.db.fetchval("select bl_words from guilds where guild_id = $1;", ctx.guild.id)
         p_l : list = json.loads(bl_words)
         p_l.extend(n_l)
+        self.bot.automod_guilds[str(ctx.guild.id)].extend(n_l)
         j_l = json.dumps(p_l)
         await self.bot.db.execute("Update guilds set bl_words = $1 where guild_id = $2;", j_l, ctx.guild.id)
         r_str = ", ".join(n_l)
