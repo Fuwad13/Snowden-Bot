@@ -1,0 +1,1 @@
+DEFAULT_BLACKLISTED_WORDS = ['nigga', 'nigger', 'cunt', 'fuck', 'bitch', 'pussy', 'asshole', 'cock', 'blowjob', 'slut']

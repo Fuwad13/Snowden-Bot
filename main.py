@@ -1,19 +1,18 @@
-import time
-import difflib
-import aiohttp
-import discord
+import os
 import random
 import asyncio
 import typing
-import os
+import time
+import json
+import difflib
+import aiohttp
+import discord
 from discord.ext import commands, tasks
-from itertools import cycle
 from discord.ext.commands import BucketType
 from dotenv import load_dotenv
 from utils import help_cmd , buttons_and_selects
 import asyncpg
 import logging
-
 import ast
 import re
 import inspect
@@ -87,6 +86,7 @@ class SnowdenBot(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.blacklist = {}
+        self.automod_guilds = {}
 
     async def get_context(self, message, *, cls=SnowdenContext):
         return await super().get_context(message, cls=cls)
@@ -102,10 +102,10 @@ bot = SnowdenBot(
 
 # extensions
 INITIAL_EXTENSIONS = ['cogs.games',
-                      'cogs.image','cogs.moderation', 'cogs.info', "cogs.misc", 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner']
+                      'cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner']
 
 ALL_EXTENSIONS = ['cogs.games',
-                  'cogs.image', 'cogs.info', "cogs.misc", 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner']
+                  'cogs.image', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner']
 
 
 if __name__ == "__main__":
@@ -120,6 +120,7 @@ bot.help_command = help_cmd.SnowdenHelp()
 async def create_db_pool():
     credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
     bot.db = await asyncpg.create_pool(dsn = f'{credential}')
+    
 
     
 
@@ -149,7 +150,15 @@ async def on_command(ctx):
 
 
 #tasks
-
+async def run_once_when_ready():
+    await bot.wait_until_ready()
+    bl_w = await bot.db.fetch("select guild_id , bl_words from guilds;")
+    for g in bl_w:
+        k = str(g['guild_id'])
+        v = json.loads(g['bl_words'])
+        bot.automod_guilds[k] = v
+    print("Blacklisted words loaded")
+    
 
 
 
@@ -246,6 +255,7 @@ async def reloaderror(ctx, error):
 
 
 bot.loop.run_until_complete(create_db_pool())
+bot.loop.create_task(run_once_when_ready())
 ready()
 bot.run(TOKEN)
 
