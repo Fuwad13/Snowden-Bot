@@ -340,6 +340,6 @@ class QuickFightView(ui.View):
 		self.player2 = player2
 		self.turn = player1
 
-	async def interaction_check(self, interaction: Interaction) -> bool:
+	async def interaction_check(self, interaction: discord.Interaction) -> bool:
 		if not interaction.user == self.turn:
 			...
