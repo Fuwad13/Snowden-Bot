@@ -868,6 +868,8 @@ class Battlefield(commands.Cog):
 	@has_started()
 	@commands.cooldown(1, 10, BucketType.user)
 	async def quickfight(self, ctx, player : discord.Member):
+		if ctx.interaction is not None:
+			await ctx.interaction.response.defer(ephemeral=False)
 		player1 = ctx.author
 		player2 = player
 		flag = await self.bfh.check_if_exists(player2.id)
@@ -889,8 +891,8 @@ class Battlefield(commands.Cog):
 
 			qf_view = bs.QuickFightView(ctx = ctx,player1=player1, player2= player2, bfh = self.bfh, embed1= embed1, embed2=embed2)
 			
-			qf_msg = await ctx.send(f"{player1.mention}, It's your turn to `attack` or `heal`!", view = qf_view)
-			
+			qf_msg = await ctx.send(f"{player1.mention}, It's your turn to `fight` or `heal`!", embeds = [embed1, embed2] ,view = qf_view)
+
 			
 
 

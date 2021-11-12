@@ -358,20 +358,56 @@ class QuickFightView(ui.View):
 
 	async def interaction_check(self, interaction: discord.Interaction) -> bool:
 		if not interaction.user == self.active_p:
-			await interaction.response.send_message(f"It's **{self.active_p}**'s turn, not yours!")
+			await interaction.response.send_message(f"{interaction.user.mention}, It's **{self.active_p}**'s turn, not yours!", ephemeral=True)
 
 		return interaction.user == self.active_p
 
 	@ui.button(label='Fight', style = discord.ButtonStyle.blurple)
-	async def fight_button(self, button, interaction):
+	async def fight_button(self, button, interaction : discord.Interaction):
 		damage = random.randint(20, 50)
 		self.qf_dict[str(self.idle_p.id)]['hp'] -= damage
+		hp = self.qf_dict[str(self.idle_p.id)]['hp'] 
+		
+		if self.ctx.author == self.active_p:
+			edit_emb = self.embed2
+		else:
+			edit_emb = self.embed1
+		if hp <= 0:
+			# idle player got killed
+			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}** and **Killed** him!\n :tada: Congrats {self.active_p.mention}, You won the quickfight match"
+			edit_emb.description = f"**__Healthpoints__**: 0/100 {self.bfh.get_bar_emojis('hp', 0 , 100)}"
+			self.clear_items()
+		else: 
+			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}**\nIt's {self.idle_p.mention}'s turn now.."
+			edit_emb.description = f"**__Healthpoints__**: {hp}/100 {self.bfh.get_bar_emojis('hp', hp, 100)}" 
 
 		self.active_p, self.idle_p = self.idle_p, self.active_p
+		await interaction.message.edit(content=content, embeds=[self.embed1, self.embed2], view= self)
+
+
+		
 
 
 	@ui.button(label="Heal", style= discord.ButtonStyle.red)
 	async def heal_button(self, button, interaction):
 		heal = random.randint(20, 50)
-		self.qf_dict[str(self.active_p)]['hp']+=heal
+		if self.qf_dict[str(self.active_p)]['hp'] + heal >= 100:
+			heal = 100 - self.qf_dict[str(self.active_p)]['hp']
+			self.qf_dict[str(self.active_p)]['hp'] = 100
+			hp = 100
+			
+		else:
+
+			self.qf_dict[str(self.active_p)]['hp']+=heal
+			hp = self.qf_dict[str(self.active_p)]['hp']
+		
+		if self.ctx.author == self.active_p:
+			edit_emb = self.embed1
+		else:
+			edit_emb = self.embed2
+
+		content = f"**{self.active_p}** used **Heal** and healed themselves by :heart:**{heal}** hp(s).\nIt's {self.idle_p.mention}'s turn now!"
+		edit_emb.description = f"**__Healthpoints__**: {hp}/100 {self.bfh.get_bar_emojis('hp', hp, 100)}"
+
 		self.active_p, self.idle_p = self.idle_p, self.active_p
+		await interaction.message.edit(content=content, embeds=[self.embed1, self.embed2], view= self)
