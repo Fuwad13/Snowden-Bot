@@ -1,6 +1,8 @@
+import random
 import discord
 from discord import ui
 from games_utils.items import ALL_ITEMS
+from games_utils.helper import BattleFieldHelper
 class ConfirmOrCancel(ui.View):
 
 
@@ -333,13 +335,43 @@ class QuickFightConfirmation(ui.View):
 	
 class QuickFightView(ui.View):
 
-	def __init__(self, ctx, player1, player2):
+	def __init__(self,*, ctx, player1, player2, bfh, embed1, embed2):
 		super().__init__(timeout=90)
 		self.ctx = ctx
 		self.player1 = player1
 		self.player2 = player2
-		self.turn = player1
+		self.active_p = player1
+		self.idle_p = player2
+		self.bfh = bfh
+		self.qf_dict = {
+			str(player1.id) : {
+				'hp' : 100,
+				'sp' : 50,
+			},
+			str(player2.id) : {
+				'hp' : 100,
+				'sp' : 50,
+			}
+		}
+		self.embed1 = embed1
+		self.embed2 = embed2
 
 	async def interaction_check(self, interaction: discord.Interaction) -> bool:
-		if not interaction.user == self.turn:
-			...
+		if not interaction.user == self.active_p:
+			await interaction.response.send_message(f"It's **{self.active_p}**'s turn, not yours!")
+
+		return interaction.user == self.active_p
+
+	@ui.button(label='Fight', style = discord.ButtonStyle.blurple)
+	async def fight_button(self, button, interaction):
+		damage = random.randint(20, 50)
+		self.qf_dict[str(self.idle_p.id)]['hp'] -= damage
+
+		self.active_p, self.idle_p = self.idle_p, self.active_p
+
+
+	@ui.button(label="Heal", style= discord.ButtonStyle.red)
+	async def heal_button(self, button, interaction):
+		heal = random.randint(20, 50)
+		self.qf_dict[str(self.active_p)]['hp']+=heal
+		self.active_p, self.idle_p = self.idle_p, self.active_p

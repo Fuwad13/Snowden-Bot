@@ -882,7 +882,16 @@ class Battlefield(commands.Cog):
 		if not view.accepted:
 			return await msg.edit(f"~~**{player2}**, {ctx.author.mention} has invited you to a quickfight match! \nYou have `90s` to **Accept** or **Reject** their invitation!~~\n**Quickfight cancelled**", view = view)
 		elif view.accepted:
-			await msg.edit(f"This feature is being implemented, thank for using the command tho", view = view)
+			await msg.edit(f"Invite accepted! Now prepare for fight...", view = view)
+			
+			embed1 = discord.Embed(title= f"**{player1}**'s status:" ,color=0x2F3136, description= f"**__Healthpoints__**: 100/100 {self.bfh.get_bar_emojis('hp', 100, 100)}")
+			embed2 = discord.Embed(title= f"**{player2}**'s status:" ,color=0x2F3136, description= f"**__Healthpoints__**: 100/100 {self.bfh.get_bar_emojis('hp', 100, 100)}")
+
+			qf_view = bs.QuickFightView(ctx = ctx,player1=player1, player2= player2, bfh = self.bfh, embed1= embed1, embed2=embed2)
+			
+			qf_msg = await ctx.send(f"{player1.mention}, It's your turn to `attack` or `heal`!", view = qf_view)
+			
+			
 
 
 	@commands.command(name= 'players', aliases = ['player', 'activeplayers'], help = "Shows currently opted in players count and information", slash_command = False)
