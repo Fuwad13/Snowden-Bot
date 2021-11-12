@@ -370,12 +370,15 @@ class QuickFightView(ui.View):
 		
 		if self.ctx.author == self.active_p:
 			edit_emb = self.embed2
+			win_emb  = self.embed1
 		else:
 			edit_emb = self.embed1
+			win_emb = self.embed2
 		if hp <= 0:
 			# idle player got killed
 			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}** and **Killed** him!\n :tada: Congrats {self.active_p.mention}, You won the quickfight match"
-			edit_emb.description = f"**__Healthpoints__**: 0/100"
+			win_emb.description+=f"  (**Won**)"
+			edit_emb.description = f"**__Healthpoints__**: 0/100 (**Lost**)"
 			self.clear_items()
 		else: 
 			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}**\nIt's {self.idle_p.mention}'s turn now.."
