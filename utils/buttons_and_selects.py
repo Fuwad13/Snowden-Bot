@@ -365,7 +365,7 @@ class QuickFightView(ui.View):
 	@ui.button(label='Fight', style = discord.ButtonStyle.blurple)
 	async def fight_button(self, button, interaction : discord.Interaction):
 		await interaction.response.defer(ephemeral=True)
-		damage = random.randint(20, 50)
+		damage = random.randint(15, 45)
 		self.qf_dict[str(self.idle_p.id)]['hp'] -= damage
 		hp = self.qf_dict[str(self.idle_p.id)]['hp'] 
 		
@@ -379,7 +379,7 @@ class QuickFightView(ui.View):
 			# idle player got killed
 			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}** and **Killed** him!\n :tada: Congrats {self.active_p.mention}, You won the quickfight match"
 			win_emb.description+=f"  (**Won**)"
-			edit_emb.description = f"**__Healthpoints__**: 0/100 (**Lost**)"
+			edit_emb.description = f"**__Healthpoints__**: 0/100 {self.bfh.get_bar_emojis('hp', 0, 100)} (**Lost**)"
 			self.clear_items()
 		else: 
 			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}**\nIt's {self.idle_p.mention}'s turn now.."

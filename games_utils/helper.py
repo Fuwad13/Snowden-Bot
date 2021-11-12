@@ -308,7 +308,7 @@ class BattleFieldHelper:
 		elif percentage > 10:
 			bar = f"{emoji_dict['left_full']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['right_empty']}"
 			return bar
-		elif percentage > 0:
+		elif percentage >= 0:
 			bar = f"{emoji_dict['left_half']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['middle_empty']}{emoji_dict['right_empty']}"
 			return bar
 	
