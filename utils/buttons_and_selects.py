@@ -391,15 +391,15 @@ class QuickFightView(ui.View):
 	@ui.button(label="Heal", style= discord.ButtonStyle.red)
 	async def heal_button(self, button, interaction):
 		heal = random.randint(20, 50)
-		if self.qf_dict[str(self.active_p)]['hp'] + heal >= 100:
-			heal = 100 - self.qf_dict[str(self.active_p)]['hp']
-			self.qf_dict[str(self.active_p)]['hp'] = 100
+		if self.qf_dict[str(self.active_p.id)]['hp'] + heal >= 100:
+			heal = 100 - self.qf_dict[str(self.active_p.id)]['hp']
+			self.qf_dict[str(self.active_p.id)]['hp'] = 100
 			hp = 100
 			
 		else:
 
-			self.qf_dict[str(self.active_p)]['hp']+=heal
-			hp = self.qf_dict[str(self.active_p)]['hp']
+			self.qf_dict[str(self.active_p.id)]['hp']+=heal
+			hp = self.qf_dict[str(self.active_p.id)]['hp']
 		
 		if self.ctx.author == self.active_p:
 			edit_emb = self.embed1
