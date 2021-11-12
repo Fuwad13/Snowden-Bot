@@ -375,7 +375,7 @@ class QuickFightView(ui.View):
 		if hp <= 0:
 			# idle player got killed
 			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}** and **Killed** him!\n :tada: Congrats {self.active_p.mention}, You won the quickfight match"
-			edit_emb.description = f"**__Healthpoints__**: 0/100 {self.bfh.get_bar_emojis('hp', 0 , 100)}"
+			edit_emb.description = f"**__Healthpoints__**: 0/100"
 			self.clear_items()
 		else: 
 			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}**\nIt's {self.idle_p.mention}'s turn now.."
