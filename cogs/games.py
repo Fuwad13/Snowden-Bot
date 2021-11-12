@@ -866,7 +866,7 @@ class Battlefield(commands.Cog):
 	@commands.command(name = 'quickfight', aliases = ['qf', 'quickf'], brief = "A quick fight mode without any attack or heal cooldowns", help = "A quick fight mode that has no cooldowns for attack or heal and no need to opt in. costs nothing from the inventory!")
 	@commands.guild_only()
 	@has_started()
-	@commands.cooldown(1, 10, BucketType.user)
+	@commands.cooldown(1, 30, BucketType.user)
 	async def quickfight(self, ctx, player : discord.Member):
 		if ctx.interaction is not None:
 			await ctx.interaction.response.defer(ephemeral=False)

@@ -448,15 +448,3 @@ class AttackEngine:
 			print("unknown error")
 			print(damage)
 			return "Unknown error occured"
-
-
-class QuickFightEngine:
-
-	def __init__(self, ctx,player1, player2):
-		self.ctx = ctx
-		self.player1 = player1
-		self.player2 = player2
-
-
-	async def start(self):
-		...
