@@ -338,8 +338,6 @@ class QuickFightView(ui.View):
 	def __init__(self,*, ctx, player1, player2, bfh, embed1, embed2):
 		super().__init__(timeout=90)
 		self.ctx = ctx
-		self.player1 = player1
-		self.player2 = player2
 		self.active_p = player1
 		self.idle_p = player2
 		self.bfh = bfh
@@ -416,3 +414,19 @@ class QuickFightView(ui.View):
 
 		self.active_p, self.idle_p = self.idle_p, self.active_p
 		await interaction.message.edit(content=content, embeds=[self.embed1, self.embed2], view= self)
+
+class Tradeview(ui.View):
+
+	def __init__(self,*, ctx, player1, player2, bfh , embed):
+		super().__init__(timeout=120)
+		self.ctx = ctx
+		self.player1 = player1
+		self.player2 = player2
+		self.bfh = bfh
+		self.embed = embed 
+
+	async def interaction_check(self, interaction: discord.Interaction) -> bool:
+		if interaction.user != self.player1 or interaction.user != self.player2:
+			await interaction.response.send_message(f"Sorry , This is {self.player1.mention} and {self.player2.mention}'s trade menu, not yours!", ephemeral= True)
+
+		return interaction.user == self.player1 or interaction.user == self.player2

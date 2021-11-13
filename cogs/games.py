@@ -654,8 +654,8 @@ class Battlefield(commands.Cog):
 		rec2 = await self.bfh.get_player_data(player2.id)
 		p1_level = self.bfh.get_level(rec1['exp'])
 		p2_level = self.bfh.get_level(rec2['exp'])
-		if p1_level < 5 or p2_level < 5:
-			return await ctx.send(f"{player1} and {player2}, sorry , one/both of you two haven't reached **Level 5** yet. You can't trade with one another before both of you reach level 5!")
+		if p1_level < 4 or p2_level < 4:
+			return await ctx.send(f"{player1} and {player2}, sorry , one/both of you two haven't reached **Level 4** yet. You can't trade with one another before both of you reach level 4!")
 		view = bs.TradeConfirmView(player2)
 		msg = await ctx.send(f"{player2.mention} -> {player1.mention} wants to trade with you?\nIf you want to trade with him then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`", view = view)
 		await view.wait()
@@ -888,7 +888,12 @@ class Battlefield(commands.Cog):
 			
 			embed1 = discord.Embed(title= f"**{player1}**'s status:" ,color=0x2F3136, description= f"**__Healthpoints__**: 100/100 {self.bfh.get_bar_emojis('hp', 100, 100)}")
 			embed2 = discord.Embed(title= f"**{player2}**'s status:" ,color=0x2F3136, description= f"**__Healthpoints__**: 100/100 {self.bfh.get_bar_emojis('hp', 100, 100)}")
-
+			
+			rn = random.randint(0,1)
+			if rn == 1:
+				player1, player2 = player1, player2
+			elif rn == 0:
+				player1, player2 = player2, player1
 
 			qf_view = bs.QuickFightView(ctx = ctx,player1=player1, player2= player2, bfh = self.bfh, embed1= embed1, embed2=embed2)
 			
