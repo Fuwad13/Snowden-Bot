@@ -295,7 +295,7 @@ class Battlefield(commands.Cog):
 					lvl_up_m = random.randint(100,200)*(c_lvl+1)
 
 					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained "
-					await self.update_balance(player_id = ctx.author.id,amount =  lvl_up_m, add = True)
+					await self.bfh.update_balance(player_id = ctx.author.id,amount =  lvl_up_m, add = True)
 				embed.description = text
 				await asyncio.sleep(2)
 				await msg.edit(embed = embed)
@@ -353,7 +353,7 @@ class Battlefield(commands.Cog):
 				if lvl_up:
 					lvl_up_m = random.randint(100,200)*(c_lvl+1)
 					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
-					await self.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
+					await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
 				embed.description = text
 				await asyncio.sleep(2)
 				await msg.edit(embed = embed)
@@ -866,6 +866,7 @@ class Battlefield(commands.Cog):
 	@commands.command(name = 'quickfight', aliases = ['qf', 'quickf'], brief = "A quick fight mode without any attack or heal cooldowns", help = "A quick fight mode that has no cooldowns for attack or heal and no need to opt in. costs nothing from the inventory!")
 	@commands.guild_only()
 	@has_started()
+	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1, 30, BucketType.user)
 	async def quickfight(self, ctx, player : discord.Member):
 		if ctx.interaction is not None:
