@@ -562,11 +562,11 @@ class Battlefield(commands.Cog):
 			await ctx.interaction.response.defer(ephemeral=False)
 		await ctx.send("This command is under maintenance.")
 
-	@commands.command(name = 'shop', aliases= ['sh'], help= "soon")
-	@has_started()
-	@commands.cooldown(1,3, BucketType.user)
-	async def _shop(self, ctx, item_name : str, amount : int = 1):
-		pass
+	# @commands.command(name = 'shop', aliases= ['sh'], help= "soon")
+	# @has_started()
+	# @commands.cooldown(1,3, BucketType.user)
+	# async def _shop(self, ctx, item_name : str, amount : int = 1):
+	# 	pass
 
 	@commands.command(name = 'buy', aliases= ['b'], help= "soon")
 	@has_started()

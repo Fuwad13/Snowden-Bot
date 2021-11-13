@@ -365,7 +365,7 @@ class QuickFightView(ui.View):
 	@ui.button(label='Fight', style = discord.ButtonStyle.blurple)
 	async def fight_button(self, button, interaction : discord.Interaction):
 		await interaction.response.defer(ephemeral=True)
-		damage = random.randint(15, 45)
+		damage = random.randint(15, 50)
 		self.qf_dict[str(self.idle_p.id)]['hp'] -= damage
 		hp = self.qf_dict[str(self.idle_p.id)]['hp'] 
 		
@@ -395,7 +395,7 @@ class QuickFightView(ui.View):
 	@ui.button(label="Heal", style= discord.ButtonStyle.red)
 	async def heal_button(self, button, interaction):
 		await interaction.response.defer(ephemeral=True)
-		heal = random.randint(20, 50)
+		heal = random.randint(10, 30)
 		if self.qf_dict[str(self.active_p.id)]['hp'] + heal >= 100:
 			heal = 100 - self.qf_dict[str(self.active_p.id)]['hp']
 			self.qf_dict[str(self.active_p.id)]['hp'] = 100
