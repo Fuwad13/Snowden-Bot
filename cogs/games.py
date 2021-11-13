@@ -297,7 +297,7 @@ class Battlefield(commands.Cog):
 					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained "
 					await self.update_balance(player_id = ctx.author.id,amount =  lvl_up_m, add = True)
 				embed.description = text
-				await asyncio.sleep(3)
+				await asyncio.sleep(2)
 				await msg.edit(embed = embed)
 
 			elif won_or_lost == 0:
@@ -316,7 +316,7 @@ class Battlefield(commands.Cog):
 					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
 					await self.bfh.update_balance(player_id = ctx.author.id,amount =  lvl_up_m, add = True)
 				embed.description = text
-				await asyncio.sleep(3)
+				await asyncio.sleep(2)
 				await msg.edit(embed = embed)
 		
 		elif view.value == False:
@@ -337,7 +337,7 @@ class Battlefield(commands.Cog):
 					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
 					await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
 				embed.description = text
-				await asyncio.sleep(3)
+				await asyncio.sleep(2)
 				await msg.edit(embed = embed)
 
 			elif won_or_lost == 0:
@@ -355,7 +355,7 @@ class Battlefield(commands.Cog):
 					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
 					await self.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
 				embed.description = text
-				await asyncio.sleep(3)
+				await asyncio.sleep(2)
 				await msg.edit(embed = embed)
 		else:
 			embed.description = "Timed out!"
@@ -888,6 +888,7 @@ class Battlefield(commands.Cog):
 			
 			embed1 = discord.Embed(title= f"**{player1}**'s status:" ,color=0x2F3136, description= f"**__Healthpoints__**: 100/100 {self.bfh.get_bar_emojis('hp', 100, 100)}")
 			embed2 = discord.Embed(title= f"**{player2}**'s status:" ,color=0x2F3136, description= f"**__Healthpoints__**: 100/100 {self.bfh.get_bar_emojis('hp', 100, 100)}")
+
 
 			qf_view = bs.QuickFightView(ctx = ctx,player1=player1, player2= player2, bfh = self.bfh, embed1= embed1, embed2=embed2)
 			

@@ -388,6 +388,12 @@ class AttackEngine:
 				if ammo_used:
 					ammo_dict = {ammo_used : -1 }
 					await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+
+				elif a_weapon == "grenade":
+					a_eq_dict = json.loads(self.a_rec['equipments'])
+					a_eq_dict['weapon'] = None
+					a_eq_json = json.dumps(a_eq_dict)
+					await self.bot.db.execute(""" UPDATE battlefield SET equipments = $1 WHERE p_id = $2;""", a_eq_json, self.attacker_id)
 				
 				r_str = f"{self.attacker.mention} -> You Killed **{self.target}** with your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}**(:boom:{damage} damage)\n\nPlease wait a few seconds before you can start looting the player's loot-crate."
 				return r_str
@@ -398,6 +404,12 @@ class AttackEngine:
 				if ammo_used:
 					ammo_dict = {ammo_used : -1 }
 					await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+
+				elif a_weapon == "grenade":
+					a_eq_dict = json.loads(self.a_rec['equipments'])
+					a_eq_dict['weapon'] = None
+					a_eq_json = json.dumps(a_eq_dict)
+					await self.bot.db.execute(""" UPDATE battlefield SET equipments = $1 WHERE p_id = $2;""", a_eq_json, self.attacker_id)
 				
 				
 				r_str = f"{self.attacker.mention} -> You Killed **{self.target}** with your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}**(:boom:{damage} damage)\n\nLooting the killed player's inventory is being implemented, keep patience."
@@ -412,7 +424,12 @@ class AttackEngine:
 			if ammo_used:
 				ammo_dict = {ammo_used : -1 }
 				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
-			
+
+			elif a_weapon == "grenade":
+				a_eq_dict = json.loads(self.a_rec['equipments'])
+				a_eq_dict['weapon'] = None
+				a_eq_json = json.dumps(a_eq_dict)
+				await self.bot.db.execute(""" UPDATE battlefield SET equipments = $1 WHERE p_id = $2;""", a_eq_json, self.attacker_id)
 			
 			r_str = f"{self.attacker.mention} -> Your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}** dealt :boom: {damage} damage to **{self.target}**.\nThey now have {new_hp}/100 {self.bfh.get_bar_emojis('hp', new_hp, 100)} `health` remaining."
 			return r_str
@@ -423,6 +440,12 @@ class AttackEngine:
 			if ammo_used:
 				ammo_dict = {ammo_used : -1 }
 				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+
+			elif a_weapon == "grenade":
+				a_eq_dict = json.loads(self.a_rec['equipments'])
+				a_eq_dict['weapon'] = None
+				a_eq_json = json.dumps(a_eq_dict)
+				await self.bot.db.execute(""" UPDATE battlefield SET equipments = $1 WHERE p_id = $2;""", a_eq_json, self.attacker_id)
 			
 			
 			r_str = f"{self.attacker.mention} -> Your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}** dealt :boom: {damage} damage to **{self.target}'s** {itm.ALL_ITEMS[str(t_armour)]['emoji']}**{itm.ALL_ITEMS[str(t_armour)]['name']}**.\nThey now have {self.t_rec['hp']}/100 {self.bfh.get_bar_emojis('hp', self.t_rec['hp'], 100)} `health` and {new_sp}/{itm.ALL_ITEMS[str(t_armour)]['shield_points']} {self.bfh.get_bar_emojis('armour', new_sp, itm.ALL_ITEMS[str(t_armour)]['shield_points'])} `armour points` remaining."
@@ -438,6 +461,12 @@ class AttackEngine:
 			if ammo_used:
 				ammo_dict = {ammo_used : -1 }
 				await self.bfh.bulk_update_inventory(player_id=self.attacker_id, items_dict = ammo_dict)
+			
+			elif a_weapon == "grenade":
+				a_eq_dict = json.loads(self.a_rec['equipments'])
+				a_eq_dict['weapon'] = None
+				a_eq_json = json.dumps(a_eq_dict)
+				await self.bot.db.execute(""" UPDATE battlefield SET equipments = $1 WHERE p_id = $2;""", a_eq_json, self.attacker_id)
 			
 			
 			r_str = f"{self.attacker.mention} -> Your {itm.ALL_ITEMS[str(a_weapon)]['emoji']}**{itm.ALL_ITEMS[str(a_weapon)]['name']}** dealt :boom: {t_sp} damage to **{self.target}'s** {itm.ALL_ITEMS[str(t_armour)]['emoji']}**{itm.ALL_ITEMS[str(t_armour)]['name']}**. Their armour was broken and the rest :boom: {damage_l} damage was dealt to their `health`.\nThey now have {new_hp}/100 {self.bfh.get_bar_emojis('hp', new_hp, 100)} `health` remaining."
