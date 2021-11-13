@@ -267,8 +267,8 @@ class Battlefield(commands.Cog):
 		balance = await self.bot.db.fetchval(""" SELECT balance FROM battlefield where p_id = $1; """, ctx.author.id)
 		if balance < amount:
 			return await ctx.send("Looks like you don't have enough money to gamble on coinflip!")
-		if amount > 10000 or amount < 50:
-			return await ctx.send("Minimum amount of gambling is **$50** and Maximum amount of gambling is **$10000**")
+		if amount > 50000 or amount < 50:
+			return await ctx.send("Minimum amount of gambling is **$50** and Maximum amount of gambling is **$50000**")
 
 		view = bs.HeadsOrTails(ctx)
 
@@ -294,7 +294,7 @@ class Battlefield(commands.Cog):
 				if lvl_up:
 					lvl_up_m = random.randint(100,200)*(c_lvl+1)
 
-					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained "
+					text+=f"\n\U0001f389 You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
 					await self.bfh.update_balance(player_id = ctx.author.id,amount =  lvl_up_m, add = True)
 				embed.description = text
 				await asyncio.sleep(2)
@@ -663,7 +663,14 @@ class Battlefield(commands.Cog):
 		if not view.confirmation:
 			return await msg.edit(f"{player2.mention} -> {player1.mention} ~~wants to trade with you!\nIf you want to trade with him then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`~~\n**Trade Cancelled**", view = view)
 		elif view.confirmation:
-			return await msg.edit(f"Trading system will be implemented soon...", view = view)
+			
+			embed = discord.Embed(color=0x2F3136,  title = "**__Trade menu__**")
+			t_view = bs.Tradeview(ctx = ctx ,player1= player1, player2= player2, bfh = self.bfh, embed = embed)
+			const_str = f" - To add items:\n ╰ `add [amount=1] <item_name>`\n - To remove items:\n ╰ `add [amount=1] <item_name>`\n You can confirm the trade after the trade has been validated!\n"
+			t_valid_str = f"** - Trade validated ? : {cs.EMOJIS['greentick'] if t_view.validated else cs.EMOJIS['redtick']}"
+			embed.description = const_str + t_valid_str
+			embed.add_field(name = f"__{player1}__", value = "")
+			await msg.edit(f"{cs.EMOJIS['greentick']} Trade request accepted. You can trade now!", view = view)
 			
 
 

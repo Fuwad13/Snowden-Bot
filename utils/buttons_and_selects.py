@@ -1,3 +1,4 @@
+from logging import disable
 import random
 import discord
 from discord import ui
@@ -432,9 +433,14 @@ class Tradeview(ui.View):
 
 		return interaction.user == self.player1 or interaction.user == self.player2
 
-	@ui.button(label= "Confirm Trade", style= discord.ButtonStyle.blurple)
+	@ui.button(label= "Confirm Trade", style= discord.ButtonStyle.blurple, disabled=True)
 	async def trade_confirm(self, button : ui.Button, intr : discord.Interaction):
 		if not self.validated:
 			await intr.response.send_message("This trade can't be confirmed yet! It hasn't been validated, please follow the trade guidelines and rules.", ephemeral= True)
+
+	@ui.button(label = "Cancel", style= discord.ButtonStyle.red)
+	async def cancel_button(self, button , intr : discord.Interaction):
+		self.clear_items()
+		
 
 		
