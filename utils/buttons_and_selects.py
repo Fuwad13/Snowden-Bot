@@ -4,6 +4,7 @@ import discord
 from discord import ui
 from games_utils.items import ALL_ITEMS
 from games_utils.helper import BattleFieldHelper
+from games_utils.constants import EMOJIS
 class ConfirmOrCancel(ui.View):
 
 
@@ -336,7 +337,7 @@ class QuickFightConfirmation(ui.View):
 	
 class QuickFightView(ui.View):
 
-	def __init__(self,*, ctx, player1, player2, bfh, embed1, embed2):
+	def __init__(self,*, ctx, player1, player2, bfh : BattleFieldHelper, embed1, embed2):
 		super().__init__(timeout=90)
 		self.ctx = ctx
 		self.active_p = player1
@@ -346,10 +347,12 @@ class QuickFightView(ui.View):
 			str(player1.id) : {
 				'hp' : 100,
 				'sp' : 50,
+				'lc' : None
 			},
 			str(player2.id) : {
 				'hp' : 100,
 				'sp' : 50,
+				'lc' : None
 			}
 		}
 		self.embed1 = embed1
@@ -366,6 +369,7 @@ class QuickFightView(ui.View):
 		await interaction.response.defer(ephemeral=True)
 		damage = random.randint(15, 50)
 		self.qf_dict[str(self.idle_p.id)]['hp'] -= damage
+		self.qf_dict[str(self.active_p.id)]['lc'] = 'fight'
 		hp = self.qf_dict[str(self.idle_p.id)]['hp'] 
 		
 		if self.ctx.author == self.active_p:
@@ -376,9 +380,10 @@ class QuickFightView(ui.View):
 			win_emb = self.embed2
 		if hp <= 0:
 			# idle player got killed
-			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}** and **Killed** him!\n :tada: Congrats {self.active_p.mention}, You won the quickfight match"
+			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}** and **Killed** him!\n :tada: Congrats {self.active_p.mention}, You won the quickfight match\n**You got** {EMOJIS['exp']} **50 exp** from this fight."
 			win_emb.description+=f"  (**Won**)"
 			edit_emb.description = f"**__Healthpoints__**: 0/100 {self.bfh.get_bar_emojis('hp', 0, 100)} (**Lost**)"
+			await self.bfh.update_exp(player_id= self.active_p.id, amount= 50)
 			self.clear_items()
 		else: 
 			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}**\nIt's {self.idle_p.mention}'s turn now.."
@@ -394,7 +399,9 @@ class QuickFightView(ui.View):
 	@ui.button(label="Heal", style= discord.ButtonStyle.red)
 	async def heal_button(self, button, interaction):
 		await interaction.response.defer(ephemeral=True)
-		heal = random.randint(10, 30)
+		heal = random.randint(10, 40)
+		if self.qf_dict[str(self.active_p.id)]['lc'] == 'heal':
+			heal = random.randint(25, 40)
 		if self.qf_dict[str(self.active_p.id)]['hp'] + heal >= 100:
 			heal = 100 - self.qf_dict[str(self.active_p.id)]['hp']
 			self.qf_dict[str(self.active_p.id)]['hp'] = 100
@@ -412,6 +419,7 @@ class QuickFightView(ui.View):
 
 		content = f"**{self.active_p}** used **Heal** and healed themselves by :heart:**{heal}** hp(s).\nIt's {self.idle_p.mention}'s turn now!"
 		edit_emb.description = f"**__Healthpoints__**: {hp}/100 {self.bfh.get_bar_emojis('hp', hp, 100)}"
+		self.qf_dict[str(self.active_p.id)]['lc'] = 'heal'
 
 		self.active_p, self.idle_p = self.idle_p, self.active_p
 		await interaction.message.edit(content=content, embeds=[self.embed1, self.embed2], view= self)
@@ -441,6 +449,6 @@ class Tradeview(ui.View):
 	@ui.button(label = "Cancel", style= discord.ButtonStyle.red)
 	async def cancel_button(self, button , intr : discord.Interaction):
 		self.clear_items()
-		
+
 
 		

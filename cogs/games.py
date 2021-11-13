@@ -907,8 +907,11 @@ class Battlefield(commands.Cog):
 			
 			qf_msg = await ctx.send(f"{player1.mention}, It's your turn to `fight` or `heal`!", embeds = [embed1, embed2] ,view = qf_view)
 
-			
-
+	@commands.command(name = "trivia", aliases = ['tri'], help = "Answer trivia questions and earn money and exp from it.", hidden = True)
+	@commands.guild_only()
+	@commands.max_concurrency(1, BucketType.user)
+	async def trivia(self, ctx):
+		...
 
 	@commands.command(name= 'players', aliases = ['player', 'activeplayers'], help = "Shows currently opted in players count and information", slash_command = False)
 	@commands.guild_only()

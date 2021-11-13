@@ -87,6 +87,7 @@ class SnowdenBot(commands.AutoShardedBot):
         super().__init__(*args, **kwargs)
         self.blacklist = {}
         self.automod_guilds = {}
+        self.session = aiohttp.ClientSession()
 
     async def get_context(self, message, *, cls=SnowdenContext):
         return await super().get_context(message, cls=cls)
