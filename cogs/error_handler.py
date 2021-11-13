@@ -34,7 +34,7 @@ class ErrorHandler(commands.Cog):
 			await ctx.send(f"This command can only run in a guild/server.")
 
 		elif isinstance(error, commands.CommandOnCooldown):
-			await ctx.send(f"You're on cooldown! Please retry after `{error.retry_after:.2}` seconds")
+			await ctx.send(f"You're on cooldown! Please retry after `{error.retry_after:.2f}` seconds")
 		elif isinstance(error, commands.MaxConcurrencyReached):
 			await ctx.send(f"{error}")
 
