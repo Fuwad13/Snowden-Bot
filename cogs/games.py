@@ -678,11 +678,9 @@ class Battlefield(commands.Cog):
 				str(player1.id) : p1td,
 				str(player2.id) : p2td
 			}
-			p1tm : int = 0
-			p2tm : int = 0
 			p12_tm = {
-				str(player1.id) : p1tm,
-				str(player2.id) : p2tm
+				str(player1.id) : 0,
+				str(player2.id) : 0
 			}
 			p12rec = {
 				str(player1.id) : rec1,
@@ -738,13 +736,17 @@ class Battlefield(commands.Cog):
 							elif p_a_d[item_res] < amount:
 								try:
 									p_t_d[item_res] += p_a_d[item_res]
+									p_a_d[item_res] = 0
 								except KeyError:
 									p_t_d[item_res] = p_a_d[item_res]
+									p_a_d[item_res] = 0
 							else:
 								try:
 									p_t_d[item_res] += amount
+									p_a_d[item_res] -=amount
 								except KeyError:
 									p_t_d[item_res] = amount
+									p_a_d[item_res] -=amount
 							eph_str = ""
 							for i, c in p_t_d.items():
 								if c <=0:
@@ -770,6 +772,7 @@ class Battlefield(commands.Cog):
 						except ValueError:
 							continue
 						else:
+							p_a_d = p12_all_items_dict.get(str(inp.author.id))
 							item_inp = itm_am_name.split(' ',1)[-1]
 							p_t_d = p12_tdict.get(str(inp.author.id))
 							if len(p_t_d) == 0:
@@ -782,8 +785,10 @@ class Battlefield(commands.Cog):
 							if p_t_d[item_res] <= 0 :
 								continue
 							elif p_t_d[item_res] < amount:
+								p_a_d[item_res]+= p_t_d[item_res]
 								p_t_d[item_res] = 0
 							else:
+								p_a_d[item_res]+= amount
 								p_t_d[item_res] -= amount
 							eph_str = ""
 							for i, c in p_t_d.items():
@@ -815,15 +820,15 @@ class Battlefield(commands.Cog):
 							if in_amount == 0:
 								continue
 							elif in_amount > 0 and in_amount > p_r['balance']:
-								p_t_m+=p_r['balance']
+								p12_tm[str(inp.author.id)]+=p_r['balance']
 							elif in_amount > 0 and in_amount <= p_r['balance']:
-								p_t_m+=in_amount
+								p12_tm[str(inp.author.id)]+=in_amount
 							elif in_amount < 0 and p_t_m == 0:
 								continue
 							elif in_amount < 0 and (p_t_m + in_amount) < 0:
 								continue
 							elif in_amount < 0 and (p_t_m + in_amount) >= 0:
-								p_t_m+=in_amount
+								p12_tm[str(inp.author.id)]+=in_amount
 							else:
 								continue
 							p_t_d = p12_tdict.get(str(inp.author.id))
@@ -832,8 +837,8 @@ class Battlefield(commands.Cog):
 								if c <=0:
 									continue
 								eph_str+=f"{ALL_ITEMS[i]['emoji']}`{ALL_ITEMS[i]['name']}` **x{c}**\n"
-							eph_str+=f"\n**Cash Money**: ${p_t_m}"
-							eph_val = self.bfh.get_value_from_dict(p_t_d) + p_t_m
+							eph_str+=f"\n**Cash Money**: ${p12_tm[str(inp.author.id)]}"
+							eph_val = self.bfh.get_value_from_dict(p_t_d) + p12_tm[str(inp.author.id)]
 							if inp.author == ctx.author:
 								item_ind = 0
 								val_ind = 1
