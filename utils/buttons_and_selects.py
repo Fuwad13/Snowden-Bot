@@ -434,6 +434,7 @@ class Tradeview(ui.View):
 		self.bfh = bfh
 		self.embed = embed 
 		self.validated = False
+		self.cancelled = False
 
 	async def interaction_check(self, interaction: discord.Interaction) -> bool:
 		if interaction.user != self.player1 or interaction.user != self.player2:
@@ -449,6 +450,7 @@ class Tradeview(ui.View):
 	@ui.button(label = "Cancel", style= discord.ButtonStyle.red)
 	async def cancel_button(self, button , intr : discord.Interaction):
 		self.clear_items()
+		self.cancelled = True
 
 
 		

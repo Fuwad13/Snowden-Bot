@@ -111,7 +111,14 @@ class BattleFieldHelper:
 		data = itm.ALL_ITEMS[item]
 		return data
 
-	
+	def get_value_from_dict(self, item_dict : dict):
+		value : int = 0
+		for item, count in item_dict.items():
+			unit_price = itm.ALL_ITEMS[str(item)]['sell_price']
+			value = value + unit_price*count
+
+		return value
+
 
 	def get_inventory_value(self, rec):
 		"""Returns the inventory value for a player"""

@@ -668,11 +668,31 @@ class Battlefield(commands.Cog):
 			value2 = 0
 			p1_all_items = self.bfh.get_inv_all_items_dict(rec1)
 			p2_all_items = self.bfh.get_inv_all_items_dict(rec2)
+			p12_all_items_dict = {
+				str(player1.id) : p1_all_items,
+				str(player2.id) : p2_all_items
+			}
+			p1td = {}
+			p2td = {}
+			p12_tdict = {
+				str(player1.id) : p1td,
+				str(player2.id) : p2td
+			}
+			p1tm : int = 0
+			p2tm : int = 0
+			p12_tm = {
+				str(player1.id) : p1tm,
+				str(player2.id) : p2tm
+			}
+			p12rec = {
+				str(player1.id) : rec1,
+				str(player2.id) : rec2
+			}
 			embed = discord.Embed(color=0x2F3136,  title = "**__Trade menu__**")
 			t_view = bs.Tradeview(ctx = ctx ,player1= player1, player2= player2, bfh = self.bfh, embed = embed)
-			const_str = f" - To add items:\n ╰ `add [amount=1] <item_name>`\n - To remove items:\n ╰ `add [amount=1] <item_name>`\n You can confirm the trade after the trade has been validated!\n"
-			t_valid_str = f"** - Trade validated ? : {cs.EMOJIS['greentick'] if t_view.validated else cs.EMOJIS['redtick']}"
-			embed.description = const_str + t_valid_str
+			const_str = f" - To add items:\n ╰ `add <amount> <item_name>`\n - To remove items:\n ╰ `add <amount> <item_name>`\n - To add/remove cash money:\n ╰ `money +<amount>` | `money -<amount>`\n You can confirm the trade after the trade has been validated!\n"
+			
+			embed.description = const_str +f"** - Trade validated ? : {cs.EMOJIS['greentick'] if t_view.validated else cs.EMOJIS['redtick']}"
 			embed.add_field(name = f"__{player1}__", value = "\u2800", inline= False)
 			embed.add_field(name = f"**Total value**:", value = f"${value1}", inline= False)
 			embed.add_field(name = f"__{player2}__", value = "\u2800", inline= False)
@@ -680,20 +700,159 @@ class Battlefield(commands.Cog):
 			await msg.edit(f"Trade ongoing...", embed = embed, view = t_view)
 			def check(message):
 				auth_c : bool = (message.author == player1) or (message.author == player2)
-				msg_c : bool = message.content.startswith('add') or message.content.startswith('remove')
-				return auth_c and msg_c
+				#msg_c : bool = message.content.startswith('add') or message.content.startswith('remove')
+				return auth_c #and msg_c
 
-			# while True:
-			# 	try:
-			# 		inp = await self.bot.wait_for('message', check = check, timeout=60.0)
+			while True:
+				if t_view.cancelled:
+					await msg.edit(content= f"Trade cancelled...", view = t_view)
+					break
+				try:
+					inp : discord.Message = await self.bot.wait_for('message', check = check, timeout=60.0)
 
-			# 	except asyncio.TimeoutError:
-			# 		t_view.clear_items()
-			# 		t_view.stop()
-			# 		await msg.edit(f"{cs.EMOJIS['redtick']} Trade cancelled due to timeout", view = t_view)
-			# 		break
-			# 	else:
-			# 		if inp
+				except asyncio.TimeoutError:
+					t_view.clear_items()
+					t_view.stop()
+					await msg.edit(f"{cs.EMOJIS['redtick']} Trade cancelled due to timeout", view = t_view)
+					break
+				else:
+					if inp.content.lower().startswith('add'):
+						itm_am_name = inp.content[4:]
+						try:
+							amount = int(itm_am_name[0])
+							if amount <= 0:
+								continue
+						except ValueError:
+							continue
+						else:
+							item_inp = itm_am_name.split(' ',1)[-1]
+							p_a_d = p12_all_items_dict.get(str(inp.author.id))
+							item_res_l = difflib.get_close_matches(item_inp, p_a_d.keys(), n = 1, cutoff= 0.4 )
+							if len(item_res_l) == 0:
+								continue
+							item_res = item_res_l[0]
+							p_t_d = p12_tdict.get(str(inp.author.id))
+							p_t_m : int = p12_tm.get(str(inp.author.id))
+							if p_a_d[item_res] <= 0 :
+								continue
+							elif p_a_d[item_res] < amount:
+								try:
+									p_t_d[item_res] += p_a_d[item_res]
+								except KeyError:
+									p_t_d[item_res] = p_a_d[item_res]
+							else:
+								try:
+									p_t_d[item_res] += amount
+								except KeyError:
+									p_t_d[item_res] = amount
+							eph_str = ""
+							for i, c in p_t_d.items():
+								if c <=0:
+									continue
+								eph_str+=f"{ALL_ITEMS[i]['emoji']}`{ALL_ITEMS[i]['name']}` **x{c}**\n"
+							eph_str+=f"\n**Cash Money**: ${p_t_m}"
+							eph_val = self.bfh.get_value_from_dict(p_t_d) + p_t_m
+							if inp.author == ctx.author:
+								item_ind = 0
+								val_ind = 1
+							else:
+								item_ind = 2
+								val_ind = 3
+							embed.set_field_at(item_ind,name = f"__{inp.author}__", value = eph_str, inline= False)
+							embed.set_field_at(val_ind,name = f"**Total value**:", value = f"${eph_val}", inline= False)
+
+					elif inp.content.lower().startswith('remove'):
+						itm_am_name = inp.content[4:]
+						try:
+							amount = int(itm_am_name[0])
+							if amount <= 0:
+								continue
+						except ValueError:
+							continue
+						else:
+							item_inp = itm_am_name.split(' ',1)[-1]
+							p_t_d = p12_tdict.get(str(inp.author.id))
+							if len(p_t_d) == 0:
+								continue
+							item_res_l = difflib.get_close_matches(item_inp, p_t_d.keys(), n = 1, cutoff= 0.4 )
+							if len(item_res_l) == 0:
+								continue
+							item_res = item_res_l[0]
+							p_t_m : int = p12_tm.get(str(inp.author.id))
+							if p_t_d[item_res] <= 0 :
+								continue
+							elif p_t_d[item_res] < amount:
+								p_t_d[item_res] = 0
+							else:
+								p_t_d[item_res] -= amount
+							eph_str = ""
+							for i, c in p_t_d.items():
+								if c <=0:
+									continue
+								eph_str+=f"{ALL_ITEMS[i]['emoji']}`{ALL_ITEMS[i]['name']}` **x{c}**\n"
+							eph_str+=f"\n**Cash Money**: ${p_t_m}"
+							eph_val = self.bfh.get_value_from_dict(p_t_d) + p_t_m
+							if inp.author == ctx.author:
+								item_ind = 0
+								val_ind = 1
+							else:
+								item_ind = 2
+								val_ind = 3
+							embed.set_field_at(item_ind,name = f"__{inp.author}__", value = eph_str, inline= False)
+							embed.set_field_at(val_ind,name = f"**Total value**:", value = f"${eph_val}", inline= False)
+
+					elif inp.content.lower().startswith('money'):
+						
+						try:
+							in_amount = int(inp.content.split(' ')[1])
+							
+						except ValueError:
+							continue
+						else:
+							p_r = p12rec.get(str(inp.author.id))
+							p_t_m : int = p12_tm.get(str(inp.author.id))
+							if in_amount == 0:
+								continue
+							elif in_amount > 0 and in_amount > p_r['balance']:
+								p_t_m+=p_r['balance']
+							elif in_amount > 0 and in_amount <= p_r['balance']:
+								p_t_m+=in_amount
+							elif in_amount < 0 and p_t_m == 0:
+								continue
+							elif in_amount < 0 and (p_t_m + in_amount) < 0:
+								continue
+							elif in_amount < 0 and (p_t_m + in_amount) >= 0:
+								p_t_m+=in_amount
+							else:
+								continue
+							p_t_d = p12_tdict.get(str(inp.author.id))
+							eph_str = ""
+							for i, c in p_t_d.items():
+								if c <=0:
+									continue
+								eph_str+=f"{ALL_ITEMS[i]['emoji']}`{ALL_ITEMS[i]['name']}` **x{c}**\n"
+							eph_str+=f"\n**Cash Money**: ${p_t_m}"
+							eph_val = self.bfh.get_value_from_dict(p_t_d) + p_t_m
+							if inp.author == ctx.author:
+								item_ind = 0
+								val_ind = 1
+							else:
+								item_ind = 2
+								val_ind = 3
+							embed.set_field_at(item_ind,name = f"__{inp.author}__", value = eph_str, inline= False)
+							embed.set_field_at(val_ind,name = f"**Total value**:", value = f"${eph_val}", inline= False)
+					p1ttv = int(embed.fields[1].value.split('$',1)[-1])
+					p2ttv = int(embed.fields[3].value.split('$',1)[-1])
+					difference = abs(p1ttv - p2ttv)
+					if p1ttv > 0 and p2ttv > 0 and difference < 1000:
+						t_view.validated = True
+						t_view.trade_confirm.disabled = False
+					else:
+						t_view.validated = False
+						t_view.trade_confirm.disabled = True
+					t_valid_str = f"** - Trade validated ? : {cs.EMOJIS['greentick'] if t_view.validated else cs.EMOJIS['redtick']}"
+					embed.description = const_str + t_valid_str
+					await msg.edit(embed = embed, view = t_view)
 					
 
 	@commands.command(name= 'equip', aliases = ['eq', 'attach'], help = "Equip a weapon or armour from your inventory")
