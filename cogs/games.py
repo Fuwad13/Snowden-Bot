@@ -762,7 +762,7 @@ class Battlefield(commands.Cog):
 							embed.set_field_at(val_ind,name = f"**Total value**:", value = f"${eph_val}", inline= False)
 
 					elif inp.content.lower().startswith('remove'):
-						itm_am_name = inp.content[4:]
+						itm_am_name = inp.content[7:]
 						try:
 							amount = int(itm_am_name[0])
 							if amount <= 0:
@@ -851,7 +851,7 @@ class Battlefield(commands.Cog):
 					else:
 						t_view.validated = False
 						t_view.trade_confirm.disabled = True
-					t_valid_str = f"** - Trade validated ? : {cs.EMOJIS['greentick'] if t_view.validated else cs.EMOJIS['redtick']}"
+					t_valid_str = f"** - Trade validated ?** : {cs.EMOJIS['greentick'] if t_view.validated else cs.EMOJIS['redtick']}"
 					embed.description = const_str + t_valid_str
 					await msg.edit(embed = embed, view = t_view)
 					
