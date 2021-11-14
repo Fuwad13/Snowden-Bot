@@ -663,16 +663,38 @@ class Battlefield(commands.Cog):
 		if not view.confirmation:
 			return await msg.edit(f"{player2.mention} -> {player1.mention} ~~wants to trade with you!\nIf you want to trade with him then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`~~\n**Trade Cancelled**", view = view)
 		elif view.confirmation:
-			
+			await msg.edit(f"{cs.EMOJIS['greentick']} Trade request accepted. You can trade now!", view = view)
+			value1 = 0
+			value2 = 0
+			p1_all_items = self.bfh.get_inv_all_items_dict(rec1)
+			p2_all_items = self.bfh.get_inv_all_items_dict(rec2)
 			embed = discord.Embed(color=0x2F3136,  title = "**__Trade menu__**")
 			t_view = bs.Tradeview(ctx = ctx ,player1= player1, player2= player2, bfh = self.bfh, embed = embed)
 			const_str = f" - To add items:\n ╰ `add [amount=1] <item_name>`\n - To remove items:\n ╰ `add [amount=1] <item_name>`\n You can confirm the trade after the trade has been validated!\n"
 			t_valid_str = f"** - Trade validated ? : {cs.EMOJIS['greentick'] if t_view.validated else cs.EMOJIS['redtick']}"
 			embed.description = const_str + t_valid_str
-			embed.add_field(name = f"__{player1}__", value = "")
-			await msg.edit(f"{cs.EMOJIS['greentick']} Trade request accepted. You can trade now!", view = view)
-			
+			embed.add_field(name = f"__{player1}__", value = "\u2800", inline= False)
+			embed.add_field(name = f"**Total value**:", value = f"${value1}", inline= False)
+			embed.add_field(name = f"__{player2}__", value = "\u2800", inline= False)
+			embed.add_field(name = f"**Total value**:", value = f"${value2}", inline= False)
+			await msg.edit(f"Trade ongoing...", embed = embed, view = t_view)
+			def check(message):
+				auth_c : bool = (message.author == player1) or (message.author == player2)
+				msg_c : bool = message.content.startswith('add') or message.content.startswith('remove')
+				return auth_c and msg_c
 
+			# while True:
+			# 	try:
+			# 		inp = await self.bot.wait_for('message', check = check, timeout=60.0)
+
+			# 	except asyncio.TimeoutError:
+			# 		t_view.clear_items()
+			# 		t_view.stop()
+			# 		await msg.edit(f"{cs.EMOJIS['redtick']} Trade cancelled due to timeout", view = t_view)
+			# 		break
+			# 	else:
+			# 		if inp
+					
 
 	@commands.command(name= 'equip', aliases = ['eq', 'attach'], help = "Equip a weapon or armour from your inventory")
 	@has_started()
@@ -922,6 +944,13 @@ class Battlefield(commands.Cog):
 		embed = discord.Embed(title = "Player count for Snowden's Battlefield!", color = 0x2F3136)
 		embed.description = f"**__Total players__**: {total_players}\n\n\n**__Opted in__**: {opted_list}"
 		await ctx.send(embed = embed)
+
+	@commands.command(name = "leaderboard", aliases = ['lb'], hidden = True, help = "Battlefield Leaderboard according to player values.")
+	@commands.guild_only()
+	@commands.cooldown(1,60, BucketType.user)
+	async def leaderboard(self, ctx):
+		...
+
 	
 
 def setup(bot):

@@ -87,7 +87,7 @@ class SnowdenBot(commands.AutoShardedBot):
         super().__init__(*args, **kwargs)
         self.blacklist = {}
         self.automod_guilds = {}
-        self.session = aiohttp.ClientSession()
+        
 
     async def get_context(self, message, *, cls=SnowdenContext):
         return await super().get_context(message, cls=cls)
@@ -121,6 +121,7 @@ bot.help_command = help_cmd.SnowdenHelp()
 async def create_db_pool():
     credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
     bot.db = await asyncpg.create_pool(dsn = f'{credential}')
+    bot.session = aiohttp.ClientSession()
     
 
     
