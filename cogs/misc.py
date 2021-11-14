@@ -28,7 +28,7 @@ class Miscellanous(commands.Cog):
 					return await ctx.send(f"**Error**: {err}")
 
 				ts = js['UnixTimeStamp']
-				await ctx.send(f"Unix timestamp : `{ts}`\n<t:{ts}:t> -> `<t:{ts}:t>`\n<t:{ts}:T> -> `<t:{ts}:T>`\n<t:{ts}> -> `<t:{ts}>` | `<t:{ts}:f>`\n<t:{ts}:F> -> `<t:{ts}:F>`\n<t:{ts}:d> -> `<t:{ts}:d>`\n<t:{ts}:D> -> `<t:{ts}:D>`\n<t:{ts}:R> -> `<t:{ts}:R>`\n")
+				await ctx.send(f"Unix timestamp : `{ts}`\n\n`<t:{ts}:t>` -> <t:{ts}:t>\n`<t:{ts}:T>` -> <t:{ts}:T>\n`<t:{ts}>` -> <t:{ts}>\n`<t:{ts}:F>` -> <t:{ts}:F>\n`<t:{ts}:d>` -> <t:{ts}:d>\n`<t:{ts}:D>` -> <t:{ts}:D>\n`<t:{ts}:R>` -> <t:{ts}:R>\n")
 
 	
 
