@@ -695,6 +695,7 @@ class Battlefield(commands.Cog):
 			embed.add_field(name = f"**Total value**:", value = f"${value1}", inline= False)
 			embed.add_field(name = f"__{player2}__", value = "\u2800", inline= False)
 			embed.add_field(name = f"**Total value**:", value = f"${value2}", inline= False)
+			embed.set_footer(text=f"type **proceed** after both of you accept/confirm the trade by pressing the button!")
 			await msg.edit(f"<a:greenDot:877638573099200512>**Trade ongoing.....**", embed = embed, view = t_view)
 			def check(message):
 				auth_c : bool = (message.author == player1) or (message.author == player2)
@@ -703,7 +704,14 @@ class Battlefield(commands.Cog):
 
 			while True:
 				if t_view.cancelled:
-					await msg.edit(content= f"{cs.EMOJIS['redtick']}**Trade cancelled...**", view = t_view)
+					await msg.edit(content= f"{cs.EMOJIS['redtick']}**Trade cancelled by {t_view.cancelled_by}**", view = t_view)
+					break
+				elif t_view.confim_dict[str(player1.id)] and t_view.confim_dict[str(player2.id)]:
+					t_view.clear_items()
+					t_view.stop()
+
+					await msg.edit(content= f"{cs.EMOJIS['greentick']}**Trade confirmed and being processed!**", view = t_view)
+					should_proceed = True
 					break
 				try:
 					inp : discord.Message = await self.bot.wait_for('message', check = check, timeout=60.0)
@@ -850,7 +858,7 @@ class Battlefield(commands.Cog):
 					p1ttv = int(embed.fields[1].value.split('$',1)[-1])
 					p2ttv = int(embed.fields[3].value.split('$',1)[-1])
 					difference = abs(p1ttv - p2ttv)
-					if p1ttv > 0 and p2ttv > 0 and difference < 1000:
+					if p1ttv > 0 and p2ttv > 0 and difference < 500:
 						t_view.validated = True
 						t_view.trade_confirm.disabled = False
 					else:

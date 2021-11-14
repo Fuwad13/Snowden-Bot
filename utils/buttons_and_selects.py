@@ -453,13 +453,18 @@ class Tradeview(ui.View):
 	async def trade_confirm(self, button : ui.Button, intr : discord.Interaction):
 		if not self.validated:
 			await intr.response.send_message("This trade can't be confirmed yet! It hasn't been validated, please follow the trade guidelines and rules.", ephemeral= True)
-		self.confim_dict[str(intr.user.id)] = True
-		
+		if self.confim_dict[str(intr.user.id)]:
+			await intr.response.send_message(f"Hey, you already confirmed your trade, waiting for the other player's confirmation!", ephemeral= True)
+		else:
+			await intr.response.send_message(f"`{intr.user}` has confirmed the trade, waiting for other player's confirmation......")
+			self.confim_dict[str(intr.user.id)] = True
+
 
 	@ui.button(label = "Cancel", style= discord.ButtonStyle.red)
 	async def cancel_button(self, button , intr : discord.Interaction):
 		self.clear_items()
 		self.cancelled = True
+		self.cancelled_by = intr.user
 
 
 		
