@@ -28,7 +28,27 @@ class Miscellanous(commands.Cog):
 					return await ctx.send(f"**Error**: {err}")
 
 				ts = js['UnixTimeStamp']
-				await ctx.send(f"Unix timestamp : `{ts}`\n\n`<t:{ts}:t>` -> <t:{ts}:t>\n`<t:{ts}:T>` -> <t:{ts}:T>\n`<t:{ts}>` -> <t:{ts}>\n`<t:{ts}:F>` -> <t:{ts}:F>\n`<t:{ts}:d>` -> <t:{ts}:d>\n`<t:{ts}:D>` -> <t:{ts}:D>\n`<t:{ts}:R>` -> <t:{ts}:R>\n")
+				await ctx.send(f"Unix timestamp : `{ts}`\n\n`<t:{ts}:t>` -> <t:{ts}:t>\n`<t:{ts}:T>` -> <t:{ts}:T>\n`<t:{ts}>`   -> <t:{ts}>\n`<t:{ts}:F>` -> <t:{ts}:F>\n`<t:{ts}:d>` -> <t:{ts}:d>\n`<t:{ts}:D>` -> <t:{ts}:D>\n`<t:{ts}:R>` -> <t:{ts}:R>\n")
+
+	@commands.command(name = 'todatetime', aliases = ['todate', 'td'], slash_command = False, help= "Get datetime from timestamp.")
+	@commands.cooldown(1, 5, BucketType.user)
+	async def _todate(self, ctx, timestamp : int):
+		t_str = str(timestamp)
+		base_url = "https://showcase.api.linx.twenty57.net/UnixTime/fromunixtimestamp?unixtimestamp="
+		url = base_url+t_str
+		async with self.bot.session.get(url) as resp:
+			try:
+				js = await resp.json()
+				
+			except Exception as e:
+				raise commands.BadArgument(f"Invalid timestamp given. Please provide a valid timestamp, thanks.")
+			else:
+				err = js.get('Error')
+				if err:
+					return await ctx.send(f"**Error**: {err}")
+
+				ts = js['Datetime']
+				await ctx.send(f"**{ts}** UTC")
 
 	
 
