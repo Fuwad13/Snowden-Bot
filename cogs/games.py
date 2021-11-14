@@ -692,12 +692,12 @@ class Battlefield(commands.Cog):
 			t_view = bs.Tradeview(ctx = ctx ,player1= player1, player2= player2, bfh = self.bfh, embed = embed)
 			const_str = f" - To add items:\n ╰ `add <amount> <item_name>`\n - To remove items:\n ╰ `add <amount> <item_name>`\n - To add/remove cash money:\n ╰ `money +<amount>` | `money -<amount>`\n You can confirm the trade after the trade has been validated!\n"
 			
-			embed.description = const_str +f"** - Trade validated ? : {cs.EMOJIS['greentick'] if t_view.validated else cs.EMOJIS['redtick']}"
+			embed.description = const_str +f"** - Trade validated ?** : {cs.EMOJIS['greentick'] if t_view.validated else cs.EMOJIS['redtick']}"
 			embed.add_field(name = f"__{player1}__", value = "\u2800", inline= False)
 			embed.add_field(name = f"**Total value**:", value = f"${value1}", inline= False)
 			embed.add_field(name = f"__{player2}__", value = "\u2800", inline= False)
 			embed.add_field(name = f"**Total value**:", value = f"${value2}", inline= False)
-			await msg.edit(f"Trade ongoing...", embed = embed, view = t_view)
+			await msg.edit(f"<a:greenDot:877638573099200512>**Trade ongoing.....**", embed = embed, view = t_view)
 			def check(message):
 				auth_c : bool = (message.author == player1) or (message.author == player2)
 				#msg_c : bool = message.content.startswith('add') or message.content.startswith('remove')
@@ -705,7 +705,7 @@ class Battlefield(commands.Cog):
 
 			while True:
 				if t_view.cancelled:
-					await msg.edit(content= f"Trade cancelled...", view = t_view)
+					await msg.edit(content= f"{cs.EMOJIS['redtick']}**Trade cancelled...**", view = t_view)
 					break
 				try:
 					inp : discord.Message = await self.bot.wait_for('message', check = check, timeout=60.0)

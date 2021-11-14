@@ -435,17 +435,26 @@ class Tradeview(ui.View):
 		self.embed = embed 
 		self.validated = False
 		self.cancelled = False
+		self.confim_dict = {
+			str(player1.id) : False,
+			str(player2.id) : False
+		}
 
 	async def interaction_check(self, interaction: discord.Interaction) -> bool:
-		if interaction.user != self.player1 or interaction.user != self.player2:
+		p1 = interaction.user == self.player1
+		p2 = interaction.user == self.player2
+		chk = p1 or p2
+		if not chk :
 			await interaction.response.send_message(f"Sorry , This is {self.player1.mention} and {self.player2.mention}'s trade menu, not yours!", ephemeral= True)
 
-		return interaction.user == self.player1 or interaction.user == self.player2
+		return chk
 
 	@ui.button(label= "Confirm Trade", style= discord.ButtonStyle.blurple, disabled=True)
 	async def trade_confirm(self, button : ui.Button, intr : discord.Interaction):
 		if not self.validated:
 			await intr.response.send_message("This trade can't be confirmed yet! It hasn't been validated, please follow the trade guidelines and rules.", ephemeral= True)
+		self.confim_dict[str(intr.user.id)] = True
+		
 
 	@ui.button(label = "Cancel", style= discord.ButtonStyle.red)
 	async def cancel_button(self, button , intr : discord.Interaction):
