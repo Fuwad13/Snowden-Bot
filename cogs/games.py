@@ -804,9 +804,10 @@ class Battlefield(commands.Cog):
 					elif inp.content.lower().startswith('money'):
 						
 						try:
-							in_amount = int(inp.content.split(' ')[1])
+							in_amount = int(inp.content.split(' ')[-1])
 							
-						except ValueError:
+						except ValueError as excp:
+							print(excp)
 							continue
 						else:
 							p_r = p12rec.get(str(inp.author.id))
