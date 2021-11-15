@@ -380,10 +380,12 @@ class QuickFightView(ui.View):
 			win_emb = self.embed2
 		if hp <= 0:
 			# idle player got killed
+			self.stop()
 			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}** and **Killed** him!\n :tada: Congrats {self.active_p.mention}, You won the quickfight match\n**You got** {EMOJIS['exp']} **50 exp** from this fight."
 			win_emb.description+=f"  (**Won**)"
 			edit_emb.description = f"**__Healthpoints__**: 0/100 {self.bfh.get_bar_emojis('hp', 0, 100)} (**Lost**)"
 			await self.bfh.update_exp(player_id= self.active_p.id, amount= 50)
+			
 			self.clear_items()
 		else: 
 			content = f"**{self.active_p}** dealt :boom: **{damage} damage** to **{self.idle_p}**\nIt's {self.idle_p.mention}'s turn now.."
@@ -458,6 +460,9 @@ class Tradeview(ui.View):
 		else:
 			await intr.response.send_message(f"`{intr.user}` has confirmed the trade, waiting for other player's confirmation......")
 			self.confim_dict[str(intr.user.id)] = True
+			if self.confim_dict[str(self.player1.id)] and self.confim_dict[str(self.player2.id)]:
+				self.stop()
+
 
 
 	@ui.button(label = "Cancel", style= discord.ButtonStyle.red)
@@ -466,5 +471,3 @@ class Tradeview(ui.View):
 		self.cancelled = True
 		self.cancelled_by = intr.user
 
-
-		

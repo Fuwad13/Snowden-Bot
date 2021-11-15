@@ -649,7 +649,7 @@ class Battlefield(commands.Cog):
 		player2 = player
 		flag = await self.bfh.check_if_exists(player2.id)
 		if not flag:
-			return await ctx.send(f"**{player2}** hasn't started playing battlefield yet! You can't trade with him before he starts playing")
+			return await ctx.send(f"**{player2}** hasn't started playing battlefield yet! You can't trade with them before he starts playing")
 		rec1 = await self.bfh.get_player_data(player1.id)
 		rec2 = await self.bfh.get_player_data(player2.id)
 		p1_level = self.bfh.get_level(rec1['exp'])
@@ -657,11 +657,11 @@ class Battlefield(commands.Cog):
 		if p1_level < 4 or p2_level < 4:
 			return await ctx.send(f"{player1} and {player2}, sorry , one/both of you two haven't reached **Level 4** yet. You can't trade with one another before both of you reach level 4!")
 		view = bs.TradeConfirmView(player2)
-		msg = await ctx.send(f"{player2.mention} -> {player1.mention} wants to trade with you?\nIf you want to trade with him then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`", view = view)
+		msg = await ctx.send(f"{player2.mention} -> {player1.mention} wants to trade with you?\nIf you want to trade with them then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`", view = view)
 		await view.wait()
 		view.clear_items()
 		if not view.confirmation:
-			return await msg.edit(f"{player2.mention} -> {player1.mention} ~~wants to trade with you!\nIf you want to trade with him then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`~~\n**Trade Cancelled**", view = view)
+			return await msg.edit(f"{player2.mention} -> {player1.mention} ~~wants to trade with you!\nIf you want to trade with them then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`~~\n**Trade Cancelled**", view = view)
 		elif view.confirmation:
 			await msg.edit(view = view)
 			value1 = 0
