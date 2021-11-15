@@ -242,6 +242,56 @@ class BattleFieldHelper:
 			print(e)
 			return False
 
+	def sort_by_rarity(self, item_dict : dict):
+		"""Sort the dict items and return a list of 5 rarity based dicts"""
+		common = {}
+		rare = {}
+		legendary = {}
+		epic = {}
+		mythic = {}
+		mp = {
+			'common' : common,
+			'rare' : rare,
+			'legendary' : legendary,
+			'epic' : epic,
+			'mythic' : mythic
+		}
+		for k, v in item_dict.items():
+			rarity = itm.ALL_ITEMS[str(k)]['rarity']
+			dic = mp[rarity]
+			dic[str(k)] = v
+		ret = [common, rare, legendary, epic, mythic]
+		return ret
+
+	async def smart_bulk_upd_inv(self, *, player_id : int, items_dict : dict):
+		rar_list = self.sort_by_rarity(items_dict)
+		rec = await self.get_player_data(player_id)
+		n_common = rar_list[0]
+		n_rare = rar_list[1]
+		n_legendary = rar_list[2]
+		n_epic = rar_list[3]
+		n_mythic = rar_list[4]
+		common : dict = json.loads(rec['common'])
+		rare : dict = json.loads(rec['rare'])
+		legendary : dict = json.loads(rec['legendary'])
+		epic : dict = json.loads(rec['epic'])
+		mythic : dict = json.loads(rec['mythic'])
+		f_com_d : dict = self.smart_dict_update(common, n_common)
+		f_rar_d : dict = self.smart_dict_update(rare, n_rare)
+		f_leg_d : dict = self.smart_dict_update(legendary, n_legendary)
+		f_epi_d : dict = self.smart_dict_update(epic, n_epic)
+		f_myt_d : dict = self.smart_dict_update(mythic, n_mythic)
+
+		com_js = json.dumps(f_com_d)
+		rar_js = json.dumps(f_rar_d)
+		leg_js = json.dumps(f_leg_d)
+		epi_js = json.dumps(f_epi_d)
+		myt_js = json.dumps(f_myt_d)
+
+		await self.bot.db.execute(""" UPDATE battlefield SET common = $1, rare = $2, legendary = $3, epic = $4, mythic = $5 WHERE p_id = $6 ;""", com_js, rar_js, leg_js, epi_js, myt_js, player_id)
+		
+
+
 
 	def can_opt_out(self, n_opt_out: int):
 		if n_opt_out> int(time.time()):
@@ -344,6 +394,28 @@ class BattleFieldHelper:
 		rec = await self.get_player_data(player_id)
 		eq_p_dict = json.loads(rec['equipments'])
 		#later
+
+	def invert_dict_values(self, i_dict : dict):
+		inverted = {}
+		for k, v in i_dict.items():
+			if v <=0:
+				continue
+			inverted[str(k)] = -v
+		return inverted
+
+	def smart_dict_update(self, d1 : dict , d2 : dict):
+		ret = {}
+		ret.update(d1)
+		key_list = [str(ke) for ke in ret.keys()]
+		for k, v in d2.items():
+			
+			if str(k) in key_list:
+				ret[str(k)] +=v
+				continue
+			ret[str(k)] = v
+		return ret
+
+
 
 class AttackEngine:
 	"""The base class for attack logics"""

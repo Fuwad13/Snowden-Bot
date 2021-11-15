@@ -695,13 +695,13 @@ class Battlefield(commands.Cog):
 			embed.add_field(name = f"**Total value**:", value = f"${value1}", inline= False)
 			embed.add_field(name = f"__{player2}__", value = "\u2800", inline= False)
 			embed.add_field(name = f"**Total value**:", value = f"${value2}", inline= False)
-			embed.set_footer(text=f"type **proceed** after both of you accept/confirm the trade by pressing the button!")
+			embed.set_footer(text=f"type proceed after both of you accept/confirm the trade by pressing the button!")
 			await msg.edit(f"<a:greenDot:877638573099200512>**Trade ongoing.....**", embed = embed, view = t_view)
 			def check(message):
 				auth_c : bool = (message.author == player1) or (message.author == player2)
 				#msg_c : bool = message.content.startswith('add') or message.content.startswith('remove')
 				return auth_c #and msg_c
-
+			should_proceed = False
 			while True:
 				if t_view.cancelled:
 					await msg.edit(content= f"{cs.EMOJIS['redtick']}**Trade cancelled by {t_view.cancelled_by}**", view = t_view)
@@ -867,7 +867,18 @@ class Battlefield(commands.Cog):
 					t_valid_str = f"** - Trade validated ?** : {cs.EMOJIS['greentick'] if t_view.validated else cs.EMOJIS['redtick']}"
 					embed.description = const_str + t_valid_str
 					await msg.edit(embed = embed, view = t_view)
-					
+			if should_proceed:
+				p1inverted = self.bfh.invert_dict_values(p1td)
+				p1finald = self.bfh.smart_dict_update(p1inverted, p2td)
+				p2inverted = self.bfh.invert_dict_values(p2td)
+				p2finald = self.bfh.smart_dict_update(p2inverted, p1td)
+				await self.bfh.smart_bulk_upd_inv(player_id= player1.id, items_dict= p1finald)
+				await self.bfh.smart_bulk_upd_inv(player_id= player2.id, items_dict= p2finald)
+				p1finalbal = rec1['balance'] - p12_tm[str(player1.id)] + p12_tm[str(player2.id)]
+				p2finalbal = rec2['balance'] - p12_tm[str(player2.id)] + p12_tm[str(player1.id)]
+				await self.bot.db.execute("UPDATE battlefield SET balance = $1 WHERE p_id = $2;", p1finalbal, player1.id)
+				await self.bot.db.execute("UPDATE battlefield SET balance = $1 WHERE p_id = $2;", p2finalbal, player2.id)
+				await ctx.send(f"{cs.EMOJIS['greentick']} Trade has been processed for {player1} and {player2}")
 
 	@commands.command(name= 'equip', aliases = ['eq', 'attach'], help = "Equip a weapon or armour from your inventory")
 	@has_started()
