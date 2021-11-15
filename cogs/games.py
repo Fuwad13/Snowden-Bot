@@ -435,7 +435,7 @@ class Battlefield(commands.Cog):
 		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
 
 		await self.bfh.update_inventory(player_id=ctx.author.id, _item = 'rare_chest', amount = 1)
-		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['rare']}`rare chest x1` **as your daily check-in reward!\nYour new balace is **${n_bal:,}**"
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['rare']}`rare chest x1` **as your daily check-in reward!\nYour new balance is **${n_bal:,}**"
 		if lvl_up:
 			lvl_up_m = random.randint(100,200)*(c_lvl+1)
 			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
@@ -463,7 +463,7 @@ class Battlefield(commands.Cog):
 		c_lvl = self.bfh.get_level(c_exp)
 		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
 		await self.bfh.update_inventory(player_id=ctx.author.id, _item = 'common_chest', amount = 1)
-		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['common']}`common chest x1` **as your hourly rewards!\nYour new balace is **${n_bal}**"
+		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['common']}`common chest x1` **as your hourly rewards!\nYour new balance is **${n_bal:,}**"
 		if lvl_up:
 			lvl_up_m = random.randint(100,200)*(c_lvl+1)
 			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
@@ -491,10 +491,10 @@ class Battlefield(commands.Cog):
 		c_lvl = self.bfh.get_level(c_exp)
 		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
 		await self.bfh.update_inventory(player_id=ctx.author.id, _item = 'legendary_chest', amount = 1)
-		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['legendary']}`legendary chest x1` **as your weekly check-in reward!\nYour new balace is **${n_bal}**"
+		text = f"{ctx.author.mention} , You got :\n• **${reward}**\n• <:exp:896086434946097162>**{n_exp-c_exp} EXP**\n• {cs.CHESTS_EMOJIS['legendary']}`legendary chest` **x1** as your weekly check-in reward!\nYour new balance is **${n_bal:,}**"
 		if lvl_up:
 			lvl_up_m = random.randint(100,200)*(c_lvl+1)
-			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m:,}**"
 			await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
 		await ctx.send(text)
 
@@ -519,10 +519,10 @@ class Battlefield(commands.Cog):
 		c_lvl = self.bfh.get_level(c_exp)
 		lvl_up = self.bfh.level_up_check(c_exp, n_exp)
 		await self.bfh.update_inventory(player_id=ctx.author.id, _item = 'legendary_chest', amount = 2)
-		text = f"{ctx.author.mention} , You got **${reward}** and <:exp:896086434946097162>**{n_exp-c_exp} EXP and {cs.CHESTS_EMOJIS['legendary']}`legendary chest x2` **as your monthly check-in reward!\nYour new balace is **${n_bal}**"
+		text = f"{ctx.author.mention} -> You got :\n• **${reward}**\n• <:exp:896086434946097162>**{n_exp-c_exp} EXP**\n• {cs.CHESTS_EMOJIS['legendary']}`legendary chest` **x2** as your monthly check-in reward!\nYour new balance is **${n_bal:,}**"
 		if lvl_up:
 			lvl_up_m = random.randint(100,200)*(c_lvl+1)
-			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m}**"
+			text += f"\n\n\U0001f389 Congrats! You levelled up! `({c_lvl} -> {c_lvl+1})` and gained **${lvl_up_m:,}**"
 			await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
 		await ctx.send(text)
 
@@ -560,7 +560,7 @@ class Battlefield(commands.Cog):
 	async def _loot(self, ctx):
 		if ctx.interaction is not None:
 			await ctx.interaction.response.defer(ephemeral=False)
-		await ctx.send("This command is under maintenance.")
+		
 
 	# @commands.command(name = 'shop', aliases= ['sh'], help= "soon")
 	# @has_started()
@@ -568,7 +568,7 @@ class Battlefield(commands.Cog):
 	# async def _shop(self, ctx, item_name : str, amount : int = 1):
 	# 	pass
 
-	@commands.command(name = 'buy', aliases= ['b'], help= "soon")
+	@commands.command(name = 'buy', aliases= ['b'], help= "Buy an item using your balance. Some items are not buyable")
 	@has_started()
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,3, BucketType.user)
@@ -604,7 +604,7 @@ class Battlefield(commands.Cog):
 			await msg.edit(f"{ctx.author.mention} ->\n{cs.EMOJIS['greentick']} You bought **{amount}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` for **${total_price}**.", view = view)
 
 
-	@commands.command(name = 'sell', aliases= ['s'], help= "soon")
+	@commands.command(name = 'sell', aliases= ['s'], help= "Sell an item from your inventory.")
 	@has_started()
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,3, BucketType.user)
@@ -638,7 +638,7 @@ class Battlefield(commands.Cog):
 			await msg.edit(f"{ctx.author.mention} ->\n{cs.EMOJIS['greentick']} You sold **{amount}x** {ALL_ITEMS[item_name_n]['emoji']}`{ALL_ITEMS[item_name_n]['name']}` from your inventory for **${total_price}**.", view = view)
 
 
-	@commands.command(name = 'trade', aliases= ['tr'], help= "soon")
+	@commands.command(name = 'trade', aliases= ['tr'], help= "Trade items with other players following trade guidelines and rules.")
 	@has_started()
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1,10, BucketType.user)
@@ -967,7 +967,7 @@ class Battlefield(commands.Cog):
 
 
 
-	@commands.command(name = 'attack', aliases= ['a'], help= "soon")
+	@commands.command(name = 'attack', aliases= ['a'], help= "Attack other players using your equipped weapon")
 	@commands.guild_only()
 	@can_attack()
 	@commands.max_concurrency(1, BucketType.user)
@@ -1116,8 +1116,13 @@ class Battlefield(commands.Cog):
 	@commands.command(name = "trivia", aliases = ['tri'], help = "Answer trivia questions and earn money and exp from it.", hidden = True)
 	@commands.guild_only()
 	@commands.max_concurrency(1, BucketType.user)
+	@commands.cooldown(1, 10, BucketType.user)
 	async def trivia(self, ctx):
-		...
+		url = "https://opentdb.com/api.php?amount=10&type=multiple"
+		async with self.bot.session.get(url) as resp:
+			js = await resp.json()
+			if not js['response_code'] == 0:
+				return await ctx.send(f"Something went wrong, can't get any questions for you.")
 
 	@commands.command(name= 'players', aliases = ['player', 'activeplayers'], help = "Shows currently opted in players count and information", slash_command = False)
 	@commands.guild_only()
