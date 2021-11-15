@@ -663,7 +663,7 @@ class Battlefield(commands.Cog):
 		if not view.confirmation:
 			return await msg.edit(f"{player2.mention} -> {player1.mention} ~~wants to trade with you!\nIf you want to trade with him then press **Trade** or press **Cancel** to cancel.`(timeout=60s)`~~\n**Trade Cancelled**", view = view)
 		elif view.confirmation:
-			await msg.edit(f"{cs.EMOJIS['greentick']} Trade request accepted. You can trade now!", view = view)
+			await msg.edit(view = view)
 			value1 = 0
 			value2 = 0
 			p1_all_items = self.bfh.get_inv_all_items_dict(rec1)
@@ -696,7 +696,7 @@ class Battlefield(commands.Cog):
 			embed.add_field(name = f"__{player2}__", value = "\u2800", inline= False)
 			embed.add_field(name = f"**Total value**:", value = f"${value2}", inline= False)
 			embed.set_footer(text=f"type proceed after both of you accept/confirm the trade by pressing the button!")
-			await msg.edit(f"<a:greenDot:877638573099200512>**Trade ongoing.....**", embed = embed, view = t_view)
+			await msg.edit(f"<a:greenDot:877638573099200512>**Trade ongoing between **{player1.mention} and {player2.mention}......", embed = embed, view = t_view)
 			def check(message):
 				auth_c : bool = (message.author == player1) or (message.author == player2)
 				#msg_c : bool = message.content.startswith('add') or message.content.startswith('remove')
@@ -710,7 +710,7 @@ class Battlefield(commands.Cog):
 					t_view.clear_items()
 					t_view.stop()
 
-					await msg.edit(content= f"{cs.EMOJIS['greentick']}**Trade confirmed and being processed!**", view = t_view)
+					await msg.edit(content= f"{cs.EMOJIS['greentick']}**Trade confirmed and is being processed!**", view = t_view)
 					should_proceed = True
 					break
 				try:
@@ -828,7 +828,7 @@ class Battlefield(commands.Cog):
 							if in_amount == 0:
 								continue
 							elif in_amount > 0 and in_amount > p_r['balance']:
-								p12_tm[str(inp.author.id)]+=p_r['balance']
+								p12_tm[str(inp.author.id)] =p_r['balance']
 							elif in_amount > 0 and in_amount <= p_r['balance']:
 								p12_tm[str(inp.author.id)]+=in_amount
 							elif in_amount < 0 and p_t_m == 0:
