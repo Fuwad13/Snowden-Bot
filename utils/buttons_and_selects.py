@@ -477,11 +477,12 @@ class Tradeview(ui.View):
 # 		options = []
 # 		self.role_list = [role[0] for role in role_dict.values()]
 # 		for r_id , l in role_dict.items():
-# 			options.append(discord.SelectOption(label=f"{r.name}", value=f"{r.id}", description=f"{d}"))
+# 			options.append(discord.SelectOption(label=f"{l[0].name}", value=f"{l[0].id}", description=f"{l[1]}"))
 
 # 		super().__init__(placeholder='Select your roles.....', max_values= len(options), options= options)
 
 # 	async def callback(self, interaction: discord.Interaction):
 # 		role_ids = self.values
-# 		for role in role_ids:
-
+# 		roles = []
+# 		for rid in role_ids:
+# 			roles.append()

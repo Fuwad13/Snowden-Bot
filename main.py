@@ -16,7 +16,7 @@ import logging
 import ast
 import re
 import inspect
-
+from utils.context_managers import UserLock
 from utils.errors import Blacklisted
 
 def source(o):
@@ -87,6 +87,65 @@ class SnowdenBot(commands.AutoShardedBot):
         super().__init__(*args, **kwargs)
         self.blacklist = {}
         self.automod_guilds = {}
+        self.user_lock = {}
+        self.command_running = {}
+
+    def add_user_lock(self, lock : UserLock):
+        self.user_lock.update({lock.user.id: lock})
+
+    async def check_user_lock(self, user: typing.Union[discord.Member, discord.User]):
+        if lock := self.user_lock.get(user.id):
+            if lock.locked():
+                if isinstance(lock, UserLock):
+                    raise lock.error
+                raise commands.CommandError("You can't invoke another command while another command is running.")
+            else:
+                self.user_lock.pop(user.id, None)
+
+    async def running_command(self, ctx: SnowdenContext, **flags):
+        dispatch = flags.pop("dispatch", True)
+        if dispatch:
+            self.dispatch('command', ctx)
+        try:
+            await self.check_user_lock(ctx.author)
+            check = await self.can_run(ctx, call_once=flags.pop("call_once", True))
+            if check or not flags.pop("call_check", True):
+                ctx.running = True
+                await ctx.trigger_typing()
+                await ctx.command.invoke(ctx)
+            else:
+                raise commands.CheckFailure('The global check once functions failed.')
+        except commands.CommandError as exc:
+            if dispatch:
+                await ctx.command.dispatch_error(ctx, exc)
+            if flags.pop("redirect_error", False):
+                raise
+        else:
+            if dispatch:
+                self.dispatch('command_completion', ctx)
+        finally:
+            ctx.running = False
+            self.command_running.pop(ctx.message.id, None)
+
+    async def invoke(self, ctx: SnowdenContext, **flags) -> None:
+        dispatch = flags.get("dispatch", True)
+        if ctx.command is not None:
+            run_in_task = flags.pop("in_task", True)
+            if run_in_task:
+                command_task = self.loop.create_task(self.running_command(ctx, **flags))
+                self.command_running.update({ctx.message.id: command_task})
+            else:
+                await self.running_command(ctx, **flags)
+        elif ctx.invoked_with:
+            exc = commands.CommandNotFound('Command "{}" is not found'.format(ctx.invoked_with))
+            if dispatch:
+                self.dispatch('command_error', ctx, exc)
+
+            if flags.pop("redirect_error", False):
+                raise exc
+
+        
+
         
 
     async def get_context(self, message, *, cls=SnowdenContext):
@@ -255,9 +314,9 @@ async def reloaderror(ctx, error):
 
 
 
-
-bot.loop.run_until_complete(create_db_pool())
-#bot.loop.create_task(run_once_when_ready())
-ready()
-bot.run(TOKEN)
+if __name__ == "__main__":
+    bot.loop.run_until_complete(create_db_pool())
+    #bot.loop.create_task(run_once_when_ready())
+    ready()
+    bot.run(TOKEN)
 
