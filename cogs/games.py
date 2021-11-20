@@ -1,4 +1,5 @@
 import discord
+import html
 from discord import embeds
 from discord import player
 from discord.ext import commands
@@ -1121,6 +1122,7 @@ class Battlefield(commands.Cog):
 			qf_msg = await ctx.send(f"{player1.mention}, It's your turn to `fight` or `heal`!", embeds = [embed1, embed2] ,view = qf_view)
 
 	@commands.command(name = "trivia", aliases = ['tri'], help = "Answer trivia questions and earn money and exp from it.", hidden = True)
+	@has_started()
 	@commands.guild_only()
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1, 10, BucketType.user)
@@ -1152,11 +1154,11 @@ class Battlefield(commands.Cog):
 		}
 		ans_str = ""
 		for k, v in options.items():
-			ans_str+=f"**{str(k)}** : *{v}*\n"
+			ans_str+=f"**{str(k)}**) {v}\n"
 
 		embed = discord.Embed(title = f"Trivia question...", color = color_d[difficulty])
-		embed.description = f"`Question :` **__{question}__**\n\n{ans_str}\n\nType the correct answer's option(example : `A` if `A` is correct)\n`you have 15 seconds to choose from the options`"
-		embed.set_footer(text = f"Difficulty : {difficulty} - Category : {category}")
+		embed.description = f"`Question :` **__{html.unescape(question)}__**\n\n{ans_str}\n\nType the correct answer's option(example : `A` if `A` is correct)\n`you have 15 seconds to choose from the options`"
+		embed.set_footer(text = f"Difficulty : {difficulty.capitalize()} - Category : {category.capitalize()} || Question from - opentdb.com")
 		msge = await ctx.send(embed = embed)
 		def chk(m):
 			return m.author == ctx.author

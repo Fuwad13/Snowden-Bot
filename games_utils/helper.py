@@ -107,6 +107,10 @@ class BattleFieldHelper:
 			await self.bot.db.execute(""" UPDATE battlefield SET balance = $1 WHERE p_id = $2; """, bal, player_id)
 		return bal
 
+	async def better_update_balance(self,*,player_id, amount : int):
+		n_bal = await self.bot.db.fetchval(""" UPDATE battlefield SET balance = balance + $1 WHERE p_id = $2 returning balance as n_bal; """, amount, player_id)
+		return n_bal
+
 	def get_item_data(self, item :str):
 		data = itm.ALL_ITEMS[item]
 		return data
