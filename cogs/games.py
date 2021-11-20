@@ -1156,7 +1156,7 @@ class Battlefield(commands.Cog):
 
 		embed = discord.Embed(title = f"Trivia question...", color = color_d[difficulty])
 		embed.description = f"`Question :` **__{question}__**\n\n{ans_str}\n\nType the correct answer's option(example : `A` if `A` is correct)\n`you have 15 seconds to choose from the options`"
-		embed.set_footer(text = f"Difficulty : {difficulty}")
+		embed.set_footer(text = f"Difficulty : {difficulty} - Category : {category}")
 		msge = await ctx.send(embed = embed)
 		def chk(m):
 			return m.author == ctx.author
@@ -1166,7 +1166,7 @@ class Battlefield(commands.Cog):
 			await msge.reply(f"Timed out.\nCorrect answer is - **{correct_ans}**")
 		else:
 			if not msg.content:
-				return await msg.reply(f"Invalid option/answer.\nCorrect answer is - **{correct_ans}**")
+				return await msg.reply(f"<:redTick:876471581054996550> Invalid option/answer.\nCorrect answer is - **{correct_ans}**")
 			user_ans = msg.content.upper()
 			if user_ans in ['A', 'B', 'C', 'D']:
 				if options[user_ans] == correct_ans:
@@ -1174,7 +1174,7 @@ class Battlefield(commands.Cog):
 				else:
 					return await msg.reply(f"Sorry, you chose a wrong answer. The correct answer is - **{correct_ans}**")
 			else:
-				return await msg.reply(f"Invalid option/answer.")
+				return await msg.reply(f"<:redTick:876471581054996550> Invalid option/answer.")
 			
 
 		
