@@ -1155,25 +1155,27 @@ class Battlefield(commands.Cog):
 			ans_str+=f"**{str(k)}** : *{v}*\n"
 
 		embed = discord.Embed(title = f"Trivia question...", color = color_d[difficulty])
-		embed.description = f"`Question :` **__{question}__**\n\n{ans_str}\n\nType the correct answer's option(example : *A* if A is correct)\n`you have 10 seconds to choose from the options`"
+		embed.description = f"`Question :` **__{question}__**\n\n{ans_str}\n\nType the correct answer's option(example : `A` if `A` is correct)\n`you have 15 seconds to choose from the options`"
 		embed.set_footer(text = f"Difficulty : {difficulty}")
 		msge = await ctx.send(embed = embed)
 		def chk(m):
 			return m.author == ctx.author
 		try:
-			msg = await self.bot.wait_for('message', check = chk, timeout = 10)
+			msg = await self.bot.wait_for('message', check = chk, timeout = 15)
 		except asyncio.TimeoutError:
-			await msge.reply(f"Timed out.")
+			await msge.reply(f"Timed out.\nCorrect answer is - **{correct_ans}**")
 		else:
-			if not msge.content:
-				return await msge.reply(f"Invalid option/answer.")
+			if not msg.content:
+				return await msg.reply(f"Invalid option/answer.\nCorrect answer is - **{correct_ans}**")
 			user_ans = msg.content.upper()
-			if user_ans not in ['A', 'B', 'C', 'D']:
-				return await msge.reply(f"Invalid option/answer.")
-			if options[user_ans] == correct_ans:
-				return await msge.reply(f":tada: You chose the correct answer!!! - {correct_ans}")
+			if user_ans in ['A', 'B', 'C', 'D']:
+				if options[user_ans] == correct_ans:
+					return await msg.reply(f":tada: You chose the correct answer!!! - {correct_ans}")
+				else:
+					return await msg.reply(f"Sorry, you chose a wrong answer. The correct answer is - **{correct_ans}**")
 			else:
-				return await msge.reply(f"Sorry, you chose a wrong answer. The correct answer is - {correct_ans}")
+				return await msg.reply(f"Invalid option/answer.")
+			
 
 		
 
