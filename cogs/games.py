@@ -862,7 +862,7 @@ class Battlefield(commands.Cog):
 						p1ttv = int(embed.fields[1].value.split('$',1)[-1])
 						p2ttv = int(embed.fields[3].value.split('$',1)[-1])
 						difference = abs(p1ttv - p2ttv)
-						if p1ttv > 0 and p2ttv > 0 and difference < 500:
+						if p1ttv > 0 and p2ttv > 0 and difference < 10000:
 							t_view.validated = True
 							t_view.trade_confirm.disabled = False
 						else:
