@@ -82,11 +82,11 @@ class Owner(commands.Cog):
 		r = await self.bot.db.execute("UPDATE battlefield SET hp = $1 where p_id = $2;", amount, player_id)
 		await ctx.send(str(r))
 
-	@_set.command(name = "sp", aliases = ['shieldpoint', 'shp', 'ap'], hidden = True)
+	@_set.command(name = "bal", aliases = ['bal', 'balance'], hidden = True)
 	@commands.is_owner()
-	async def _setsp(self, ctx, player : typing.Union[discord.Member, discord.User], amount : int):
+	async def _setbal(self, ctx, player : typing.Union[discord.Member, discord.User], amount : int):
 		player_id = player.id
-		r = await self.bot.db.execute("UPDATE battlefield SET sp = $1 where p_id = $2;", amount, player_id)
+		r = await self.bot.db.execute("UPDATE battlefield SET balance = $1 where p_id = $2;", amount, player_id)
 		await ctx.send(str(r))
 
 	@commands.command(name = "/cleanup", aliases = ['/clean'],hidden = True )

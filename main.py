@@ -57,7 +57,7 @@ TOKEN = os.getenv("TOKEN")
 
 # ======================= Bot constructor =====================
 intents = discord.Intents(messages=True, guilds=True,
-                          reactions=True, members=True, presences=True, emojis=True)
+                          reactions=True, members=True, emojis=True)
 
 
 def get_prefix(bot, message):

@@ -108,19 +108,28 @@ class Moderation(commands.Cog):
         ev_ov = overwrites.get(ctx.guild.default_role)
         if not ev_ov:
             await channel.set_permissions(ctx.guild.default_role, send_messages = False)
-            return await ctx.send(f"Locked {channel.mention}")
+            return await ctx.send(f"{EMOJIS['greentick']}Locked {channel.mention}")
         if ev_ov.send_messages == False:
-            return await ctx.send(f"{channel.mention} is already locked for everyone!", delete_after = 5)
+            return await ctx.send(f"{channel.mention} is already locked for everyone!", delete_after = 10)
         overwrites[ctx.guild.default_role].send_messages = False  
         await channel.set_permissions(ctx.guild.default_role, overwrite = overwrites[ctx.guild.default_role])
-        await ctx.send(f"Locked {channel.mention}")
+        await ctx.send(f"{EMOJIS['greentick']}Locked {channel.mention}")
 
-
-
-        
-
-    
-
+    @commands.command(name= 'unlock', aliases = ['unlockdown'], brief = "Enable `Send messages` permission for everyone.", help = "Enable `Send messages` permission for everyone for a channel.", slash_command = False)
+    @commands.has_permissions(manage_channels = True, manage_permissions = True)
+    @commands.bot_has_permissions(manage_channels = True,manage_permissions = True)
+    async def unlock(self, ctx):
+        channel = ctx.channel
+        overwrites = channel.overwrites
+        ev_ov = overwrites.get(ctx.guild.default_role)
+        if not ev_ov:
+            await channel.set_permissions(ctx.guild.default_role, send_messages = True)
+            return await ctx.send(f"{EMOJIS['greentick']}Unlocked {channel.mention}")
+        if ev_ov.send_messages == True:
+            return await ctx.send(f"{channel.mention} is already unlocked for everyone!", delete_after = 10)
+        overwrites[ctx.guild.default_role].send_messages = True 
+        await channel.set_permissions(ctx.guild.default_role, overwrite = overwrites[ctx.guild.default_role])
+        await ctx.send(f"{EMOJIS['greentick']}Unlocked {channel.mention}")
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
