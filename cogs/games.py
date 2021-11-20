@@ -1094,6 +1094,9 @@ class Battlefield(commands.Cog):
 		if not flag:
 			return await ctx.send(f"**{player2}** hasn't started playing battlefield yet! You can't attack them before they starts playing!")
 
+		if player1 == player2:
+			return await ctx.send("You can't invite yourself to a quickfight!")
+
 		view = bs.QuickFightConfirmation(ctx, player2)
 		msg = await ctx.send(f"**{player2}**, {ctx.author.mention} has invited you to a quickfight match! \nYou have `90s` to **Accept** or **Reject** their invitation!", view = view)
 
@@ -1122,11 +1125,56 @@ class Battlefield(commands.Cog):
 	@commands.max_concurrency(1, BucketType.user)
 	@commands.cooldown(1, 10, BucketType.user)
 	async def trivia(self, ctx):
-		url = "https://opentdb.com/api.php?amount=10&type=multiple"
+		url = "https://opentdb.com/api.php?amount=1&type=multiple"
 		async with self.bot.session.get(url) as resp:
 			js = await resp.json()
 			if not js['response_code'] == 0:
 				return await ctx.send(f"Something went wrong, can't get any questions for you rn.")
+		color_d = {
+			'easy' : discord.Color.green(),
+			'medium' : discord.Color.blurple(),
+			'hard' : discord.Color.red()
+		}
+		results = js['results'][0]
+		category = results['category']
+		difficulty = results['difficulty']
+		question = results['question']
+		correct_ans = results['correct_answer']
+		all_ans = []
+		all_ans.append(correct_ans)
+		all_ans.extend(results['incorrect_answers'])
+		random.shuffle(all_ans)
+		options = {
+			'A' : all_ans[0],
+			'B' : all_ans[1],
+			'C' : all_ans[2],
+			'D' : all_ans[3]
+		}
+		ans_str = ""
+		for k, v in options.items():
+			ans_str+=f"**{str(k)}** : *{v}*\n"
+
+		embed = discord.Embed(title = f"Trivia question...", color = color_d[difficulty])
+		embed.description = f"`Question :` **__{question}__**\n\n{ans_str}\n\nType the correct answer's option(example : *A* if A is correct)\n`you have 10 seconds to choose from the options`"
+		embed.set_footer(text = f"Difficulty : {difficulty}")
+		msge = await ctx.send(embed = embed)
+		def chk(m):
+			return m.author == ctx.author
+		try:
+			msg = await self.bot.wait_for('message', check = chk, timeout = 10)
+		except asyncio.TimeoutError:
+			await msge.reply(f"Timed out.")
+		else:
+			if not msge.content:
+				return await msge.reply(f"Invalid option/answer.")
+			user_ans = msg.content.upper()
+			if user_ans not in ['A', 'B', 'C', 'D']:
+				return await msge.reply(f"Invalid option/answer.")
+			if options[user_ans] == correct_ans:
+				return await msge.reply(f":tada: You chose the correct answer!!! - {correct_ans}")
+			else:
+				return await msge.reply(f"Sorry, you chose a wrong answer. The correct answer is - {correct_ans}")
+
 		
 
 	@commands.command(name= 'players', aliases = ['player', 'activeplayers'], help = "Shows currently opted in players count and information", slash_command = False)
