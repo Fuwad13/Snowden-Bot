@@ -1,5 +1,6 @@
 import discord
 from discord import mentions
+from discord import channel
 from discord.ext import commands
 from utils.emojis import EMOJIS
 
@@ -35,6 +36,14 @@ class Events(commands.Cog):
         embed.set_image(url= str(guild.icon) or "https://cdn.discordapp.com/banners/336642139381301249/9b615fb84dbe8e5f4dd7b6ab167762cc.png?size=1024")
         channel = self.bot.get_channel(911675333927907348)
         await channel.send(f"{guild.id}", embed = embed)
+
+    @commands.Cog.listener('on_member_join')
+    async def on_emote_island_join(self, member):
+        if not member.guild.id == 874735250842984458:
+            return
+        channel = self.bot.get_channel(874737401807917117)
+        await channel.send(f"{member.mention}, Welcome to **Emoji Tools** Support Server.")
+        
 
         
 
