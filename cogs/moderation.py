@@ -104,7 +104,11 @@ class Moderation(commands.Cog):
     @commands.bot_has_permissions(manage_channels = True,manage_permissions = True)
     async def lock(self, ctx):
         channel = ctx.channel
-        await channel.set_permissions(ctx.guild.default_role, send_messages = False)
+        overwrites = channel.overwrites
+        if overwrites[ctx.guild.default_role].send_messages == False:
+            return await ctx.send(f"{channel.mention} is already locked for everyone!", delete_after = 5)
+        overwrites[ctx.guild.default_role].send_messages = False  
+        await channel.set_permissions(ctx.guild.default_role, overwrite = overwrites[ctx.guild.default_role])
         await ctx.send(f"Locked {channel.mention}")
 
 
