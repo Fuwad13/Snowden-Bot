@@ -62,6 +62,8 @@ class Moderation(commands.Cog):
         perms = member.guild_permissions
         if perms.administrator or perms.manage_guild or perms.ban_members or perms.kick_members or perms.manage_channels:
             return await ctx.send(f"{EMOJIS['redtick']}Can't kick that member as they have mod/admin perms.", ephemeral = True)
+        if not reason:
+            reason = "No reason provided"
         reason = reason[:450:] + f"\nResponsible Moderator: {ctx.author} - "
         try:
             await member.send(f"You have been kicked from {ctx.guild.name}\n {reason}")
@@ -70,9 +72,9 @@ class Moderation(commands.Cog):
             pass
         await member.kick(reason= reason)
 
-        embed = discord.embed(title= f"{member} has been kicked || reason : {reason[:200:]}...")
+        embed = discord.Embed(title= f"{EMOJIS['greentick']} {member} has been kicked || reason : {reason[:180:]}...")
         await ctx.send(embed = embed)
-        
+
 
         
 
