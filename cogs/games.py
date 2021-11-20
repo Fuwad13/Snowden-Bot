@@ -1141,23 +1141,23 @@ class Battlefield(commands.Cog):
 		category = results['category']
 		difficulty = results['difficulty']
 		question = results['question']
-		correct_ans = results['correct_answer']
+		correct_ans = html.unescape(results['correct_answer']) 
 		all_ans = []
 		all_ans.append(correct_ans)
 		all_ans.extend(results['incorrect_answers'])
 		random.shuffle(all_ans)
 		options = {
-			'A' : all_ans[0],
-			'B' : all_ans[1],
-			'C' : all_ans[2],
-			'D' : all_ans[3]
+			'A' : html.unescape(all_ans[0]),
+			'B' : html.unescape(all_ans[1]),
+			'C' : html.unescape(all_ans[2]),
+			'D' : html.unescape(all_ans[3])
 		}
 		ans_str = ""
 		for k, v in options.items():
 			ans_str+=f"**{str(k)}**) {v}\n"
 
 		embed = discord.Embed(title = f"Trivia question...", color = color_d[difficulty])
-		embed.description = f"`Question :` **__{html.unescape(question)}__**\n\n{ans_str}\n\nType the correct answer's option(example : `A` if `A` is correct)\n`you have 15 seconds to choose from the options`"
+		embed.description = f"`Question :` **__{html.unescape(question)}__**\n\n{ans_str}\n\nType the correct answer's option(example : `A` if `A` is correct)\n`you have 15 seconds to choose from the options`(only 1 chance)"
 		embed.set_footer(text = f"Difficulty : {difficulty.capitalize()} - Category : {category.capitalize()} || Question from - opentdb.com")
 		msge = await ctx.send(embed = embed)
 		def chk(m):
@@ -1165,18 +1165,18 @@ class Battlefield(commands.Cog):
 		try:
 			msg = await self.bot.wait_for('message', check = chk, timeout = 15)
 		except asyncio.TimeoutError:
-			await msge.reply(f"Timed out.\nCorrect answer is - **{correct_ans}**")
+			await msge.reply(f"Timed out.\nCorrect answer is -> **{correct_ans}**")
 		else:
 			if not msg.content:
 				return await msg.reply(f"<:redTick:876471581054996550> Invalid option/answer.\nCorrect answer is - **{correct_ans}**")
 			user_ans = msg.content.upper()
 			if user_ans in ['A', 'B', 'C', 'D']:
 				if options[user_ans] == correct_ans:
-					return await msg.reply(f":tada: You chose the correct answer!!! - {correct_ans}")
+					return await msg.reply(f":tada: You chose the correct answer!!! -> **{correct_ans}**")
 				else:
-					return await msg.reply(f"Sorry, you chose a wrong answer. The correct answer is - **{correct_ans}**")
+					return await msg.reply(f"Sorry, you chose a wrong answer. The correct answer is -> **{correct_ans}**")
 			else:
-				return await msg.reply(f"<:redTick:876471581054996550> Invalid option/answer.")
+				return await msg.reply(f"<:redTick:876471581054996550> Invalid option/answer.The correct answer is -> **{correct_ans}**")
 			
 
 		
