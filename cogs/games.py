@@ -730,7 +730,7 @@ class Battlefield(commands.Cog):
 						if inp.content.lower().startswith('add'):
 							itm_am_name = inp.content[4:]
 							try:
-								amount = int(itm_am_name[0])
+								amount = int(itm_am_name.strip().split(' ')[0])
 								if amount <= 0:
 									continue
 							except ValueError:
@@ -779,7 +779,7 @@ class Battlefield(commands.Cog):
 						elif inp.content.lower().startswith('remove'):
 							itm_am_name = inp.content[7:]
 							try:
-								amount = int(itm_am_name[0])
+								amount = int(itm_am_name.strip().split(' ')[0])
 								if amount <= 0:
 									continue
 							except ValueError:
