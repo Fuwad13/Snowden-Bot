@@ -202,13 +202,13 @@ class Battlefield(commands.Cog):
 		player_id = player.id
 		
 		cd_dict : dict = await self.bfh.get_cooldown_data(player_id)
-		embed = discord.Embed(title = f"__{player}'s cooldowns:__",color =0x2F3136)
+		embed = discord.Embed(title = f":stopwatch: __{player}'s cooldowns:__",color =0x2F3136)
 		now = int(time.time())
 		for n_c, t in cd_dict.items():
 			if 'equip' in str(n_c):
-				embed.add_field(name=f"__equip__", value= f"**{'Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
+				embed.add_field(name=f"__equip__", value= f"**{':white_check_mark: Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
 				break
-			embed.add_field(name=f"__{str(n_c).split('n_', 1)[1]}__", value= f"**{'Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
+			embed.add_field(name=f"__{str(n_c).split('n_', 1)[1]}__", value= f"**{':white_check_mark: Available' if now >= t else self.bfh.format_cooldown(t-now)}**")
 			
 		embed.description = "Note: `equip` cooldown is applicable for weapon equipments only.\nArmour equipments have no cooldowns."
 		await ctx.send(f"{ctx.author.mention} ->", embed = embed)
