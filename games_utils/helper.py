@@ -97,15 +97,12 @@ class BattleFieldHelper:
 
 	async def update_balance(self,*,player_id, amount : int, add : bool = True):
 		if add == True:
-			bal :int = await self.bot.db.fetchval(""" SELECT balance FROM battlefield WHERE p_id = $1 ;""", player_id)
-			bal = bal + amount
-			await self.bot.db.execute(""" UPDATE battlefield SET balance = $1 WHERE p_id = $2; """, bal, player_id)
+			n_bal = await self.bot.db.fetchval(""" UPDATE battlefield SET balance = balance + $1 WHERE p_id = $2 returning balance as n_bal; """, amount, player_id)
+			return n_bal
 
 		elif add == False:
-			bal :int = await self.bot.db.fetchval(""" SELECT balance FROM battlefield WHERE p_id = $1 ;""", player_id)
-			bal = bal - amount
-			await self.bot.db.execute(""" UPDATE battlefield SET balance = $1 WHERE p_id = $2; """, bal, player_id)
-		return bal
+			n_bal = await self.bot.db.fetchval(""" UPDATE battlefield SET balance = balance - $1 WHERE p_id = $2 returning balance as n_bal; """, amount, player_id)
+			return n_bal
 
 	async def better_update_balance(self,*,player_id, amount : int):
 		n_bal = await self.bot.db.fetchval(""" UPDATE battlefield SET balance = balance + $1 WHERE p_id = $2 returning balance as n_bal; """, amount, player_id)

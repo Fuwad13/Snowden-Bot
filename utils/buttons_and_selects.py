@@ -360,9 +360,14 @@ class QuickFightView(ui.View):
 
 	async def interaction_check(self, interaction: discord.Interaction) -> bool:
 		if not interaction.user == self.active_p:
-			await interaction.response.send_message(f"{interaction.user.mention}, It's **{self.active_p}**'s turn, not yours!", ephemeral=True)
+			await interaction.response.send_message(f"{interaction.user}, It's **{self.active_p}**'s turn, not yours!", ephemeral=True)
 
 		return interaction.user == self.active_p
+
+	async def on_timeout(self) -> None:
+		self.stop()
+		self.clear_items()
+		self.fmsg.edit(view = self)
 
 	@ui.button(label='Fight', style = discord.ButtonStyle.blurple)
 	async def fight_button(self, button, interaction : discord.Interaction):
@@ -398,7 +403,7 @@ class QuickFightView(ui.View):
 		
 
 
-	@ui.button(label="Heal", style= discord.ButtonStyle.red)
+	@ui.button(label="Heal", style= discord.ButtonStyle.green)
 	async def heal_button(self, button, interaction):
 		await interaction.response.defer(ephemeral=True)
 		heal = random.randint(10, 40)

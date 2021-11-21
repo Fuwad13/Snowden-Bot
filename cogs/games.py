@@ -1106,20 +1106,25 @@ class Battlefield(commands.Cog):
 		if not view.accepted:
 			return await msg.edit(f"~~**{player2}**, {ctx.author.mention} has invited you to a quickfight match! \nYou have `90s` to **Accept** or **Reject** their invitation!~~\n**Quickfight cancelled**", view = view)
 		elif view.accepted:
-			await msg.edit(f"Invite accepted! Now prepare for fight...", view = view)
-			
-			embed1 = discord.Embed(title= f"**{player1}**'s status:" ,color=0x2F3136, description= f"**__Healthpoints__**: 100/100 {self.bfh.get_bar_emojis('hp', 100, 100)}")
-			embed2 = discord.Embed(title= f"**{player2}**'s status:" ,color=0x2F3136, description= f"**__Healthpoints__**: 100/100 {self.bfh.get_bar_emojis('hp', 100, 100)}")
-			
-			rn = random.randint(0,1)
-			if rn == 1:
-				player1, player2 = player1, player2
-			elif rn == 0:
-				player1, player2 = player2, player1
+			lock1 = UserLock(player1, "You're in a quickfight match currently. You can't use other commands before the quickfight ends!")
+			lock2 = UserLock(player2, "You're in a quickfight match currently. You can't use other commands before the quickfight ends!")
+			async with lock1(self.bot), lock2(self.bot):
+				await msg.edit(f"Invite accepted! Now prepare for fight...", view = view)
+				
+				embed1 = discord.Embed(title= f"**{player1}**'s status:" ,color=0x2F3136, description= f"**__Healthpoints__**: 100/100 {self.bfh.get_bar_emojis('hp', 100, 100)}")
+				embed2 = discord.Embed(title= f"**{player2}**'s status:" ,color=0x2F3136, description= f"**__Healthpoints__**: 100/100 {self.bfh.get_bar_emojis('hp', 100, 100)}")
+				
+				rn = random.randint(0,1)
+				if rn == 1:
+					player1, player2 = player1, player2
+				elif rn == 0:
+					player1, player2 = player2, player1
 
-			qf_view = bs.QuickFightView(ctx = ctx,player1=player1, player2= player2, bfh = self.bfh, embed1= embed1, embed2=embed2)
-			
-			qf_msg = await ctx.send(f"{player1.mention}, It's your turn to `fight` or `heal`!", embeds = [embed1, embed2] ,view = qf_view)
+				qf_view = bs.QuickFightView(ctx = ctx,player1=player1, player2= player2, bfh = self.bfh, embed1= embed1, embed2=embed2)
+				
+				qf_view.fmsg = await ctx.send(f"{player1.mention}, It's your turn to `fight` or `heal`!", embeds = [embed1, embed2] ,view = qf_view)
+				await qf_view.wait()
+
 
 	@commands.command(name = "trivia", aliases = ['tri'], help = "Answer trivia questions and earn money and exp from it.", hidden = True)
 	@has_started()
