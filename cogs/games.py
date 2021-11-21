@@ -1124,6 +1124,7 @@ class Battlefield(commands.Cog):
 				
 				qf_view.fmsg = await ctx.send(f"{player1.mention}, It's your turn to `fight` or `heal`!", embeds = [embed1, embed2] ,view = qf_view)
 				await qf_view.wait()
+				print("quickfight ended or timed out")
 
 
 	@commands.command(name = "trivia", aliases = ['tri'], help = "Answer trivia questions and earn money and exp from it.", hidden = True)
