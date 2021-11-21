@@ -86,8 +86,8 @@ class InventoryEmbeds(ui.View):
 	@ui.button(emoji = '<:stop:904438127530225724>', style = discord.ButtonStyle.gray)
 	async def _stop(self, button, intr):
 		self.stop()
+		self.clear_items()
 		await self.message.edit(view = self)
-		await intr.message.delete(silent = True)
 
 
 	async def on_timeout(self):
@@ -270,6 +270,9 @@ class Guide(ui.View):
 - Use `{ctx.clean_prefix}attack <player>` to attack a player (you must be opted in and have a equipped weapon with necessary ammunition.)
 
 - Use `{ctx.clean_prefix}heal <healing_item_name>` to heal and increase your healthpoints.
+
+- Use `{ctx.clean_prefix}quickfight <player>` to invite a player to a quickfight match 
+where you will fight with them interactively.
 
 - Use `{ctx.clean_prefix}buy [amount] <item_name>` or `{ctx.clean_prefix}sell [amount] <item_name>` to buy/sell items. `{ctx.clean_prefix}trade <player>` to trade items with a player.
 
@@ -463,10 +466,13 @@ class Tradeview(ui.View):
 		if self.confim_dict[str(intr.user.id)]:
 			await intr.response.send_message(f"Hey, you already confirmed your trade, waiting for the other player's confirmation!", ephemeral= True)
 		else:
-			await intr.response.send_message(f"`{intr.user}` has confirmed the trade, waiting for other player's confirmation......")
+			
 			self.confim_dict[str(intr.user.id)] = True
 			if self.confim_dict[str(self.player1.id)] and self.confim_dict[str(self.player2.id)]:
+
 				self.stop()
+				return await intr.response.send_message(f"`{intr.user}` has confirmed the trade too. The trade will be processed.\nPlease type any word to proceed.")
+			await intr.response.send_message(f"`{intr.user}` has confirmed the trade, waiting for other player's confirmation......")
 
 
 

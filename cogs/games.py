@@ -713,7 +713,6 @@ class Battlefield(commands.Cog):
 						break
 					elif t_view.confim_dict[str(player1.id)] and t_view.confim_dict[str(player2.id)]:
 						t_view.clear_items()
-						t_view.stop()
 
 						await msg.edit(content= f"{cs.EMOJIS['greentick']}**Trade confirmed and is being processed!**", view = t_view)
 						should_proceed = True
