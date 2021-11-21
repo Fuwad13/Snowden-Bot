@@ -1009,17 +1009,19 @@ class Battlefield(commands.Cog):
 		if not view.confirmation:
 			return await msg.edit(f"{ctx.author.mention} -> ~~Do you want to attack **{target}** using your {ALL_ITEMS[str(a_weapon)]['emoji']}**{ALL_ITEMS[str(a_weapon)]['name']}**?\nIf yes then press the *Attack* button or press the *Cancel* button to cancel.(`timeout = 20s`)~~\n**Cancelled**", view = view)
 		elif view.confirmation:
+			lock1 = UserLock(ctx.author, "**You are currently attacking | looting someone, you can't use other commands before you finish that task!**")
+			lock2 = UserLock(target, "**You are being attacked or looted. You can use command once the attacker finishes their attack/loot.")
+			async with lock1(self.bot), lock2(self.bot):
 
+				attack_engine = AttackEngine(bot = self.bot, bfh = self.bfh,attacker = ctx.author, a_rec = a_rec, target = target, t_rec = t_rec)
 
-			attack_engine = AttackEngine(bot = self.bot, bfh = self.bfh,attacker = ctx.author, a_rec = a_rec, target = target, t_rec = t_rec)
-
-			text = await attack_engine.attack()
-			if 'killed' in text:
+				text = await attack_engine.attack()
+				if 'killed' in text:
+					await self.bfh.update_attack_or_heal_cd(player_id= player_id, command_name= 'attack', item_used=a_weapon)
+					await msg.edit(f"{text}", view = view)
+					
 				await self.bfh.update_attack_or_heal_cd(player_id= player_id, command_name= 'attack', item_used=a_weapon)
 				await msg.edit(f"{text}", view = view)
-				
-			await self.bfh.update_attack_or_heal_cd(player_id= player_id, command_name= 'attack', item_used=a_weapon)
-			await msg.edit(f"{text}", view = view)
 
 	@commands.command(name = 'heal', aliases= ['healing'], help= "heal/ increase your healthpoints using a healing item from your inventory.")
 	@has_started()
