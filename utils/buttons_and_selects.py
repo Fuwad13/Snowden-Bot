@@ -367,7 +367,7 @@ class QuickFightView(ui.View):
 	async def on_timeout(self) -> None:
 		self.stop()
 		self.clear_items()
-		self.fmsg.edit(view = self)
+		await self.fmsg.edit(view = self)
 
 	@ui.button(label='Fight', style = discord.ButtonStyle.blurple)
 	async def fight_button(self, button, interaction : discord.Interaction):

@@ -1127,11 +1127,11 @@ class Battlefield(commands.Cog):
 				print("quickfight ended or timed out")
 
 
-	@commands.command(name = "trivia", aliases = ['tri'], help = "Answer trivia questions and earn money and exp from it.", hidden = True)
+	@commands.command(name = "trivia", aliases = ['tri'], help = "Answer trivia questions and earn money and exp from it.", slash_command = False)
 	@has_started()
 	@commands.guild_only()
 	@commands.max_concurrency(1, BucketType.user)
-	@commands.cooldown(1, 10, BucketType.user)
+	@commands.cooldown(1, 15, BucketType.user)
 	async def trivia(self, ctx):
 		url = "https://opentdb.com/api.php?amount=1&type=multiple"
 		async with self.bot.session.get(url) as resp:
@@ -1165,7 +1165,7 @@ class Battlefield(commands.Cog):
 		embed = discord.Embed(title = f"Trivia question...", color = color_d[difficulty])
 		embed.description = f"`Question :` **__{html.unescape(question)}__**\n\n{ans_str}\n\nType the correct answer's option(example : `A` if `A` is correct)\n`you have 15 seconds to choose from the options`(only 1 chance)"
 		embed.set_footer(text = f"Difficulty : {difficulty.capitalize()} - Category : {category.capitalize()} || Question from - opentdb.com")
-		msge = await ctx.send(embed = embed)
+		msge = await ctx.reply(embed = embed, mention_author = False)
 		def chk(m):
 			return m.author == ctx.author
 		try:

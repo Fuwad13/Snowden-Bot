@@ -19,7 +19,7 @@ class Information(commands.Cog):
 	@commands.command(name= 'invite', help = "Invite me to your servers, Thanks!", slash_command = False)
 	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def _invite_cmd(self, ctx):
-		await ctx.send("https://discord.com/api/oauth2/authorize?client_id=862771284014530561&permissions=8&scope=bot%20applications.commands")
+		await ctx.send("https://discord.com/api/oauth2/authorize?client_id=862771284014530561&permissions=2134207679&scope=bot%20applications.commands")
 
 	@commands.command(name='avatar', aliases=['av', 'pfp'], brief='Shows the avatar of an user(if possible)', help='Shows the avatar of an user(if possible)')
 	@commands.cooldown(1, 10, commands.BucketType.user)

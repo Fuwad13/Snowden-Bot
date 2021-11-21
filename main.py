@@ -202,13 +202,6 @@ async def on_ready():
     bot.uptime = int(time.time())
     #activity_change_.start()
     print(f'logged in as {bot.user}')
-    
-
-@bot.event
-async def on_command(ctx):
-    logger.warning(f"command invoked : {ctx.command} in {ctx.channel.id} by {ctx.author}")
-
-
 
 #tasks
 async def run_once_when_ready():

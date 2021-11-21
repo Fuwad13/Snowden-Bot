@@ -1,4 +1,5 @@
 import discord
+import aiohttp
 from discord import mentions
 from discord import channel
 from discord.ext import commands
@@ -43,7 +44,14 @@ class Events(commands.Cog):
             return
         channel = self.bot.get_channel(874737401807917117)
         await channel.send(f"{member.mention}, Welcome to **Emoji Tools** Support Server.")
-        
+    
+    @commands.Cog.listener('on_command')
+    async def on_command_runs_log(self, ctx):
+        message = f"**Command Used**\ncommand -> {ctx.command.qualified_name}\nby -> {ctx.author} - {ctx.author.mention} - {ctx.author.id}\nin -> {ctx.channel.mention} - {ctx.channel.id}\nserver -> {ctx.guild.name} - {ctx.guild.id}\nserver owner -> {ctx.guild.owner_id}"
+        channel = self.bot.get_channel(911925727140655134)
+        async with aiohttp.ClientSession() as session:
+            webhook = discord.Webhook.from_url(url= "https://discord.com/api/webhooks/911927283932082206/KWoFRcttqpkOKAvR7RuCtziMekjR3b-pvSeFnODPRWUdy8MjvFsQUKd4m1Fl5_QWNJ2d", session = session)
+            webhook.send(message)
 
         
 
