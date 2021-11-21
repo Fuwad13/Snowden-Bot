@@ -51,7 +51,7 @@ class Events(commands.Cog):
         channel = self.bot.get_channel(911925727140655134)
         async with aiohttp.ClientSession() as session:
             webhook = discord.Webhook.from_url(url= "https://discord.com/api/webhooks/911927283932082206/KWoFRcttqpkOKAvR7RuCtziMekjR3b-pvSeFnODPRWUdy8MjvFsQUKd4m1Fl5_QWNJ2d", session = session)
-            await webhook.send(message)
+            await webhook.send(message, allowed_mentions= discord.AllowedMentions.none())
 
         
 
