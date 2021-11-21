@@ -281,7 +281,7 @@ class Battlefield(commands.Cog):
 
 		await view.wait()
 		if view.value == True:
-			embed.description = f"<a:windows_loading:894852723726499852> The coin has been tossed.."
+			embed.description = f"{cs.EMOJIS['sd_loading']} The coin has been tossed.."
 			await msg.edit(embed = embed , view = view)
 			won_or_lost = random.randint(0,1)
 			if won_or_lost == 1:
@@ -322,7 +322,7 @@ class Battlefield(commands.Cog):
 				await msg.edit(embed = embed)
 		
 		elif view.value == False:
-			embed.description = f"<a:windows_loading:894852723726499852> The coin has been tossed.."
+			embed.description = f"{cs.EMOJIS['sd_loading']} The coin has been tossed.."
 			await msg.edit(embed = embed , view = view)
 			won_or_lost = random.randint(0,1)
 			if won_or_lost == 1:
@@ -392,7 +392,7 @@ class Battlefield(commands.Cog):
 			return await ctx.send(f"{ctx.author.mention} please specify a valid amount for opening chests.")
 		elif amount >15:
 			return await ctx.send(f"{ctx.author.mention}, Can't open more than 15 chests at once!")
-		msg = await ctx.send(f"<a:windows_loading:894852723726499852> {ctx.author.mention} ->  Opening **{amount}x** `{ALL_ITEMS[chest_name_n]['name']}(s)` from your inventory.....")
+		msg = await ctx.send(f"{cs.EMOJIS['sd_loading']} {ctx.author.mention} ->  Opening **{amount}x** `{ALL_ITEMS[chest_name_n]['name']}(s)` from your inventory.....")
 
 		items_dict = {}
 		items_list = []
