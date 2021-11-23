@@ -51,7 +51,7 @@ class Moderation(commands.Cog):
 
         url_reg = re.compile(r'https?://(?:www\.)?.+')
         def is_link(message):
-            if (time.time() - message.created_at.timestamp()) < 1209600:
+            if not (time.time() - message.created_at.timestamp()) < 1209600:
                 return False
             if len(message.content) == 0:
                 return False
@@ -73,7 +73,7 @@ class Moderation(commands.Cog):
 
         
         def is_file(message):
-            if (time.time() - message.created_at.timestamp()) < 1209600:
+            if not (time.time() - message.created_at.timestamp()) < 1209600:
                 return False
             if len(message.attachments) == 0:
                 return False
@@ -93,7 +93,7 @@ class Moderation(commands.Cog):
 
         
         def is_embed(message):
-            if (time.time() - message.created_at.timestamp()) < 1209600:
+            if not (time.time() - message.created_at.timestamp()) < 1209600:
                 return False
             if len(message.embeds) == 0:
                 return False
