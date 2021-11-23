@@ -35,8 +35,8 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_messages= True)
     @commands.bot_has_permissions(manage_messages= True)
     async def _purge(self, ctx, amount : int = 5):
-        if amount > 2000:
-            return await ctx.send("**Can't delete more than 2000 messages at once!**")
+        if amount > 1000:
+            return await ctx.send("**Can't delete more than 1000 messages at once!**")
         def is_deleteable(message):
             return (time.time() - message.created_at.timestamp()) < 1209600
         deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at, check = is_deleteable)
@@ -45,12 +45,14 @@ class Moderation(commands.Cog):
     @_purge.command(name= "links", aliases = ['link', 'url'], help = "Bulk delete messages that contains links/url.", slash_command = False)
     @commands.has_permissions(manage_messages= True)
     @commands.bot_has_permissions(manage_messages = True)
-    async def links(self, ctx, amount : int = 5):
-        if amount > 2000:
-            return await ctx.send("**Can't delete more than 2000 messages at once!**")
+    async def _links(self, ctx, amount : int = 5):
+        if amount > 1000:
+            return await ctx.send("**Can't delete more than 1000 messages at once!**")
 
         url_reg = re.compile(r'https?://(?:www\.)?.+')
         def is_link(message):
+            if (time.time() - message.created_at.timestamp()) < 1209600:
+                return False
             if len(message.content) == 0:
                 return False
             search = re.search(url_reg, message.content)
@@ -62,7 +64,43 @@ class Moderation(commands.Cog):
         deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at, check = is_link)
         await ctx.send(f"**Deleted {len(deleted)} message(s) containing links/url**" , delete_after = 5)
 
+    @_purge.command(name= "files", aliases = ['file', 'attachments'], help = "Bulk delete messages that contains files/attachments.", slash_command = False)
+    @commands.has_permissions(manage_messages= True)
+    @commands.bot_has_permissions(manage_messages = True)
+    async def _files(self, ctx, amount : int = 5):
+        if amount > 1000:
+            return await ctx.send("**Can't delete more than 1000 messages at once!**")
+
         
+        def is_file(message):
+            if (time.time() - message.created_at.timestamp()) < 1209600:
+                return False
+            if len(message.attachments) == 0:
+                return False
+            else:
+                return True
+
+            
+        deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at, check = is_file)
+        await ctx.send(f"**Deleted {len(deleted)} message(s) containing files/attachments**" , delete_after = 5)
+
+    @_purge.command(name= "embeds", aliases = ['embed'], help = "Bulk delete messages that contains embeds.", slash_command = False)
+    @commands.has_permissions(manage_messages= True)
+    @commands.bot_has_permissions(manage_messages = True)
+    async def _embeds(self, ctx, amount : int = 5):
+        if amount > 1000:
+            return await ctx.send("**Can't delete more than 1000 messages at once!**")
+
+        
+        def is_embed(message):
+            if (time.time() - message.created_at.timestamp()) < 1209600:
+                return False
+            if len(message.embeds) == 0:
+                return False
+            else: 
+                return True
+        deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at, check = is_embed)
+        await ctx.send(f"**Deleted {len(deleted)} message(s) containing embeds**" , delete_after = 5)
 
     @commands.command(name= 'kick', brief = "Kick a member for breaking rules or being annoying.", help = "Kick a member from your server for breaking rules or being an annoying person.")
     @commands.has_permissions(kick_members = True)
