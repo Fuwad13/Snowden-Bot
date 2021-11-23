@@ -300,7 +300,7 @@ class Battlefield(commands.Cog):
 					await self.bfh.update_balance(player_id = ctx.author.id,amount =  lvl_up_m, add = True)
 				embed.description = text
 				await asyncio.sleep(2)
-				await msg.edit(embed = embed)
+				await msg.edit(embed = embed, view = view)
 
 			elif won_or_lost == 0:
 				g_exp = random.randint(20,25)
@@ -319,7 +319,7 @@ class Battlefield(commands.Cog):
 					await self.bfh.update_balance(player_id = ctx.author.id,amount =  lvl_up_m, add = True)
 				embed.description = text
 				await asyncio.sleep(2)
-				await msg.edit(embed = embed)
+				await msg.edit(embed = embed, view = view)
 		
 		elif view.value == False:
 			embed.description = f"{cs.EMOJIS['sd_loading']} The coin has been tossed.."
@@ -340,7 +340,7 @@ class Battlefield(commands.Cog):
 					await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
 				embed.description = text
 				await asyncio.sleep(2)
-				await msg.edit(embed = embed)
+				await msg.edit(embed = embed, view = view)
 
 			elif won_or_lost == 0:
 				g_exp = random.randint(20,25)
@@ -358,7 +358,7 @@ class Battlefield(commands.Cog):
 					await self.bfh.update_balance(player_id = ctx.author.id,amount = lvl_up_m, add = True)
 				embed.description = text
 				await asyncio.sleep(2)
-				await msg.edit(embed = embed)
+				await msg.edit(embed = embed, view = view)
 		else:
 			embed.description = "Timed out!"
 			view.clear_items()
