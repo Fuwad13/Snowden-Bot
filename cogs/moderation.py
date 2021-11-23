@@ -1,4 +1,5 @@
 import time
+import re
 import typing
 from discord.ext.commands.core import check
 from discord.ext.commands.errors import NoPrivateMessage
@@ -30,26 +31,38 @@ class Moderation(commands.Cog):
         await channel.edit(slowmode_delay=seconds, reason=f"responsible user - {ctx.author}")
         return await ctx.send(f"{EMOJIS['greentick']} Set the slowmode to **{humanize.precisedelta(seconds)}**")
 
-    # @commands.group(name= "purge", aliases = ['cleanup'], help= "Bulk delete messages of a channel, specify the amount of messages to be deleted `(default 5)`", invoke_without_command = True, slash_command = False)
-    # @commands.has_permissions(manage_messages= True)
-    # @commands.bot_has_permissions(manage_messages= True)
-    # async def _purge(self, ctx, amount : int = 5):
-    #     if amount > 2000:
-    #         return await ctx.send("**Can't delete more than 2000 messages at once!**")
-    #     def is_deleteable(message):
-    #         return (time.time() - message.created_at.timestamp()) < 1209600
-    #     deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at, check = is_deleteable)
-    #     await ctx.send(f"**Deleted {len(deleted)} message(s)**" , delete_after = 5)
+    @commands.group(name= "purge", aliases = ['cleanup'], help= "Bulk delete messages of a channel, specify the amount of messages to be deleted `(default 5)`", invoke_without_command = True, slash_command = False)
+    @commands.has_permissions(manage_messages= True)
+    @commands.bot_has_permissions(manage_messages= True)
+    async def _purge(self, ctx, amount : int = 5):
+        if amount > 2000:
+            return await ctx.send("**Can't delete more than 2000 messages at once!**")
+        def is_deleteable(message):
+            return (time.time() - message.created_at.timestamp()) < 1209600
+        deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at, check = is_deleteable)
+        await ctx.send(f"**Deleted {len(deleted)} message(s)**" , delete_after = 5)
 
-    # @_purge.command(name= "links", aliases = ['link', 'url'], help = "Bulk delete messages that contains links/url.", slash_command = False)
-    # @commands.has_permissions(manage_messages= True)
-    # @commands.bot_has_permissions(manage_messages = True)
-    # async def links(self, ctx, amount : int = 5):
-    #     if amount > 2000:
-    #         return await ctx.send("**Can't delete more than 2000 messages at once!**")
-    #     def is_link(message):
-    #         ...
-    #     k = "kdk"
+    @_purge.command(name= "links", aliases = ['link', 'url'], help = "Bulk delete messages that contains links/url.", slash_command = False)
+    @commands.has_permissions(manage_messages= True)
+    @commands.bot_has_permissions(manage_messages = True)
+    async def links(self, ctx, amount : int = 5):
+        if amount > 2000:
+            return await ctx.send("**Can't delete more than 2000 messages at once!**")
+
+        url_reg = re.compile(r'https?://(?:www\.)?.+')
+        def is_link(message):
+            if len(message.content) == 0:
+                return False
+            search = re.search(url_reg, message.content)
+            if not search:
+                return False
+            else:
+                return True
+            
+        deleted = await ctx.channel.purge(limit= amount, before = ctx.message.created_at, check = is_link)
+        await ctx.send(f"**Deleted {len(deleted)} message(s) containing links/url**" , delete_after = 5)
+
+        
 
     @commands.command(name= 'kick', brief = "Kick a member for breaking rules or being annoying.", help = "Kick a member from your server for breaking rules or being an annoying person.")
     @commands.has_permissions(kick_members = True)
