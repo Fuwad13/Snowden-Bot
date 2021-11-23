@@ -105,7 +105,7 @@ class Miscellanous(commands.Cog):
 								value=f"**{current_pressure}hPa**", inline=True)
 				embed.set_thumbnail(url="https://i.ibb.co/CMrsxdX/weather.png")
 				embed.set_footer(text=f"Requested by {ctx.author.name}")
-				await ctx.reply(embed=embed, mention_author=False)
+				return await ctx.reply(embed=embed, mention_author=False)
 		else:
 			await ctx.send("City not found.", ephemeral = True)
 	
