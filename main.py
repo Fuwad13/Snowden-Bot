@@ -165,7 +165,7 @@ INITIAL_EXTENSIONS = ['cogs.games',
                       'cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner']
 
 ALL_EXTENSIONS = ['cogs.games',
-                  'cogs.image', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner']
+                  'cogs.image', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner', 'cogs.utility']
 
 
 if __name__ == "__main__":
