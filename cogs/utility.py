@@ -21,7 +21,7 @@ class Utility(commands.Cog):
     @commands.command(name = 'selfrole', hidden = True, slash_command = False)
     @commands.is_owner()
     async def _selfrole(self, ctx):
-        view = SelfRoles()
+        view = SelfRoles(self.bot)
         role_ids = [874745412991479819,875449711685955694,876913032549245008,879370829882871908]
         guild = self.bot.get_guild(874735250842984458)
         role_names = [guild.get_role(r).name for r in role_ids]

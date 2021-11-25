@@ -484,9 +484,10 @@ class Tradeview(ui.View):
 
 class SelfRoles(ui.View):
 
-	def __init__(self):
+	def __init__(self, bot):
 		super().__init__(timeout=None)
-
+		self.guild = bot.get_guild(874735250842984458)
+		
 	@ui.select(placeholder="Select roles...", max_values=4)
 	async def sr_dropdown(self, select, intr):
 		role_ids = select.values
