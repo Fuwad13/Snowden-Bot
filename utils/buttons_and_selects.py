@@ -482,18 +482,18 @@ class Tradeview(ui.View):
 		self.cancelled = True
 		self.cancelled_by = intr.user
 
-# class SelfRoleTemplate(ui.Select):
+class SelfRoles(ui.View):
 
-# 	def __init__(self, role_dict : dict):
-# 		options = []
-# 		self.role_list = [role[0] for role in role_dict.values()]
-# 		for r_id , l in role_dict.items():
-# 			options.append(discord.SelectOption(label=f"{l[0].name}", value=f"{l[0].id}", description=f"{l[1]}"))
+	def __init__(self):
+		super().__init__(timeout=None)
 
-# 		super().__init__(placeholder='Select your roles.....', max_values= len(options), options= options)
+	@ui.select(placeholder="Select roles...", max_values=4)
+	async def sr_dropdown(self, select, intr):
+		role_ids = select.values
+		roles = []
+		for r_id in role_ids:
+			roles.append(self.guild.get_role(r_id))
 
-# 	async def callback(self, interaction: discord.Interaction):
-# 		role_ids = self.values
-# 		roles = []
-# 		for rid in role_ids:
-# 			roles.append()
+		member : discord.Member = intr.user
+		await member.add_roles(*roles)
+

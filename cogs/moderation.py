@@ -156,7 +156,7 @@ class Moderation(commands.Cog):
 
         except:
             pass
-        await member.kick(reason= reason)
+        await member.kick(reason = reason)
 
         embed = discord.Embed(title= f"{EMOJIS['greentick']} {member} has been kicked || reason : {reason[:180:]}...")
         await ctx.send(embed = embed)
@@ -164,7 +164,7 @@ class Moderation(commands.Cog):
     # @commands.command(name= 'ban', brief = "Ban a member/user for breaking rules or being annoying.", help = "Ban a member from your server for breaking rules or being an annoying person.")
     # @commands.has_permissions(ban_members = True)
     # @commands.bot_has_permissions(ban_members = True)
-    # async def ban(self, ctx, member : discord.User, *, reason : str = None):
+    # async def _ban(self, ctx, member : discord.User, *, reason : str = None):
     #     if member == ctx.author:
     #         return await ctx.send(f"{EMOJIS['redtick']}You can't kick yourself.", ephemeral = True)
     #     if (ctx.me.top_role <= member.top_role) or member.id == ctx.guild.owner_id :
