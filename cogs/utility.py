@@ -28,7 +28,7 @@ class Utility(commands.Cog):
         options = []
         x = 0
         for n in role_names:
-            options.append(discord.SelectOption(label = str(n), value = self.role_ids[x]))
+            options.append(discord.SelectOption(label = str(n), value = role_ids[x]))
             x+=1
         view.children[0].options = options
         await ctx.send("Test", view = view)
