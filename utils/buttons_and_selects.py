@@ -1,10 +1,11 @@
-from logging import disable
 import random
 import discord
 from discord import ui
 from games_utils.items import ALL_ITEMS
 from games_utils.helper import BattleFieldHelper
 from games_utils.constants import EMOJIS
+
+
 class ConfirmOrCancel(ui.View):
 
 
@@ -482,19 +483,4 @@ class Tradeview(ui.View):
 		self.cancelled = True
 		self.cancelled_by = intr.user
 
-class SelfRoles(ui.View):
-
-	def __init__(self, bot):
-		super().__init__(timeout=None)
-		self.guild = bot.get_guild(874735250842984458)
-		
-	@ui.select(placeholder="Select roles...", max_values=4)
-	async def sr_dropdown(self, select, intr):
-		role_ids = select.values
-		roles = []
-		for r_id in role_ids:
-			roles.append(self.guild.get_role(r_id))
-
-		member : discord.Member = intr.user
-		await member.add_roles(*roles)
 

@@ -1,21 +1,21 @@
+import ast
+import asyncio
+from dotenv import load_dotenv
+import inspect
+import logging
 import os
 import random
-import asyncio
+import re
 import typing
 import time
 import json
 import difflib
 import aiohttp
+import asyncpg
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import BucketType
-from dotenv import load_dotenv
 from utils import help_cmd , buttons_and_selects
-import asyncpg
-import logging
-import ast
-import re
-import inspect
 from utils.context_managers import UserLock
 from utils.errors import Blacklisted
 
@@ -45,20 +45,9 @@ handler.setFormatter(logging.Formatter(
     '%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-
 load_dotenv()  # take environment variables from .env.
 os.environ["JISHAKU_HIDE"] = "True"
-# --------tokens and keys-----------------
-
 TOKEN = os.getenv("TOKEN")
-
-
-
-
-# ======================= Bot constructor =====================
-intents = discord.Intents(messages=True, guilds=True,
-                          reactions=True, members=True, emojis=True, bans = True)
-
 
 def get_prefix(bot, message):
 
@@ -69,6 +58,10 @@ def get_prefix(bot, message):
         return 's/'
 
     return commands.when_mentioned_or(*prefixes)(bot, message)
+
+intents = discord.Intents(messages=True, guilds=True,
+                          reactions=True, members=True, emojis=True, bans = True)
+
 
 class SnowdenContext(commands.Context):
     
@@ -81,6 +74,7 @@ class SnowdenContext(commands.Context):
             return await super().send(content, **kwargs)
 
         return await super().send(content, **kwargs)
+
 
 class SnowdenBot(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
@@ -152,13 +146,8 @@ class SnowdenBot(commands.AutoShardedBot):
         return await super().get_context(message, cls=cls)
 
 
-
 bot = SnowdenBot(
     command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True,slash_commands=True, chunk_guilds_at_startup = False)
-
-
-
-
 
 # extensions
 INITIAL_EXTENSIONS = ['cogs.games',
@@ -173,17 +162,12 @@ if __name__ == "__main__":
         bot.load_extension(e)
 
 bot.help_command = help_cmd.SnowdenHelp()
-
-
 # database
 
 async def create_db_pool():
     credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
     bot.db = await asyncpg.create_pool(dsn = f'{credential}')
     bot.session = aiohttp.ClientSession()
-    
-
-    
 
 #events =========
 @bot.check
@@ -206,18 +190,7 @@ async def on_ready():
 #tasks
 async def run_once_when_ready():
     await bot.wait_until_ready()
-    bl_w = await bot.db.fetch("select guild_id , bl_words from guilds;")
-    for g in bl_w:
-        k = str(g['guild_id'])
-        v = json.loads(g['bl_words'])
-        bot.automod_guilds[k] = v
-    print("Blacklisted words loaded")
-    
-
-
-
-# dev essential commands
-
+    await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name=f"Snowflakes"))
 
 @bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=True, brief="Loads a cog")
 @commands.is_owner()
@@ -304,12 +277,9 @@ async def _reloadcog(ctx, *, cogname: str):
 async def reloaderror(ctx, error):
     await ctx.channel.send(f"`ERROR` : `{error}`")
 
-
-
-
 if __name__ == "__main__":
     bot.loop.run_until_complete(create_db_pool())
-    #bot.loop.create_task(run_once_when_ready())
+    bot.loop.create_task(run_once_when_ready())
     ready()
     bot.run(TOKEN)
 
