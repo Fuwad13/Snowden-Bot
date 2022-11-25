@@ -47,7 +47,8 @@ logger.addHandler(handler)
 
 load_dotenv()  # take environment variables from .env.
 os.environ["JISHAKU_HIDE"] = "True"
-TOKEN = "ODYyNzcxMjg0MDE0NTMwNTYx.YOdMXw.8GMnmlpvCWUbUVW2jq7lA9h6PyI"
+TOKEN = os.getenv("SNOWDEN_TOKEN") # env var in aws ec2
+
 
 def get_prefix(bot, message):
 
