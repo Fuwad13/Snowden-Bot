@@ -47,7 +47,7 @@ logger.addHandler(handler)
 
 load_dotenv()  # take environment variables from .env.
 os.environ["JISHAKU_HIDE"] = "True"
-TOKEN = os.getenv("TOKEN")
+TOKEN = "ODYyNzcxMjg0MDE0NTMwNTYx.YOdMXw.8GMnmlpvCWUbUVW2jq7lA9h6PyI"
 
 def get_prefix(bot, message):
 
@@ -151,7 +151,7 @@ bot = SnowdenBot(
 
 # extensions
 INITIAL_EXTENSIONS = ['cogs.games',
-                      'cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner']
+                      'cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'cogs.owner']
 
 ALL_EXTENSIONS = ['cogs.games',
                   'cogs.image', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner', 'cogs.utility']
