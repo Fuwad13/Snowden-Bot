@@ -7,11 +7,15 @@ import os
 import random
 import re
 import typing
+from typing import List, Optional
 import time
 import json
 import difflib
 import aiohttp
+from aiohttp import ClientSession
 import asyncpg
+
+
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import BucketType
@@ -37,13 +41,6 @@ def ready():
        discord.gateway.__dict__, loc)
   discord.gateway.DiscordWebSocket.identify = loc["identify"]
 
-logger = logging.getLogger('discord')
-logger.setLevel(logging.WARNING)
-handler = logging.FileHandler(
-    filename='discord.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter(
-    '%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logger.addHandler(handler)
 
 load_dotenv()  # take environment variables from .env.
 os.environ["JISHAKU_HIDE"] = "True"
@@ -78,12 +75,35 @@ class SnowdenContext(commands.Context):
 
 
 class SnowdenBot(commands.AutoShardedBot):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args ,initial_extensions : List[str], web_client : ClientSession, testing_guild_id : Optional[int] = None , **kwargs):
         super().__init__(*args, **kwargs)
+        self.my_client = web_client
+        self.testing_guild_id = testing_guild_id
+        self.initial_extensions = initial_extensions
         self.blacklist = {}
         self.automod_guilds = {}
         self.user_lock = {}
         self.command_running = {}
+
+    async def setup_hook(self) -> None:
+        
+        for extension in self.initial_extensions:
+            await self.load_extension(extension)
+        
+        self.help_command = help_cmd.SnowdenHelp()
+        
+        if self.testing_guild_id:
+            guild = discord.Object(874735250842984458)
+            self.tree.copy_global_to(guild = guild)
+            await self.tree.sync(guild = guild)
+
+        await self.tree.sync()
+
+    async def on_ready(self):
+        self.uptime = int(time.time())
+        #activity_change_.start()
+        print(f'logged in as {self.user}')
+
 
     def add_user_lock(self, lock : UserLock):
         self.user_lock.update({lock.user.id: lock})
@@ -147,140 +167,167 @@ class SnowdenBot(commands.AutoShardedBot):
         return await super().get_context(message, cls=cls)
 
 
-bot = SnowdenBot(
-    command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True,slash_commands=True, chunk_guilds_at_startup = False)
+# bot = SnowdenBot(
+#     command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True, chunk_guilds_at_startup = False)
 
 # extensions
-INITIAL_EXTENSIONS = ['cogs.games',
-                      'cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'cogs.owner']
+INITIAL_EXTENSIONS = ['cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'cogs.owner']
 
 ALL_EXTENSIONS = ['cogs.games',
                   'cogs.image', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner', 'cogs.utility']
 
 
-if __name__ == "__main__":
-    for e in INITIAL_EXTENSIONS:
-        bot.load_extension(e)
 
-bot.help_command = help_cmd.SnowdenHelp()
+
 # database
 
-async def create_db_pool():
-    credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
-    bot.db = await asyncpg.create_pool(dsn = f'{credential}')
-    bot.session = aiohttp.ClientSession()
+# async def create_db_pool():
+#     credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
+#     bot.db = await asyncpg.create_pool(dsn = f'{credential}')
+#     bot.session = aiohttp.ClientSession()
 
 #events =========
-@bot.check
-async def black_list(ctx):
+# @bot.check
+# async def black_list(ctx):
     
-    mf = ctx.bot.blacklist.get(str(ctx.author.id))
+#     mf = ctx.bot.blacklist.get(str(ctx.author.id))
     
-    if mf:
-        raise Blacklisted(f"You have been blacklisted from using any commands.\nreason: {mf}")
+#     if mf:
+#         raise Blacklisted(f"You have been blacklisted from using any commands.\nreason: {mf}")
 
-    else:
-        return True
+#     else:
+#         return True
 
-@bot.event
-async def on_ready():
-    bot.uptime = int(time.time())
-    #activity_change_.start()
-    print(f'logged in as {bot.user}')
+
 
 #tasks
-async def run_once_when_ready():
+async def run_once_when_ready(bot : SnowdenBot):
     await bot.wait_until_ready()
     await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name=f"Snowflakes"))
 
-@bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=True, brief="Loads a cog")
-@commands.is_owner()
-async def _loadcog(ctx, *, cogname: str):
-    try:
-        tick = bot.get_emoji(880695423516430336)
-        cname = difflib.get_close_matches(cogname.lower(), ALL_EXTENSIONS, n=1, cutoff= 0.5)
-        cname = cname[0]
+# @bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=True, brief="Loads a cog")
+# @commands.is_owner()
+# async def _loadcog(ctx, *, cogname: str):
+#     try:
+#         tick = bot.get_emoji(880695423516430336)
+#         cname = difflib.get_close_matches(cogname.lower(), ALL_EXTENSIONS, n=1, cutoff= 0.5)
+#         cname = cname[0]
 
-        bot.load_extension(cname)
-        em = discord.Embed(
-            title=f"{tick} Successfully Loaded  `{cname}`",  color=0x2F3136)
-        await ctx.channel.send(embed=em)
-    except Exception as e:
-        await ctx.channel.send(e)
-
-
-@_loadcog.error
-async def _loadcogerror(ctx, error):
-    await ctx.channel.send(f"`Error`: `{error}`")
+#         bot.load_extension(cname)
+#         em = discord.Embed(
+#             title=f"{tick} Successfully Loaded  `{cname}`",  color=0x2F3136)
+#         await ctx.channel.send(embed=em)
+#     except Exception as e:
+#         await ctx.channel.send(e)
 
 
-@bot.command(name="unloadcog", aliases=["unload"], hidden=True, brief="Unloads a cog")
-@commands.is_owner()
-async def _unloadcog(ctx, *,cogname: str):
-
-    try:
-        tick = bot.get_emoji(880695423516430336)
-        cname = difflib.get_close_matches(cogname.lower(), ALL_EXTENSIONS, n=1, cutoff= 0.5)
-        cname = cname[0]
-        bot.unload_extension(cname)
-        em = discord.Embed(
-            title=f"{tick} Successfully unloaded  `{cname}`",  color=0x2F3136)
-        await ctx.channel.send(embed=em)
-    except Exception as e:
-        await ctx.channel.send(e)
+# @_loadcog.error
+# async def _loadcogerror(ctx, error):
+#     await ctx.channel.send(f"`Error`: `{error}`")
 
 
-@_unloadcog.error
-async def _unloadcogerror(ctx, error):
-    await ctx.channel.send(f"`Error`: `{error}`")
+# @bot.command(name="unloadcog", aliases=["unload"], hidden=True, brief="Unloads a cog")
+# @commands.is_owner()
+# async def _unloadcog(ctx, *,cogname: str):
+
+#     try:
+#         tick = bot.get_emoji(880695423516430336)
+#         cname = difflib.get_close_matches(cogname.lower(), ALL_EXTENSIONS, n=1, cutoff= 0.5)
+#         cname = cname[0]
+#         bot.unload_extension(cname)
+#         em = discord.Embed(
+#             title=f"{tick} Successfully unloaded  `{cname}`",  color=0x2F3136)
+#         await ctx.channel.send(embed=em)
+#     except Exception as e:
+#         await ctx.channel.send(e)
 
 
-@bot.command(name="reloadall", aliases=["ra", "rela"], hidden=True, brief="Reloads all cogs, [if not loaded previously, then loads the cog]")
-@commands.is_owner()
-async def reloadall(ctx):
-    success_s = ""
-    tick = bot.get_emoji(880695423516430336)
-    for e in ALL_EXTENSIONS:
-        try:
-            bot.reload_extension(e)
-            tt = f"{str(tick)} `{e.split('cogs.')[-1]}`\n"
-            success_s += tt
-        except commands.ExtensionNotLoaded:
-            bot.load_extension(e)
-            tt = f"{str(tick)} `{e.split('cogs.')[-1]}`\n"
-            success_s += tt
-    em = discord.Embed(
-        title="Success!", description=f"Successfully reloaded these cogs!\n{success_s}", color=0x2F3136)
-    await ctx.channel.send(embed=em)
+# @_unloadcog.error
+# async def _unloadcogerror(ctx, error):
+#     await ctx.channel.send(f"`Error`: `{error}`")
+
+
+# @bot.command(name="reloadall", aliases=["ra", "rela"], hidden=True, brief="Reloads all cogs, [if not loaded previously, then loads the cog]")
+# @commands.is_owner()
+# async def reloadall(ctx):
+#     success_s = ""
+#     tick = bot.get_emoji(880695423516430336)
+#     for e in ALL_EXTENSIONS:
+#         try:
+#             bot.reload_extension(e)
+#             tt = f"{str(tick)} `{e.split('cogs.')[-1]}`\n"
+#             success_s += tt
+#         except commands.ExtensionNotLoaded:
+#             bot.load_extension(e)
+#             tt = f"{str(tick)} `{e.split('cogs.')[-1]}`\n"
+#             success_s += tt
+#     em = discord.Embed(
+#         title="Success!", description=f"Successfully reloaded these cogs!\n{success_s}", color=0x2F3136)
+#     await ctx.channel.send(embed=em)
     
 
-@reloadall.error
-async def reloadallerror(ctx, error):
-    await ctx.channel.send(f"`ERROR` : `{error}`")
+# @reloadall.error
+# async def reloadallerror(ctx, error):
+#     await ctx.channel.send(f"`ERROR` : `{error}`")
 
 
-@bot.command(name="reloadcog", aliases=["rc", "r"], hidden=True, brief="Reloads a cog")
-@commands.is_owner()
-async def _reloadcog(ctx, *, cogname: str):
-    try:
-        tick = bot.get_emoji(880695423516430336)
-        cname = difflib.get_close_matches(cogname.lower(), ALL_EXTENSIONS, n=1, cutoff= 0.5)
-        cname = cname[0]
-        bot.reload_extension(cname)
-        em = discord.Embed(
-            title=f"Cogs Reloader", description=f"{tick} Successfully reloaded the cog `{cname}`", timestamp=ctx.message.created_at)
-        await ctx.channel.send(embed=em)
-    except commands.ExtensionNotLoaded:
-        await ctx.channel.send("This cog was not loaded")
+# @bot.command(name="reloadcog", aliases=["rc", "r"], hidden=True, brief="Reloads a cog")
+# @commands.is_owner()
+# async def _reloadcog(ctx, *, cogname: str):
+#     try:
+#         tick = bot.get_emoji(880695423516430336)
+#         cname = difflib.get_close_matches(cogname.lower(), ALL_EXTENSIONS, n=1, cutoff= 0.5)
+#         cname = cname[0]
+#         bot.reload_extension(cname)
+#         em = discord.Embed(
+#             title=f"Cogs Reloader", description=f"{tick} Successfully reloaded the cog `{cname}`", timestamp=ctx.message.created_at)
+#         await ctx.channel.send(embed=em)
+#     except commands.ExtensionNotLoaded:
+#         await ctx.channel.send("This cog was not loaded")
 
 
-@_reloadcog.error
-async def reloaderror(ctx, error):
-    await ctx.channel.send(f"`ERROR` : `{error}`")
+# @_reloadcog.error
+# async def reloaderror(ctx, error):
+#     await ctx.channel.send(f"`ERROR` : `{error}`")
 
-if __name__ == "__main__":
-    bot.loop.run_until_complete(create_db_pool())
-    bot.loop.create_task(run_once_when_ready())
-    ready()
-    bot.run(TOKEN)
+# if __name__ == "__main__":
+#     bot.loop.run_until_complete(create_db_pool())
+#     bot.loop.create_task(run_once_when_ready())
+#     ready()
+#     bot.run(TOKEN)
 
+
+async def kickstart():
+
+    logger = logging.getLogger('discord')
+    logger.setLevel(logging.WARNING)
+    handler = logging.FileHandler(
+        filename='discord.log', encoding='utf-8', mode='w')
+    handler.setFormatter(logging.Formatter(
+        '%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    logger.addHandler(handler)
+
+    async with ClientSession() as my_client:
+        exts = INITIAL_EXTENSIONS
+        async with SnowdenBot(
+            command_prefix=get_prefix,
+            initial_extensions=exts,
+            webc_client=my_client, 
+
+            intents=intents, 
+            testing_guild_id=874735250842984458,
+            case_insensitive=True, 
+            strip_after_prefix=True, 
+            chunk_guilds_at_startup = False
+        ) as bot:
+            bot.logger = logger
+            bot.loop.create_task(run_once_when_ready(bot))
+            await bot.start(TOKEN)
+
+asyncio.run(kickstart())
+
+
+
+
+
+            

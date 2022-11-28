@@ -20,6 +20,9 @@ import games_utils.constants as cs
 from utils.decorators import has_started, is_opted, has_ref_started, can_attack
 from utils.errors import NotStartedPlaying
 from utils.context_managers import UserLock
+
+
+# This cog is not under development anymore and is excluded from the extentions list
 class Battlefield(commands.Cog):
 	"""Snowden's Battlefield cog"""
 	def __init__(self, bot):
@@ -1206,6 +1209,6 @@ class Battlefield(commands.Cog):
 
 	
 
-def setup(bot):
-	bot.add_cog(Battlefield(bot))
+async def setup(bot):
+	await bot.add_cog(Battlefield(bot))
 

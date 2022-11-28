@@ -217,5 +217,5 @@ class Moderation(commands.Cog):
         await channel.set_permissions(ctx.guild.default_role, overwrite = overwrites[ctx.guild.default_role])
         await ctx.send(f"{EMOJIS['greentick']}Unlocked {channel.mention}")
 
-def setup(bot):
-    bot.add_cog(Moderation(bot))
+async def setup(bot):
+    await bot.add_cog(Moderation(bot))

@@ -120,5 +120,5 @@ class Owner(commands.Cog):
 		await ctx.send(f"{cs.EMOJIS['greentick']} forgave / unblacklisted {user} for {reason}")
 
 
-def setup(bot):
-	bot.add_cog(Owner(bot))
+async def setup(bot):
+	await bot.add_cog(Owner(bot))
