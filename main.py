@@ -57,7 +57,7 @@ def get_prefix(bot, message):
 
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
-intents = discord.Intents(messages=True, guilds=True,
+intents = discord.Intents(message_content=True, guilds=True,
                           reactions=True, members=True, emojis=True, bans = True)
 
 
@@ -313,7 +313,7 @@ async def kickstart():
             command_prefix=get_prefix,
             initial_extensions=exts,
             web_client=my_client, 
-            intents=discord.Intents.all(), 
+            intents=intents, 
             testing_guild_id=874735250842984458,
             case_insensitive=True, 
             strip_after_prefix=True, 
