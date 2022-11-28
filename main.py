@@ -126,7 +126,7 @@ class SnowdenBot(commands.AutoShardedBot):
             check = await self.can_run(ctx, call_once=flags.pop("call_once", True))
             if check or not flags.pop("call_check", True):
                 ctx.running = True
-                await ctx.trigger_typing()
+                #await ctx.trigger_typing() # trigger_typing removed in 2.0
                 await ctx.command.invoke(ctx)
             else:
                 raise commands.CheckFailure('The global check once functions failed.')
