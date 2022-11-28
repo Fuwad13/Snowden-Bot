@@ -312,8 +312,7 @@ async def kickstart():
         async with SnowdenBot(
             command_prefix=get_prefix,
             initial_extensions=exts,
-            webc_client=my_client, 
-
+            web_client=my_client, 
             intents=intents, 
             testing_guild_id=874735250842984458,
             case_insensitive=True, 
