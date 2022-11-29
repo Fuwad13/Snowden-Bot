@@ -1,6 +1,7 @@
 import asyncio
 from collections import defaultdict
 import datetime as dt
+import json
 import time
 
 import discord
@@ -96,17 +97,26 @@ class ClistReminder(commands.Cog):
         if current_timestamp - last_cache_timestamp < 1800:
             # if last cache was less than 30 minutes ago
             return
-        data = await _query_api()
+        data = await _query_api() # list of dicts
+        data_dict = {}
+        cnt = 0
+
+        for i in data:
+            data_dict[cnt] = i
+            cnt += 1
+        data_json = json.dumps(data_dict)
         query = """ UPDATE clistdata SET api_data = $1 WHERE id = $2; """
-        await self.bot.db.execute(query, data, 2022)
+        await self.bot.db.execute(query, data_json, 2022)
+        self.last_cache_timestamp = current_timestamp
          
     async def generate_contest_cache(self):
         print("Generating contest cache")
         await self.cache_contests()
         query = """ SELECT api_data FROM clistdata WHERE id = $1; """
         data = await self.bot.db.fetchval(query, 2022)
+        data_dict : dict= json.loads(data)
 
-        contests = [Round(contest) for contest in data]
+        contests = [Round(contest) for k, contest in data_dict.items()]
         self.contest_cache = [
             contest for contest in contests if contest.is_desired(_WEBSITE_ALLOWED_PATTERNS, _WEBSITE_DISALLOWED_PATTERNS)]
         
