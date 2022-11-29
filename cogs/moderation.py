@@ -161,29 +161,6 @@ class Moderation(commands.Cog):
         embed = discord.Embed(title= f"{EMOJIS['greentick']} {member} has been kicked || reason : {reason[:180:]}...")
         await ctx.send(embed = embed)
     
-    # @commands.command(name= 'ban', brief = "Ban a member/user for breaking rules or being annoying.", help = "Ban a member from your server for breaking rules or being an annoying person.")
-    # @commands.has_permissions(ban_members = True)
-    # @commands.bot_has_permissions(ban_members = True)
-    # async def _ban(self, ctx, member : discord.User, *, reason : str = None):
-    #     if member == ctx.author:
-    #         return await ctx.send(f"{EMOJIS['redtick']}You can't kick yourself.", ephemeral = True)
-    #     if (ctx.me.top_role <= member.top_role) or member.id == ctx.guild.owner_id :
-    #         return await ctx.send(f"{EMOJIS['redtick']}Can't kick that member as they are in a higher role position than me.", ephemeral = True)
-    #     perms = member.guild_permissions
-    #     if perms.administrator or perms.manage_guild or perms.ban_members or perms.kick_members or perms.manage_channels:
-    #         return await ctx.send(f"{EMOJIS['redtick']}Can't kick that member as they have mod/admin perms.", ephemeral = True)
-    #     if not reason:
-    #         reason = "No reason provided"
-    #     reason = reason[:450:] + f"\nResponsible Moderator: {ctx.author} - "
-    #     try:
-    #         await member.send(f"You have been kicked from {ctx.guild.name}\n {reason}")
-
-    #     except:
-    #         pass
-    #     await member.kick(reason= reason)
-
-    #     embed = discord.Embed(title= f"{EMOJIS['greentick']} {member} has been kicked || reason : {reason[:180:]}...")
-    #     await ctx.send(embed = embed)
 
     @commands.group(name= 'lock', aliases = ['lockdown'], brief = "Disable `Send messages` permission for everyone.", help = "Disable `Send messages` permission for everyone for a channel.Specify a time to unlock the channel for everyone.", slash_command = False, invoke_without_command = True)
     @commands.has_permissions(manage_channels = True, manage_permissions = True)
