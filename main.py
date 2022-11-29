@@ -101,9 +101,7 @@ class SnowdenBot(commands.AutoShardedBot):
 
         await self.tree.sync()
 
-        credential = "postgres://clolcvsq:CfTT4598q4EH7ozpkz8vzgUjaZolLlhj@peanut.db.elephantsql.com/clolcvsq"
-        self.db = await asyncpg.create_pool(dsn = f'{credential}')
-        print("connected to database")
+        
 
     async def on_ready(self):
         self.uptime = int(time.time())
@@ -326,7 +324,9 @@ async def kickstart():
             case_insensitive=True, 
             strip_after_prefix=True, 
             chunk_guilds_at_startup = False
-        ) as bot:
+        ) as bot, asyncpg.create_pool(
+            dsn="postgres://clolcvsq:CfTT4598q4EH7ozpkz8vzgUjaZolLlhj@peanut.db.elephantsql.com/clolcvsq") as db:
+            bot.db = db
             bot.logger = logger
             bot.loop.create_task(run_once_when_ready(bot))
             
@@ -335,6 +335,9 @@ async def kickstart():
 
 if __name__ == "__main__":
     asyncio.run(kickstart())
+
+
+
 
 
 
