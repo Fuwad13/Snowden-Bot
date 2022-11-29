@@ -23,12 +23,14 @@ from utils import help_cmd , buttons_and_selects
 from utils.context_managers import UserLock
 from utils.errors import Blacklisted
 
+
+#for mobile online status
 def source(o):
     s = inspect.getsource(o).split("\n")
     indent = len(s[0]) - len(s[0].lstrip())
     return "\n".join(i[indent:] for i in s)
 
-
+# for mobline online status
 def ready():
   source_ = source(discord.gateway.DiscordWebSocket.identify)
   patched = re.sub(
@@ -98,6 +100,10 @@ class SnowdenBot(commands.AutoShardedBot):
             await self.tree.sync(guild = guild)
 
         await self.tree.sync()
+
+        credential = "postgres://clolcvsq:CfTT4598q4EH7ozpkz8vzgUjaZolLlhj@peanut.db.elephantsql.com/clolcvsq"
+        self.db = await asyncpg.create_pool(dsn = f'{credential}')
+        print("connected to database")
 
     async def on_ready(self):
         self.uptime = int(time.time())
@@ -181,11 +187,11 @@ ALL_EXTENSIONS = ['cogs.games',
 
 # database
 
-async def create_db_pool(bot):
-    #credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
-    credential = "postgres://clolcvsq:CfTT4598q4EH7ozpkz8vzgUjaZolLlhj@peanut.db.elephantsql.com/clolcvsq"
-    bot.db = await asyncpg.create_pool(dsn = f'{credential}')
-    print("connected to database")
+# async def create_db_pool(bot):
+#     #credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
+#     credential = "postgres://clolcvsq:CfTT4598q4EH7ozpkz8vzgUjaZolLlhj@peanut.db.elephantsql.com/clolcvsq"
+#     bot.db = await asyncpg.create_pool(dsn = f'{credential}')
+#     print("connected to database")
 
 #events =========
 # @bot.check
@@ -205,7 +211,7 @@ async def create_db_pool(bot):
 async def run_once_when_ready(bot : SnowdenBot):
     await bot.wait_until_ready()
     await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name=f"Snowflakes"))
-    await create_db_pool(bot)
+    
 
 # @bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=True, brief="Loads a cog")
 # @commands.is_owner()
@@ -323,8 +329,7 @@ async def kickstart():
         ) as bot:
             bot.logger = logger
             bot.loop.create_task(run_once_when_ready(bot))
-            #bot.loop.run_until_complete(create_db_pool(bot))
-            ready()
+            
             await bot.start(TOKEN)
 
 
