@@ -101,7 +101,8 @@ class ClistReminder(commands.Cog):
         await self.bot.db.execute(query, data, 2022)
          
     async def generate_contest_cache(self):
-        self.cache_contests()
+        print("Generating contest cache")
+        await self.cache_contests()
         query = """ SELECT api_data FROM clistdata WHERE id = $1; """
         data = await self.bot.db.fetchval(query, 2022)
 
@@ -112,7 +113,7 @@ class ClistReminder(commands.Cog):
     
     async def _update_task(self):
         self.bot.logger.info(f'Updating reminder tasks.')
-        self.generate_contest_cache()
+        await self.generate_contest_cache()
         contest_cache = self.contest_cache
         current_time = dt.datetime.utcnow()
 
