@@ -322,7 +322,7 @@ async def kickstart():
         ) as bot:
             bot.logger = logger
             bot.loop.create_task(run_once_when_ready(bot))
-            bot.loop.run_until_complete(create_db_pool())
+            bot.loop.run_until_complete(create_db_pool(bot))
             ready()
             await bot.start(TOKEN)
 
