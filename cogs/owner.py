@@ -14,7 +14,7 @@ class Owner(commands.Cog):
 		self.bfh = helper.BattleFieldHelper(bot)
 
 	
-	
+
 
 
 	# previous codes
@@ -51,12 +51,12 @@ class Owner(commands.Cog):
 	# 	await ctx.send("Ok")
 
 	
-	@db.command(name = 'fetchval', aliases = ['getval'], hidden = True)
-	@commands.is_owner()
-	async def _fetchval(self, ctx, query: str, arg: int):
+	# @db.command(name = 'fetchval', aliases = ['getval'], hidden = True)
+	# @commands.is_owner()
+	# async def _fetchval(self, ctx, query: str, arg: int):
 		
-		val = await self.bot.db.fetchval(query, arg)
-		await ctx.send(val)
+	# 	val = await self.bot.db.fetchval(query, arg)
+	# 	await ctx.send(val)
 
 	# @commands.command(name = '/updateinv', aliases = ['/updinv', '/updateinventory'], hidden = True)
 	# @commands.is_owner()
