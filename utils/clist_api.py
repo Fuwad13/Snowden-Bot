@@ -5,7 +5,7 @@ import json
 from discord.ext import commands
 
 C_BASE_URL = "https://clist.by/api/v1/contest/"
-C_CREDENTIALS = "username=fuwad2&api_key=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"
+C_CREDENTIALS = "username=fuwad2&api_key=f4caba195a30836df60a2d40d4136fe08243bf3c"
 # credential stuffs
 # https://clist.by/api/v1/contest//?username=fuwad2&api_key=f4caba195a30836df60a2d40d4136fe08243bf3c
 

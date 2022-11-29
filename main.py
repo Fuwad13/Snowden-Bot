@@ -210,7 +210,7 @@ ALL_EXTENSIONS = ['cogs.games',
 async def run_once_when_ready(bot : SnowdenBot):
     await bot.wait_until_ready()
     await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name=f"Snowflakes"))
-    await bot.clist_cog._update_task()
+    bot.loop.create_task(bot.clist_cog._update_task())
     
 
 # @bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=True, brief="Loads a cog")
