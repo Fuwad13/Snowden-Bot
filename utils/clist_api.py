@@ -66,6 +66,8 @@ class Round:
 
 
 async def _query_api():
+
+    """gets the data from the api and returns the json data of contests found"""
     contests_start_time = dt.datetime.utcnow() - dt.timedelta(days=2)
     contests_start_time_string = contests_start_time.strftime(
         "%Y-%m-%dT%H%%3A%M%%3A%S")

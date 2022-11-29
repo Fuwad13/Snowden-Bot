@@ -109,6 +109,7 @@ class SnowdenBot(commands.AutoShardedBot):
         print(f'logged in as {self.user}')
 
 
+
     def add_user_lock(self, lock : UserLock):
         self.user_lock.update({lock.user.id: lock})
 
@@ -175,7 +176,7 @@ class SnowdenBot(commands.AutoShardedBot):
 #     command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True, chunk_guilds_at_startup = False)
 
 # extensions
-INITIAL_EXTENSIONS = ['cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'cogs.owner', 'jishaku']
+INITIAL_EXTENSIONS = ['cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'cogs.owner', 'jishaku', 'cogs.clist']
 
 ALL_EXTENSIONS = ['cogs.games',
                   'cogs.image', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner', 'cogs.utility']
@@ -209,6 +210,7 @@ ALL_EXTENSIONS = ['cogs.games',
 async def run_once_when_ready(bot : SnowdenBot):
     await bot.wait_until_ready()
     await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name=f"Snowflakes"))
+    await bot.clist_cog._update_task()
     
 
 # @bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=True, brief="Loads a cog")
@@ -329,6 +331,7 @@ async def kickstart():
             bot.db = db
             bot.logger = logger
             bot.loop.create_task(run_once_when_ready(bot))
+            
             
             await bot.start(TOKEN)
 
