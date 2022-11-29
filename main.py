@@ -175,7 +175,7 @@ class SnowdenBot(commands.AutoShardedBot):
 #     command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True, chunk_guilds_at_startup = False)
 
 # extensions
-INITIAL_EXTENSIONS = ['cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'cogs.owner']
+INITIAL_EXTENSIONS = ['cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'cogs.owner', 'jishaku']
 
 ALL_EXTENSIONS = ['cogs.games',
                   'cogs.image', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner', 'cogs.utility']
