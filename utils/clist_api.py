@@ -70,7 +70,7 @@ async def _query_api():
     """gets the data from the api and returns the json data of contests found"""
     contests_start_time = dt.datetime.utcnow() - dt.timedelta(days=2)
     contests_start_time_string = contests_start_time.strftime(
-        "%Y-%m-%dT%H%:%M:%S")
+        "%Y-%m-%dT%H:%M:%S")
     url = C_BASE_URL + '?limit=200&start__gte=' + \
         contests_start_time_string + '&' + C_CREDENTIALS
     print(f"Querying API: {url}")
