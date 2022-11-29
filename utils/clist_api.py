@@ -73,6 +73,7 @@ async def _query_api():
         "%Y-%m-%dT%H%%3A%M%%3A%S")
     url = C_BASE_URL + '?limit=200&start__gte=' + \
         contests_start_time_string + '&' + C_CREDENTIALS
+    print(f"Querying API: {url}")
     
     try:
         async with aiohttp.ClientSession() as cl_session:
