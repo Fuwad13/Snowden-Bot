@@ -152,19 +152,23 @@ class ClistReminder(commands.Cog):
         # Keep most recent _FINISHED_LIMIT
         self.finished_contests = \
             self.finished_contests[:_FINISHED_CONTESTS_LIMIT]
+        await self._reschedule_tasks()
         
         await asyncio.sleep(_CONTEST_REFRESH_PERIOD)
         self.bot.loop.create_task(self._update_task())
 
-    def _reschedule_tasks(self):
+    async def _reschedule_tasks(self):
         role_id = 1047221079950757918
+
         channel_id = 1047199249227591791
+        channel = self.bot.get_channel(channel_id)
         guild = self.bot.get_guild(874735250842984458)
+        role = guild.get_role(role_id)
         before = [600, 7200, 86400]
         if len(self.future_contests):
             for contest in self.future_contests:
                 for before_secs in before:
-                    ...
+                    await self._send_reminder_at(channel, role, contest, before_secs, contest.start_time.timestamp(), "utc+6")
 
     async def _send_reminder_at(self, channel, role, contests, before_secs, send_time,
                             localtimezone):
