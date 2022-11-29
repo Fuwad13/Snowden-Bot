@@ -1138,7 +1138,7 @@ class Battlefield(commands.Cog):
 	@commands.cooldown(1, 15, BucketType.user)
 	async def trivia(self, ctx):
 		url = "https://opentdb.com/api.php?amount=1&type=multiple"
-		async with self.bot.session.get(url) as resp:
+		async with self.bot.my_client.get(url) as resp:
 			js = await resp.json()
 			if not js['response_code'] == 0:
 				return await ctx.send(f"Something went wrong, can't get any questions for you rn.")

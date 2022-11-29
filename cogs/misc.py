@@ -3,10 +3,13 @@ import aiohttp
 from discord.ext import commands
 from discord.ext.commands import BucketType
 
+from main import SnowdenBot
+
+
 
 class Miscellanous(commands.Cog):
 	"""Miscellanous cog"""
-	def __init__(self, bot):
+	def __init__(self, bot : SnowdenBot):
 		self.bot = bot
 
 	@commands.command(name = 'tounix', aliases = ['2uinx', 'tu'], slash_command = False, help= "Get unix timestamp from datetime. Datetime example = 2020/11/25 12:56:54" )
@@ -16,7 +19,7 @@ class Miscellanous(commands.Cog):
 		datetime = datetime.replace('.', '/')
 		base_url = "https://showcase.api.linx.twenty57.net/UnixTime/tounixtimestamp?datetime="
 		url = base_url+datetime
-		async with self.bot.session.get(url) as resp:
+		async with self.bot.my_client.get(url) as resp:
 			try:
 				js = await resp.json()
 				
@@ -36,7 +39,7 @@ class Miscellanous(commands.Cog):
 		t_str = str(timestamp)
 		base_url = "https://showcase.api.linx.twenty57.net/UnixTime/fromunixtimestamp?unixtimestamp="
 		url = base_url+t_str
-		async with self.bot.session.get(url) as resp:
+		async with self.bot.my_client.get(url) as resp:
 			try:
 				js = await resp.json()
 				
@@ -108,6 +111,11 @@ class Miscellanous(commands.Cog):
 				return await ctx.reply(embed=embed, mention_author=False)
 		else:
 			await ctx.send("City not found.", ephemeral = True)
+
+	
+		
+
+
 	
 
 	

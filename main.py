@@ -77,7 +77,7 @@ class SnowdenContext(commands.Context):
 class SnowdenBot(commands.AutoShardedBot):
     def __init__(self, *args ,initial_extensions : List[str], web_client : ClientSession, testing_guild_id : Optional[int] = None , **kwargs):
         super().__init__(*args, **kwargs)
-        self.my_client = web_client
+        self.my_client = web_client #  my client session
         self.testing_guild_id = testing_guild_id
         self.initial_extensions = initial_extensions
         self.blacklist = {}
@@ -181,10 +181,11 @@ ALL_EXTENSIONS = ['cogs.games',
 
 # database
 
-# async def create_db_pool():
-#     credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
-#     bot.db = await asyncpg.create_pool(dsn = f'{credential}')
-#     bot.session = aiohttp.ClientSession()
+async def create_db_pool(bot):
+    #credential = "postgres://jqqsebpbrbqxac:7a794f0e39633d490eb582e9dd531b77e85af2995eddd9c9f9fc8ce2b72a4f07@ec2-44-198-204-136.compute-1.amazonaws.com:5432/d5ipdv1nvq274t"
+    credential = "postgres://clolcvsq:CfTT4598q4EH7ozpkz8vzgUjaZolLlhj@peanut.db.elephantsql.com/clolcvsq"
+    bot.db = await asyncpg.create_pool(dsn = f'{credential}')
+    print("connected to database")
 
 #events =========
 # @bot.check
@@ -321,9 +322,14 @@ async def kickstart():
         ) as bot:
             bot.logger = logger
             bot.loop.create_task(run_once_when_ready(bot))
+            bot.loop.run_until_complete(create_db_pool())
+            ready()
             await bot.start(TOKEN)
 
-asyncio.run(kickstart())
+
+if __name__ == "__main__":
+    asyncio.run(kickstart())
+
 
 
 
