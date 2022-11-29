@@ -205,6 +205,7 @@ async def create_db_pool(bot):
 async def run_once_when_ready(bot : SnowdenBot):
     await bot.wait_until_ready()
     await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name=f"Snowflakes"))
+    await create_db_pool(bot)
 
 # @bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=True, brief="Loads a cog")
 # @commands.is_owner()
@@ -322,7 +323,7 @@ async def kickstart():
         ) as bot:
             bot.logger = logger
             bot.loop.create_task(run_once_when_ready(bot))
-            bot.loop.create_task(create_db_pool(bot))
+            #bot.loop.run_until_complete(create_db_pool(bot))
             ready()
             await bot.start(TOKEN)
 
