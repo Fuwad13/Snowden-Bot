@@ -82,6 +82,7 @@ async def _query_api():
                 data = await response.json() # type : dict
                 return data['objects'] # type : list
     except Exception as e:
+        print(e)
         raise ClientError from e
 
 
