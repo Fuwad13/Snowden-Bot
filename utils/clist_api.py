@@ -31,6 +31,7 @@ class Round:
         self.start_time = dt.datetime.strptime(
             round['start'], '%Y-%m-%dT%H:%M:%S')
         self.duration = dt.timedelta(seconds=round['duration'])
+        self.duration_in_seconds = round['duration']
         self.url = round['href']
         self.website = round['resource']['name']
         self.website_id = round['resource']['id']

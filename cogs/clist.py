@@ -6,6 +6,7 @@ import time
 
 import discord
 from discord.ext import commands
+import humanize
 from main import SnowdenBot
 from utils.clist_api import Round, _query_api
 
@@ -72,6 +73,9 @@ class ClistReminder(commands.Cog):
         self.future_contests = None
         self.running_contests = None
         self.finished_contests = None
+        self.task_list = []
+        self.start_time_map = defaultdict(list)
+
         
 
 
@@ -149,6 +153,10 @@ class ClistReminder(commands.Cog):
             reverse=True
         )
         self.future_contests.sort(key=lambda contest: contest.start_time)
+
+        self.start_time_map.clear()
+        for contest in self.future_contests:
+            self.start_time_map[int(contest.start_time.timestamp())].append(contest)
         # Keep most recent _FINISHED_LIMIT
         self.finished_contests = \
             self.finished_contests[:_FINISHED_CONTESTS_LIMIT]
@@ -158,6 +166,9 @@ class ClistReminder(commands.Cog):
         self.bot.loop.create_task(self._update_task())
 
     async def _reschedule_tasks(self):
+        for task in self.task_list:
+            task.cancel()
+        self.task_list.clear()
         role_id = 1047221079950757918
 
         channel_id = 1047199249227591791
@@ -165,18 +176,28 @@ class ClistReminder(commands.Cog):
         guild = self.bot.get_guild(874735250842984458)
         role = guild.get_role(role_id)
         before = [600, 7200, 86400]
-        if len(self.future_contests):
-            for contest in self.future_contests:
-                for before_secs in before:
-                    await self._send_reminder_at(channel, role, contest, before_secs, contest.start_time.timestamp(), "utc+6")
+        for start_time, contests in self.start_time_map.items():
+            for before_secs in before:
+                task = self.bot.loop.create_task(self._send_reminder_at(channel, role, contests, before_secs, start_time))
+                self.task_list.append(task)
+                        
+                    
+                    
 
-    async def _send_reminder_at(self, channel, role, contests, before_secs, send_time,
-                            localtimezone):
+    async def _send_reminder_at(self, channel, role, contests, before_secs, start_time):
+        send_time = start_time - before_secs
         delay = send_time - dt.datetime.utcnow().timestamp()
         if delay <= 0:
             return
         await asyncio.sleep(delay)
-        await channel.send("Test")
+
+        embed = discord.Embed(title="Contest Reminder", color=0x2F3136)
+        for contest in contests:
+            embed.add_field(
+                name=f"**{contest.name}**", 
+                value=f"Start time: <t:{start_time}:F> | <t:{start_time}:R>\nDuration: {humanize.precisedelta(contest.duration_in_seconds)}\n[link]({contest.url} \"Link to contest\")")
+        await channel.send(f"{role.mention}", embed=embed)
+        
             
         
 
