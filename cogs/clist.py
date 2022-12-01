@@ -191,7 +191,7 @@ class ClistReminder(commands.Cog):
             return
         await asyncio.sleep(delay)
 
-        embed = discord.Embed(title="Contest Reminder", description=f"About to start in {humanize.precisedelta(before_secs)}" color=0x2F3136)
+        embed = discord.Embed(title="Contest Reminder", description=f"About to start in {humanize.precisedelta(before_secs)}" ,color=0x2F3136)
         for contest in contests:
             embed.add_field(
                 name=f"**{contest.name}**", 
