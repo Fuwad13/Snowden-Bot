@@ -211,28 +211,28 @@ class ClistReminder(commands.Cog):
         for contest in self.finished_contests:
             embed.add_field(
                 name=f"**{contest.name}**", 
-                value=f"Start time: <t:{int(contest.start_time.timestamp())}:F> | <t:{int(contest.start_time.timestamp())}:R>\nDuration: {humanize.precisedelta(contest.duration_in_seconds)}\n[link]({contest.url} \"Link to contest\")", inline=True)
+                value=f"Start time: <t:{int(contest.start_time.timestamp())}:F> | <t:{int(contest.start_time.timestamp())}:R>\nDuration: {humanize.precisedelta(contest.duration_in_seconds)}\n[link]({contest.url} \"Link to contest\")", inline=False)
 
         await ctx.send(embed=embed)
     
-    @clist.command(name="acive",help="List currently running contests")
+    @clist.command(name="active",help="List currently running contests")
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _active(self, ctx : commands.Context):
         embed = discord.Embed(title="Currently running contests", color=0x2F3136)
         for contest in self.running_contests:
             embed.add_field(
                 name=f"**{contest.name}**", 
-                value=f"Start time: <t:{int(contest.start_time.timestamp())}:F> | <t:{int(contest.start_time.timestamp())}:R>\nDuration: {humanize.precisedelta(contest.duration_in_seconds)}\n[link]({contest.url} \"Link to contest\")", inline=True)
+                value=f"Start time: <t:{int(contest.start_time.timestamp())}:F> | <t:{int(contest.start_time.timestamp())}:R>\nDuration: {humanize.precisedelta(contest.duration_in_seconds)}\n[link]({contest.url} \"Link to contest\")", inline=False)
         await ctx.send(embed=embed)
 
     @clist.command(name="future",aliases = ["upcoming"],help="List upcoming contests")
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def _future(self, ctx : commands.Context):
         embed = discord.Embed(title="Upcoming contests", color=0x2F3136)
-        for contest in self.future_contests:
+        for contest in self.future_contests[:5]:
             embed.add_field(
                 name=f"**{contest.name}**", 
-                value=f"Start time: <t:{int(contest.start_time.timestamp())}:F> | <t:{int(contest.start_time.timestamp())}:R>\nDuration: {humanize.precisedelta(contest.duration_in_seconds)}\n[link]({contest.url} \"Link to contest\")", inline=True)
+                value=f"Start time: <t:{int(contest.start_time.timestamp())}:F> | <t:{int(contest.start_time.timestamp())}:R>\nDuration: {humanize.precisedelta(contest.duration_in_seconds)}\n[link]({contest.url} \"Link to contest\")", inline=False)
         await ctx.send(embed=embed)
 
             
