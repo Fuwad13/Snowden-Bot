@@ -65,7 +65,7 @@ class Events(commands.Cog):
             if e.target.id == member.id:
                 embed.description+=f"\nModerator: {e.user.mention}\nReason: {e.reason}"
                 await msg.edit(embed = embed)
-                await msg.add_reaction("\U0001f1eb")
+                await msg.add_reaction("\U0001f1f1")
                 break
 
 
