@@ -176,7 +176,7 @@ class SnowdenBot(commands.AutoShardedBot):
 #     command_prefix=get_prefix, intents=intents, case_insensitive=True, strip_after_prefix=True, chunk_guilds_at_startup = False)
 
 # extensions
-INITIAL_EXTENSIONS = ['cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'cogs.owner', 'jishaku', 'cogs.clist']
+INITIAL_EXTENSIONS = ['cogs.image','cogs.moderation', 'cogs.info', "cogs.misc",'cogs.error_handler','cogs.events', 'cogs.owner', 'jishaku']
 
 ALL_EXTENSIONS = ['cogs.games',
                   'cogs.image', 'cogs.info', "cogs.misc",'cogs.automod', 'cogs.error_handler','cogs.events', 'jishaku', 'cogs.owner', 'cogs.utility']
@@ -210,7 +210,7 @@ ALL_EXTENSIONS = ['cogs.games',
 async def run_once_when_ready(bot : SnowdenBot):
     await bot.wait_until_ready()
     await bot.change_presence(status=discord.Status.online, activity=discord.Activity(type=discord.ActivityType.watching, name=f"Snowflakes"))
-    bot.loop.create_task(bot.clist_cog._update_task())
+    # bot.loop.create_task(bot.clist_cog._update_task())
     
 
 # @bot.command(name="loadcog", aliases=['lc', 'loadc'], hidden=True, brief="Loads a cog")
